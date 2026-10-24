@@ -361,7 +361,7 @@ function mkSample(){
  return s;
 }
 /* ---------- state ---------- */
-const S={mode:'sample',theme:'light',d:null,view:'month',cur:NOW,hist:[],nc:null,nid:null,logIc:'📝',hau:'',mm:'text',rf:null,pk:null,cb:null,hid:null,hic:'star'};
+const S={mode:'sample',theme:'light',d:null,view:'month',cur:NOW,hist:[],nc:null,nid:null,logIc:'📝',hau:'',ai:{range:'all',anon:true,memo:false},mm:'text',rf:null,pk:null,cb:null,hid:null,hic:'star'};
 let PH={};
 const TABS=['year','month','week','day','notes','habit','goal','setting'];
 const gd=k=>S.d.days[k]||null;
@@ -564,7 +564,8 @@ function vSetting(){
  '<div class="set"><span class="lb">활동링 목표</span><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">'+[['mv','움직이기','kcal'],['ex','운동','분'],['st','일어서기','시간']].map(a=>'<div class="arow"><span style="width:76px">'+a[1]+'</span><input class="nu sm" inputmode="numeric" pattern="[0-9]*" maxlength="4" data-f="rg:'+a[0]+'" value="'+S.d.rg[a[0]]+'"><small>'+a[2]+'</small></div>').join('')+'</div></div>'+
  '<div class="set"><span class="lb">노트 카테고리</span><div class="chips">'+S.d.cats.map((c,i)=>'<span class="chip">'+esc(c)+' <button data-a="delCat" data-i="'+i+'" style="color:var(--mut)">✕</button></span>').join('')+'</div><form class="addf" data-form="cat"><input placeholder="+ 카테고리 추가" enterkeyhint="done"><button class="go">↵</button></form></div>'+
  '<div class="set"><span class="lb">Google 캘린더 연동</span><p>가져온 일정 <b>'+(S.d.gcal||[]).length+'</b>칸 · 가져온 일정은 MONTH(글자) · WEEK · DAY에 보여요.</p><div class="gr"><label class="btn sm">⬆ 캘린더 일정 가져오기<input type="file" accept=".ics,text/calendar" multiple hidden data-ch="ics"></label><button class="btn sm" data-a="icsOut">⬇ 일기를 캘린더로 내보내기</button>'+((S.d.gcal||[]).length?'<button class="btn sm" data-a="icsClear" style="color:var(--red);border-color:var(--red)">가져온 일정 삭제</button>':'')+'</div><p style="margin-top:10px">① 가져오기: 구글 캘린더(웹) → 설정 → 가져오기/내보내기 → 내보내기로 받은 .ics 파일을 선택해요. 다시 가져오면 같은 일정은 갱신돼요.<br>② 내보내기: 만든 .ics를 구글 캘린더 → 설정 → 가져오기 에서 올리거나, 아이폰에서 파일을 열어 캘린더에 추가해요.<br>③ 하루씩: DAY 화면의 ‘Google 캘린더에 추가’ 버튼으로 그날 기록을 일정으로 바로 만들 수 있어요.</p></div>'+
- '<div class="set"><span class="lb">백업 · 복원</span><p>사진까지 한 파일(JSON)로 저장해요. 브라우저 데이터를 지우기 전에 꼭 백업하세요.</p><div class="gr"><button class="btn sm" data-a="export">⬇ 백업</button><label class="btn sm">⬆ 복원<input type="file" accept=".json,application/json" hidden data-ch="import"></label></div></div>'+
+ '<div class="set"><span class="lb">AI 분석용 내보내기</span><p>ChatGPT, Claude 같은 AI에게 “언제 기분이 좋아지는지” 같은 분석을 맡길 수 있게, 사진을 뺀 표(CSV)와 분석 요청문을 한 파일로 만들어요.</p><button class="btn sm" data-a="aiOpen">🤖 AI 분석용 파일 만들기</button></div>'+
+ '<div class="set"><span class="lb">백업 · 복원</span><p>사진까지 한 파일(JSON)로 저장해요. 복원용이라 AI 분석에는 쓰지 마세요. 브라우저 데이터를 지우기 전에 꼭 백업하세요.</p><div class="gr"><button class="btn sm" data-a="export">⬇ 백업</button><label class="btn sm">⬆ 복원<input type="file" accept=".json,application/json" hidden data-ch="import"></label></div></div>'+
  '<div class="set"><span class="lb">저장 상태</span><p>'+(persistent?'정상 · 브라우저 저장소 사용 중':'임시 · 이 환경에서는 저장소를 쓸 수 없어 새로고침하면 사라져요. 백업을 활용하세요.')+'</p></div>'+
  (sm?'':'<div class="set"><button class="btn sm" data-a="wipe" style="color:var(--red);border-color:var(--red)">내 다이어리 전체 삭제</button></div>');
 }
@@ -711,6 +712,83 @@ function gcalUrl(k,d){
  const f=(d&&d.memo||'').split('\n')[0].slice(0,50),det=d?dayDesc(d).slice(0,900):'';
  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(f||('일기 '+k))+'&dates='+ds8(k)+'/'+ds8(add(k,1))+'&details='+encodeURIComponent(det);
 }
+/* ---------- AI export ---------- */
+const csvc=v=>{v=String(v==null?'':v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+function aiBuild(){
+ const o=S.ai,days=S.d.days;
+ let keys=Object.keys(days).filter(k=>k<=NOW&&written(days[k])).sort();
+ if(o.range==='1y'){const lo=add(NOW,-364);keys=keys.filter(k=>k>=lo)}
+ if(!keys.length)return null;
+ const cnt={};keys.forEach(k=>days[k].pp.forEach(n=>{cnt[n]=(cnt[n]||0)+1}));
+ const order=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||(a<b?-1:1)),map={};
+ order.forEach((n,i)=>{map[n]='사람'+(i+1)});
+ const nm=n=>o.anon?map[n]:n;
+ const hs=S.d.habits;
+ const head=['date','weekday','month','week_of_year','day_of_year','sleep_min','sleep_score','mood_am','mood_pm','mood_avg','move_kcal','exercise_min','stand_hours','steps','read','people_count','met_anyone','people'].concat(o.memo?['memo']:[]).concat(hs.map(h=>'habit_'+h.n.replace(/\s+/g,'_')));
+ const num=v=>v===''||v==null?'':(+v);
+ const rows=keys.map(k=>{
+  const d=days[k],dt=P(k),y=dt.getFullYear();
+  const sm=(d.slH!==''||d.slM!=='')?(+d.slH||0)*60+(+d.slM||0):'';
+  const mv=[d.mA,d.mP].filter(x=>x>0),avg=mv.length?Math.round(mv.reduce((a,b)=>a+b,0)/mv.length*10)/10:'';
+  const r=[k,EN[dt.getDay()],dt.getMonth()+1,isoW(k).w,Math.round((dt-new Date(y,0,0))/864e5),sm,num(d.slS),d.mA||'',d.mP||'',avg,num(d.mv),num(d.ex),num(d.stand),num(d.steps),d.rd?1:0,d.pp.length,d.pp.length?1:0,d.pp.map(nm).join('|')];
+  if(o.memo)r.push((d.memo||'').replace(/\s+/g,' ').trim());
+  hs.forEach(h=>r.push(hv(k,h.id)));
+  return r.map(csvc).join(',');
+ });
+ const csv=[head.map(csvc).join(',')].concat(rows).join('\n');
+ const first=keys[0],last=keys[keys.length-1],span=Math.round((P(last)-P(first))/864e5)+1;
+ const habDesc=hs.map(h=>'habit_'+h.n.replace(/\s+/g,'_')+(autoOf(h)?' ('+autoOf(h).rule(S.d.rg)+'이면 1, 자동 판정)':' (직접 체크: 1=완료, 0.5=절반, 0=미완료)')).join('\n  - ');
+ const L=[];
+ L.push('# 요청');
+ L.push('아래는 내가 매일 기록한 개인 다이어리 데이터(CSV)야. 너는 데이터 분석가로서 이 기록을 분석해서 내 생활 패턴을 알려줘.','');
+ L.push('- 기록 기간: '+first+' ~ '+last+' ('+span+'일 중 '+keys.length+'일 기록)');
+ L.push('- 기록이 없는 날짜는 CSV에 행이 없어(미기록). 결측으로 취급해줘.');
+ L.push('- 빈칸은 입력하지 않은 값이야. 0으로 계산하지 말고 제외해줘.');
+ L.push('- people이 비어 있는 날은 “아무도 만나지 않은 날”로 간주해줘.');
+ if(o.anon)L.push('- 개인정보 보호를 위해 사람 이름은 “사람1, 사람2…”로 바꿨어. 숫자가 작을수록 자주 만난 사람이야.');
+ if(span<365)L.push('- 기록 기간이 1년 미만이라 계절·시기 분석은 “경향” 수준으로만 말해줘.');
+ L.push('','# 컬럼 설명');
+ L.push('- date: 날짜 / weekday: 요일 / month: 월 / week_of_year: 연중 몇 번째 주 / day_of_year: 연중 몇 번째 날');
+ L.push('- sleep_min: 수면 시간(분) / sleep_score: 애플워치 수면 점수(0~100)');
+ L.push('- mood_am, mood_pm: 오전/오후 기분 1~5 (1=매우 나쁨, 5=매우 좋음) / mood_avg: 둘의 평균');
+ L.push('- move_kcal: 활동링 움직이기(kcal) / exercise_min: 운동(분) / stand_hours: 일어서기(시간)');
+ L.push('- steps: 걸음수 / read: 독서 여부(1=읽음)');
+ L.push('- people_count: 만난 사람 수 / met_anyone: 누군가 만났는지(1/0) / people: 만난 사람('+(o.anon?'코드':'이름')+', | 로 구분)');
+ if(o.memo)L.push('- memo: 그날의 짧은 메모');
+ L.push('- 습관 컬럼:');
+ L.push('  - '+habDesc);
+ L.push('','# 분석해줘');
+ L.push('1. 사람: met_anyone이 1인 날과 0인 날의 기분(mood_am, mood_pm, mood_avg) 평균을 비교해줘. 5번 이상 만난 사람이 있다면 사람별로 “그 사람을 만난 날”과 “전체 평균”의 기분 차이도 보여줘.');
+ L.push('2. 운동: exercise_min이 30분 이상인 날과 아닌 날의 같은 날 기분을 비교하고, 다음 날의 sleep_score와 기분도 비교해줘. 걸음수와 move_kcal도 같은 방식으로 봐줘.');
+ L.push('3. 수면: sleep_score, sleep_min과 같은 날 기분의 관계, 그리고 전날 수면과 다음 날 기분의 관계를 알려줘.');
+ L.push('4. 독서와 습관: 독서한 날, 습관을 많이 달성한 날의 기분 차이를 봐줘.');
+ L.push('5. 시기(계절·월): 월별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 평소보다 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지는 시기가 있는지 알려줘.');
+ L.push('6. 요일 패턴이 있는지 알려줘.');
+ L.push('7. 위 모두를 종합해서 “가장 의미 있는 발견 3가지”와, 내가 앞으로 기록하면 분석이 더 정확해질 항목 3가지를 제안해줘.');
+ L.push('','# 지켜줘야 할 것');
+ L.push('- 모든 비교에는 표본 수(n)를 같이 적어줘. n이 10 미만이면 “참고 수준”이라고 표시하고 단정하지 마.');
+ L.push('- 상관관계와 인과관계를 구분해줘. (예: “운동한 날 기분이 높다”는 “운동이 기분을 올린다”는 뜻이 아닐 수 있어.)');
+ L.push('- 숫자는 표로, 해석은 쉬운 한국어로 써줘.');
+ L.push('- 의학적 진단은 하지 말고, 필요해 보이면 “전문가 상담을 고려해볼 수 있다” 정도로만 말해줘.');
+ L.push('','# 데이터 (CSV)','```csv',csv,'```','');
+ const txt=L.join('\n');
+ return {text:txt,name:'diary-ai-'+NOW+'.txt',n:keys.length,map:map,order:order,cnt:cnt,first:first,last:last};
+}
+function aiSheet(){
+ const o=S.ai,r=aiBuild(),ch=(k,v,l)=>'<button class="chip'+(String(o[k])===String(v)?' on':'')+'" data-a="aiOpt" data-k="'+k+'" data-v="'+v+'">'+l+'</button>';
+ let h='<h3>AI 분석용 내보내기</h3>'+(S.mode==='sample'?'<p class="emp" style="font-size:12px">지금은 예시 데이터예요. 흐름을 시험해 보기용이에요.</p>':'')+
+ '<span class="lb">기간</span><div class="chips">'+ch('range','all','전체')+ch('range','1y','최근 1년')+'</div>'+
+ '<span class="lb">사람 이름</span><div class="chips">'+ch('anon','true','익명 처리 (사람1, 사람2…)')+ch('anon','false','실명 그대로')+'</div>'+
+ '<span class="lb">메모</span><div class="chips">'+ch('memo','false','제외')+ch('memo','true','포함')+'</div>';
+ if(!r){return sheet(h+'<p class="emp">내보낼 기록이 없어요.</p><button class="btn" data-a="closeSh">닫기</button>')}
+ const len=r.text.length;
+ h+='<p class="emp" style="font-size:12px;margin-top:10px">기록 <b>'+r.n+'일</b> ('+r.first.replace(/-/g,'.')+' ~ '+r.last.replace(/-/g,'.')+') · 글자 수 약 '+Math.round(len/1000)+'천자'+(len>120000?'<br><b>분량이 커요.</b> 파일로 첨부하거나 ‘최근 1년’을 고르세요.':'')+'</p>';
+ h+='<div class="gr"><button class="btn blk" data-a="aiShare">📤 파일로 공유·저장</button><button class="btn" data-a="aiCopy">📋 전체 복사</button></div><p id="aimsg" class="emp" style="font-size:12px"></p>';
+ if(o.anon&&r.order.length)h+='<span class="lb">이름 대조표 (이 기기에만 보여요)</span><p class="emp" style="font-size:12px">'+r.order.slice(0,12).map(n=>r.map[n]+' = '+esc(n)+' ('+r.cnt[n]+'일)').join('<br>')+(r.order.length>12?'<br>… 외 '+(r.order.length-12)+'명':'')+'</p>';
+ sheet(h+'<button class="btn" data-a="closeSh" style="margin-top:8px">닫기</button>');
+}
+function aiMsg(t){const e=$('#aimsg');if(e)e.textContent=t}
+function aiDl(r){const blob=new Blob([r.text],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=r.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);aiMsg('파일을 내려받았어요. 파일 앱의 ‘다운로드’를 확인하세요.')}
 /* ---------- actions ---------- */
 const A={
  prev(){nav(-1)},next(){nav(1)},
@@ -730,6 +808,13 @@ const A={
  addPp(el){const d=wd(S.cur),n=el.dataset.n;if(d.pp.indexOf(n)<0)d.pp.push(n);save();render(true)},
  delPp(el){wd(S.cur).pp.splice(+el.dataset.i,1);save();render(true)},
  mm(el){S.mm=el.dataset.m;meta();render(true)},
+ aiOpen(){aiSheet()},
+ aiOpt(el){const k=el.dataset.k,v=el.dataset.v;S.ai[k]=(k==='anon'||k==='memo')?v==='true':v;aiSheet()},
+ aiShare(){const r=aiBuild();if(!r)return;let f=null;try{f=new File([r.text],r.name,{type:'text/plain'})}catch(e){}
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'다이어리 AI 분석용'}).then(()=>aiMsg('공유 메뉴에서 선택한 곳에 저장·전달했어요.')).catch(e=>{if(e&&e.name!=='AbortError')aiDl(r)})}else aiDl(r)},
+ aiCopy(){const r=aiBuild();if(!r)return;const t=r.text;
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0;top:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,t.length);let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();aiMsg(ok?'복사했어요. AI 채팅창에 붙여 넣으세요.':'복사에 실패했어요. ‘파일로 공유·저장’을 이용해 주세요.')};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>aiMsg('복사했어요. AI 채팅창에 붙여 넣으세요.')).catch(fb);else fb()},
  goMonthNow(){closeSh();S.mm='text';go('month')},
  icsClear(){ask('가져온 캘린더 일정을 모두 삭제할까요? (일기 기록은 그대로예요)','삭제',()=>{S.d.gcal=[];save();render(true)})},
  icsOut(){
