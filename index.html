@@ -762,7 +762,7 @@ const csvc=v=>{v=String(v==null?'':v);return /[",\n\r]/.test(v)?'"'+v.replace(/"
 function aiBuild(){
  const o=S.ai,days=S.d.days;
  let keys=Object.keys(days).filter(k=>k<=NOW&&written(days[k])).sort();
- if(o.range==='1y'){const lo=add(NOW,-364);keys=keys.filter(k=>k>=lo)}
+ if(o.range==='1y'){const lo=add(NOW,-364);keys=keys.filter(k=>k>=lo)}else if(o.range==='1m'){const lo=add(NOW,-29);keys=keys.filter(k=>k>=lo)}
  if(!keys.length)return null;
  const cnt={};keys.forEach(k=>days[k].pp.forEach(n=>{cnt[n]=(cnt[n]||0)+1}));
  const order=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||(a<b?-1:1)),map={};
@@ -791,7 +791,7 @@ function aiBuild(){
  L.push('- 빈칸은 입력하지 않은 값이야. 0으로 계산하지 말고 제외해줘.');
  L.push('- people이 비어 있는 날은 “아무도 만나지 않은 날”로 간주해줘.');
  if(o.anon)L.push('- 개인정보 보호를 위해 사람 이름은 “사람1, 사람2…”로 바꿨어. 숫자가 작을수록 자주 만난 사람이야.');
- if(span<365)L.push('- 기록 기간이 1년 미만이라 계절·시기 분석은 “경향” 수준으로만 말해줘.');
+ if(o.range==='1m')L.push('- 기록 기간이 최근 한 달이라 표본이 적어. 모든 결론은 “경향” 수준으로만 말해줘.');else if(span<365)L.push('- 기록 기간이 1년 미만이라 계절·시기 분석은 “경향” 수준으로만 말해줘.');
  L.push('','# 컬럼 설명');
  L.push('- date: 날짜 / weekday: 요일 / month: 월 / week_of_year: 연중 몇 번째 주 / day_of_year: 연중 몇 번째 날');
  L.push('- sleep_min: 수면 시간(분) / sleep_score: 애플워치 수면 점수(0~100)');
@@ -807,7 +807,7 @@ function aiBuild(){
  L.push('2. 운동: exercise_min이 30분 이상인 날과 아닌 날의 같은 날 기분을 비교하고, 다음 날의 sleep_score와 기분도 비교해줘. 걸음수와 move_kcal도 같은 방식으로 봐줘.');
  L.push('3. 수면: sleep_score, sleep_min과 같은 날 기분의 관계, 그리고 전날 수면과 다음 날 기분의 관계를 알려줘.');
  L.push('4. 독서와 습관: 독서한 날, 습관을 많이 달성한 날의 기분 차이를 봐줘.');
- L.push('5. 시기(계절·월): 월별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 평소보다 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지는 시기가 있는지 알려줘.');
+ if(o.range==='1m')L.push('5. 주 단위 흐름: 주별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 한 달 안에서 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지거나 좋아진 주가 있는지 알려줘.');else L.push('5. 시기(계절·월): 월별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 평소보다 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지는 시기가 있는지 알려줘.');
  L.push('6. 요일 패턴이 있는지 알려줘.');
  L.push('7. 위 모두를 종합해서 “가장 의미 있는 발견 3가지”와, 내가 앞으로 기록하면 분석이 더 정확해질 항목 3가지를 제안해줘.');
  L.push('','# 지켜줘야 할 것');
@@ -822,7 +822,7 @@ function aiBuild(){
 function aiSheet(){
  const o=S.ai,r=aiBuild(),ch=(k,v,l)=>'<button class="chip'+(String(o[k])===String(v)?' on':'')+'" data-a="aiOpt" data-k="'+k+'" data-v="'+v+'">'+l+'</button>';
  let h='<h3>AI 분석용 내보내기</h3>'+(S.mode==='sample'?'<p class="emp" style="font-size:12px">지금은 예시 데이터예요. 흐름을 시험해 보기용이에요.</p>':'')+
- '<span class="lb">기간</span><div class="chips">'+ch('range','all','전체')+ch('range','1y','최근 1년')+'</div>'+
+ '<span class="lb">기간</span><div class="chips">'+ch('range','all','전체')+ch('range','1y','최근 1년')+ch('range','1m','최근 1달')+'</div>'+
  '<span class="lb">사람 이름</span><div class="chips">'+ch('anon','true','익명 처리 (사람1, 사람2…)')+ch('anon','false','실명 그대로')+'</div>'+
  '<span class="lb">메모</span><div class="chips">'+ch('memo','false','제외')+ch('memo','true','포함')+'</div>';
  if(!r){return sheet(h+'<p class="emp">내보낼 기록이 없어요.</p><button class="btn" data-a="closeSh">닫기</button>')}
