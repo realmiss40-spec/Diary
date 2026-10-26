@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#fcfbf9">
@@ -12,7 +13,7 @@ input,textarea{font:inherit;color:inherit;border:0;background:transparent;outlin
 input[type=text],input:not([type]),textarea{-webkit-appearance:none;appearance:none}
 textarea{resize:none;display:block;overflow:hidden}
 #app{max-width:440px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;background:var(--paper);position:relative;overflow:hidden}
-@media(min-width:500px){#app{height:min(calc(100dvh - 32px),880px);margin:16px auto;border-radius:36px;box-shadow:0 20px 60px rgba(0,0,0,.18)}}
+@media(min-width:500px) and (pointer:fine){#app{height:min(calc(100dvh - 32px),880px);margin:16px auto;border-radius:36px;box-shadow:0 20px 60px rgba(0,0,0,.18)}}
 #hd{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 10px) 18px 8px}
 #hd .t{flex:1;font-size:15px;font-weight:500;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cb{width:32px;height:32px;border-radius:50%;background:var(--soft);border:1px solid var(--faint);display:grid;place-items:center;flex:none}
