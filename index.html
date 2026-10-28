@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -258,6 +259,12 @@ a.btn{color:inherit;text-decoration:none}
 .y3 .yp{display:flex;gap:4px;margin-top:8px}
 .y3 .yp .ph{width:72px;height:72px;flex:none}
 @media(hover:none){#app{height:100vh;height:100dvh;margin:0 auto;border-radius:0;box-shadow:none}}
+@media(hover:none){input:not(.nu):not(.nt),textarea,select{font-size:16px!important}}
+.wrv{display:block;width:100%;text-align:left;padding:8px 0;border-top:1px solid var(--faint)}
+.wrv small{display:inline;font-size:9.5px;letter-spacing:.06em;color:var(--mut);margin-right:8px;white-space:nowrap}
+.wrv span{display:inline;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.sec.wsec+.sec{border-top:0}
+.sec.wsec{border-bottom:1.5px solid var(--ink);padding-bottom:6px;margin-bottom:6px}
 @media print{#hd,#tabs,#strip{display:none}#app{height:auto}#view{overflow:visible}}
 </style>
 <div id="app">
@@ -275,7 +282,7 @@ a.btn{color:inherit;text-decoration:none}
 <script>
 (function(){
 'use strict';
-try{let vm=document.querySelector('meta[name=viewport]');if(!vm){vm=document.createElement('meta');vm.name='viewport';document.head.appendChild(vm)}vm.setAttribute('content','width=device-width,initial-scale=1,viewport-fit=cover')}catch(e){}
+try{let vm=document.querySelector('meta[name=viewport]');if(!vm){vm=document.createElement('meta');vm.name='viewport';document.head.appendChild(vm)}vm.setAttribute('content','width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover')}catch(e){}
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
 const pad=n=>String(n).padStart(2,'0');
@@ -607,6 +614,8 @@ function vReview(){
  const nn=S.d.notes.filter(x=>x.date.indexOf(mk)===0).length,hp=habStats(y,m).pct;
  let h=ttl('Review',MONTHS[m]+' '+y);
  h+='<div class="st4"><div><b>'+wr+'<small>일</small></b><span>기록한 날</span></div><div><b>'+nn+'<small>개</small></b><span>노트</span></div><div><b>'+(mc?(ms/mc).toFixed(1):'–')+'</b><span>평균 기분 (5점)</span></div><div><b>'+hp+'<small>%</small></b><span>습관 달성률</span></div></div>';
+ {const wl=[],seen={};for(let i=1;i<=n;i++){const k=mk+'-'+pad(i),ws=wkStart(k),wk=wkKey(k);if(seen[wk])continue;seen[wk]=1;const t=S.d.wl[wk];if(t&&t.trim())wl.push('<button class="wrv" data-a="goWk" data-d="'+(ws<mk+'-01'?mk+'-01':ws)+'"><small>'+ws.slice(5).replace('-','.')+' – '+add(ws,6).slice(5).replace('-','.')+'</small><span>'+esc(t)+'</span></button>')}
+  h+='<div class="sec wsec"><span class="lb">🗓 WEEKS · 이 달의 한 줄 모음</span>'+(wl.length?wl.join(''):'<div class="emp">이 달에 쓴 주간 한 줄이 아직 없어요. WEEK 탭의 PERIOD LOG에 적어 보세요.</div>')+'</div>'}
  [['book','📚','BOOK · 이 달의 책','읽은 책과 한 줄 감상'],['video','🎬','VIDEO · 이 달의 영상','영화, 드라마, 영상'],['event','⚡','EVENT · 이 달의 사건','기억에 남는 일'],['place','📍','PLACE · 이 달의 장소','가 본 곳'],['spend','💳','SPEND · 이 달의 지출','제일 괜찮았던 지출, 아쉬웠던 지출']].forEach(f=>{
   h+='<div class="sec"><span class="lb">'+f[1]+' '+f[2]+'</span>';
   h+='<textarea class="ta" rows="2" data-f="rv:'+f[0]+'" placeholder="'+f[3]+'">'+esc(r[f[0]]||'')+'</textarea></div>';
@@ -839,6 +848,7 @@ const A={
  prev(){nav(-1)},next(){nav(1)},
  tdy(){S.cur=NOW;render(false)},
  goV(el){closeSh();go(el.dataset.v)},
+ goWk(el){closeSh();S.cur=el.dataset.d;go('week')},
  openRv(el){closeSh();S.cur=el.dataset.d;S.nid=null;go('review')},
  back(){const h=S.hist.pop();if(!h)return;S.view=h[0];S.cur=h[1];S.nc=h[2];S.nid=h[3];render(false)},
  tab(el){closeSh();S.nid=null;if(S.view===el.dataset.v&&S.nc==null){$('#view').scrollTop=0;return}go(el.dataset.v)},
