@@ -260,10 +260,11 @@ a.btn{color:inherit;text-decoration:none}
 .y3 .yp .ph{width:72px;height:72px;flex:none}
 @media(hover:none){#app{height:100vh;height:100dvh;margin:0 auto;border-radius:0;box-shadow:none}}
 @media(hover:none){input:not(.nu):not(.nt),textarea,select{font-size:16px!important}}
-.wrv{display:block;width:100%;text-align:left;padding:8px 0;border-top:1px solid var(--faint)}
+.wrv{display:block;width:100%;text-align:left;padding:5px 0}
 .wrv small{display:inline;font-size:9.5px;letter-spacing:.06em;color:var(--mut);margin-right:8px;white-space:nowrap}
 .wrv span{display:inline;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .sec.wsec+.sec{border-top:0}
+.sec.one{border-top:1.5px solid var(--ink);margin-top:14px;padding-top:12px}
 .sec.wsec{border-bottom:1.5px solid var(--ink);padding-bottom:6px;margin-bottom:6px}
 @media print{#hd,#tabs,#strip{display:none}#app{height:auto}#view{overflow:visible}}
 </style>
@@ -373,7 +374,8 @@ function mkSample(){
  G('week','2026-W42','물놀이 즐기기',true);G('week','2026-W42','책 한 권 끝내기',true);G('week','2026-W42','사진 정리',false);
  s.memo['2026-10']='11월에는 운동 루틴부터 다시 잡기.';
  s.rv['2026-10']={book:'밤에 읽기 좋은 단편집, 테라스에서 읽은 소설',video:'숨바꼭질 하는 공이 (전시 영화)',event:'10/8–14 여행. 만타가오리와 은하수',place:'골목 안 새 카페, 곱창 와인바, 한강 러닝 코스',spend:'가장 좋았던 것: 여행 중 스노클링 투어. 아쉬웠던 것: 충동구매한 소품'};
- s.rv['2026-09']={book:'에세이 한 권',video:'다큐 시리즈 정주행',event:'추석 연휴 가족 모임',place:'양평 산책로',spend:'가장 좋았던 것: 부모님 선물. 아쉬웠던 것: 잦은 배달'};s.wl['2026-W42']='만타가오리, 은하수, 선셋. 올해 최고의 일주일.';
+ s.rv['2026-10'].one='여행으로 채운 가을, 11월엔 루틴부터.';
+ s.rv['2026-09']={book:'에세이 한 권',video:'다큐 시리즈 정주행',event:'추석 연휴 가족 모임',place:'양평 산책로',spend:'가장 좋았던 것: 부모님 선물. 아쉬웠던 것: 잦은 배달',one:'가족과 오래 앉아 있던 달.'};s.wl['2026-W42']='만타가오리, 은하수, 선셋. 올해 최고의 일주일.';
  s.gcal=[['2026-10-19','10:00','주간 회의'],['2026-10-24','18:00','친구 생일 파티'],['2026-10-26','10:00','주간 회의'],['2026-10-28','','엄마 생신'],['2026-10-30','15:00','치과 예약']].map((a,i)=>({u:'s'+i,d:a[0],tm:a[1],t:a[2]}));
  return s;
 }
@@ -570,6 +572,8 @@ function vYear(){
   for(let d=1;d<=dim(y,m);d++){const k=y+'-'+pad(m+1)+'-'+pad(d),w=written(gd(k)),dow=new Date(y,m,d).getDay();cells+='<i class="'+(k===NOW?'t':w?'w':'')+(dow===0||hol(k)?' r':'')+'">'+d+'</i>'}
   h+='<button class="mm" data-a="goMonth" data-d="'+y+'-'+pad(m+1)+'-01"><b>'+MS[m]+'</b><div>'+cells+'</div></button>';}
  h+='</div>'+goalBlock('year','YEARLY GOAL',String(y));
+ {const L=[];for(let m=0;m<12;m++){const mk=y+'-'+pad(m+1),o=S.d.rv[mk],t=o&&o.one;if(t&&t.trim())L.push('<button class="wrv" data-a="openRv" data-d="'+mk+'-01"><small>'+MS[m]+'</small><span>'+esc(t)+'</span></button>')}
+  h+='<div class="lbr"><span class="lb">YEARLY LOG · 올해의 한 줄 모음</span><span class="lb">'+(L.length?L.length+'/12':'')+'</span></div>'+(L.length?L.join(''):'<div class="emp">REVIEW 탭 맨 아래 ‘이번 달을 한 문장으로’에 적으면 여기에 모여요.</div>')}
  return h;
 }
 function vSetting(){
@@ -620,6 +624,7 @@ function vReview(){
   h+='<div class="sec"><span class="lb">'+f[1]+' '+f[2]+'</span>';
   h+='<textarea class="ta" rows="2" data-f="rv:'+f[0]+'" placeholder="'+f[3]+'">'+esc(r[f[0]]||'')+'</textarea></div>';
  });
+ h+='<div class="sec one"><span class="lb">이번 달을 한 문장으로</span><textarea class="ta" rows="2" data-f="rv:one" placeholder="'+MONTHS[m]+'을 한 문장으로">'+esc(r.one||'')+'</textarea></div>';
  return h;
 }
 const VIEWS={year:vYear,month:vMonth,week:vWeek,day:vDay,tri:vTri,review:vReview,notes:vNotes,habit:vHabit,goal:vGoal,setting:vSetting};
@@ -653,7 +658,7 @@ function doSearch(q){
  Object.keys(S.d.days).sort().reverse().forEach(k=>{const d=S.d.days[k];const txt=[d.memo].concat(d.pp||[]).filter(Boolean);const hit=txt.find(t=>t.toLowerCase().indexOf(q)>=0);if(hit)out.push('<button class="sr" data-a="goDay" data-d="'+k+'"><small>'+k.replace(/-/g,'.')+' · DAY</small><span>'+esc(hit)+'</span></button>')});
  (S.d.gcal||[]).filter(e=>e.t.toLowerCase().indexOf(q)>=0).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,15).forEach(e=>out.push('<button class="sr" data-a="goDay" data-d="'+e.d+'"><small>'+e.d.replace(/-/g,'.')+' · CALENDAR</small><span>'+esc((e.tm?e.tm+' ':'')+e.t)+'</span></button>'));
  S.d.notes.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(n=>{if((n.t+' '+n.body+' '+n.cat).toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openNote" data-id="'+n.id+'"><small>'+n.date.replace(/-/g,'.')+' · NOTE · '+esc(n.cat)+'</small><span>'+n.ic+' '+esc(n.t)+'</span></button>')});
- {const RN={book:'책',video:'영상',event:'사건',place:'장소',spend:'지출'};Object.keys(S.d.rv||{}).sort().reverse().forEach(mk=>{const o=S.d.rv[mk];Object.keys(RN).forEach(f=>{const t=o[f];if(t&&t.toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openRv" data-d="'+mk+'-01"><small>'+mk.replace('-','.')+' · REVIEW · '+RN[f]+'</small><span>'+esc(t)+'</span></button>')})})}
+ {const RN={one:'한 문장',book:'책',video:'영상',event:'사건',place:'장소',spend:'지출'};Object.keys(S.d.rv||{}).sort().reverse().forEach(mk=>{const o=S.d.rv[mk];Object.keys(RN).forEach(f=>{const t=o[f];if(t&&t.toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openRv" data-d="'+mk+'-01"><small>'+mk.replace('-','.')+' · REVIEW · '+RN[f]+'</small><span>'+esc(t)+'</span></button>')})})}
  $('#sres').innerHTML=out.slice(0,40).join('')||'<div class="emp">결과가 없어요</div>';
 }
 /* ---------- data ops ---------- */
