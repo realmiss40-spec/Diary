@@ -412,7 +412,7 @@ const sc=v=>v===1?1:v===2?.5:0;
 const dayRatio=k=>{const hs=S.d.habits;return hs.length?hs.reduce((a,h)=>a+sc(hv(k,h.id)),0)/hs.length:0};
 function elapsed(y,m){const n=dim(y,m),t=P(NOW);if(y<t.getFullYear()||(y===t.getFullYear()&&m<t.getMonth()))return n;if(y===t.getFullYear()&&m===t.getMonth())return t.getDate();return 0}
 let st=null;
-function save(){const r=$('#ring');if(S.mode==='mine'){clearTimeout(st);st=setTimeout(flush,250)}r.classList.remove('ping');void r.offsetWidth;r.classList.add('ping')}
+function save(){const r=$('#ring');if(S.mode==='mine'){clearTimeout(st);st=setTimeout(flush,250);try{ls.s('diary.v2.edit',String(Date.now()))}catch(e){}syncSoon()}r.classList.remove('ping');void r.offsetWidth;r.classList.add('ping')}
 function flush(){if(S.mode==='mine'){clearTimeout(st);ls.s(KEY,JSON.stringify(S.d))}}
 function meta(){ls.s(META,JSON.stringify({mode:S.mode,theme:S.theme,mm:S.mm}))}
 /* ---------- nav ---------- */
@@ -597,7 +597,7 @@ function vSetting(){
  '<div class="set"><span class="lb">노트 카테고리</span><div class="chips">'+S.d.cats.map((c,i)=>'<span class="chip">'+esc(c)+' <button data-a="delCat" data-i="'+i+'" style="color:var(--mut)">✕</button></span>').join('')+'</div><form class="addf" data-form="cat"><input placeholder="+ 카테고리 추가" enterkeyhint="done"><button class="go">↵</button></form></div>'+
  '<div class="set"><span class="lb">Google 캘린더 연동</span><p>가져온 일정 <b>'+(S.d.gcal||[]).length+'</b>칸 · 가져온 일정은 MONTH(글자) · WEEK · DAY에 보여요.</p><div class="gr"><label class="btn sm">⬆ 캘린더 일정 가져오기<input type="file" accept=".ics,text/calendar" multiple hidden data-ch="ics"></label><button class="btn sm" data-a="icsOut">⬇ 일기를 캘린더로 내보내기</button>'+((S.d.gcal||[]).length?'<button class="btn sm" data-a="icsClear" style="color:var(--red);border-color:var(--red)">가져온 일정 삭제</button>':'')+'</div><p style="margin-top:10px">① 가져오기: 구글 캘린더(웹) → 설정 → 가져오기/내보내기 → 내보내기로 받은 .ics 파일을 선택해요. 다시 가져오면 같은 일정은 갱신돼요.<br>② 내보내기: 만든 .ics를 구글 캘린더 → 설정 → 가져오기 에서 올리거나, 아이폰에서 파일을 열어 캘린더에 추가해요.<br>③ 하루씩: DAY 화면의 ‘Google 캘린더에 추가’ 버튼으로 그날 기록을 일정으로 바로 만들 수 있어요.</p></div>'+
  '<div class="set"><span class="lb">AI 분석용 내보내기</span><p>ChatGPT, Claude 같은 AI에게 “언제 기분이 좋아지는지” 같은 분석을 맡길 수 있게, 사진을 뺀 표(CSV)와 분석 요청문을 한 파일로 만들어요.</p><button class="btn sm" data-a="aiOpen">🤖 AI 분석용 파일 만들기</button></div>'+
- '<div class="set"><span class="lb">백업 · 복원</span><p>사진까지 한 파일(JSON)로 저장해요. 복원용이라 AI 분석에는 쓰지 마세요. 브라우저 데이터를 지우기 전에 꼭 백업하세요.</p><div class="gr"><button class="btn sm" data-a="export">⬇ 백업</button><label class="btn sm">⬆ 복원<input type="file" accept=".json,application/json" hidden data-ch="import"></label></div></div>'+
+ syncUi()+'<div class="set"><span class="lb">백업 · 복원</span><p>사진까지 한 파일(JSON)로 저장해요. 복원용이라 AI 분석에는 쓰지 마세요. 브라우저 데이터를 지우기 전에 꼭 백업하세요.</p><div class="gr"><button class="btn sm" data-a="export">⬇ 백업</button><label class="btn sm">⬆ 복원<input type="file" accept=".json,application/json" hidden data-ch="import"></label></div></div>'+
  '<div class="set"><span class="lb">저장 상태</span><p>'+(persistent?'정상 · 브라우저 저장소 사용 중':'임시 · 이 환경에서는 저장소를 쓸 수 없어 새로고침하면 사라져요. 백업을 활용하세요.')+'</p></div>'+
  (sm?'':'<div class="set"><button class="btn sm" data-a="wipe" style="color:var(--red);border-color:var(--red)">내 다이어리 전체 삭제</button></div>');
 }
@@ -931,7 +931,7 @@ const A={
   if(S.mode!=='mine'){sheet('<h3>예시 데이터 모드예요</h3><p class="emp">‘내 다이어리’로 전환한 뒤 백업할 수 있어요.</p><button class="btn" data-a="closeSh">확인</button>');return}
   const used={};const mark=id=>{if(PH[id])used[id]=PH[id]};Object.keys(S.d.days).forEach(k=>S.d.days[k].ph.forEach(mark));S.d.notes.forEach(n=>n.ph.forEach(mark));
   const blob=new Blob([JSON.stringify({v:2,d:S.d,photos:used})],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='diary-backup-'+NOW+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)},
- wipe(){ask('내 다이어리의 모든 기록과 사진을 삭제할까요? 되돌릴 수 없어요.','전체 삭제',()=>{Object.keys(PH).forEach(id=>{if(id.charAt(0)==='p')idb.del(id)});ls.s(KEY,JSON.stringify(mkNew()));loadMode().then(()=>render(false))})}
+ wipe(){ask(SY.repo?'내 다이어리의 모든 기록을 삭제할까요? 동기화가 연결되어 있어 다른 기기의 기록도 함께 지워져요.':'내 다이어리의 모든 기록과 사진을 삭제할까요? 되돌릴 수 없어요.','전체 삭제',()=>{Object.keys(PH).forEach(id=>{if(id.charAt(0)==='p')idb.del(id)});ls.s(KEY,JSON.stringify(mkNew()));loadMode().then(()=>render(false))})}
 };
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||el.tagName==='INPUT')return;const f=A[el.dataset.a];if(f){f(el,e)}});
 /* ---------- field + form + file handlers ---------- */
@@ -942,6 +942,7 @@ function onField(e){
  else if(p[0]==='wl')S.d.wl[wkKey(wkStart(S.cur))]=v;
  else if(p[0]==='rg'){v=v.replace(/\D/g,'');if(el.value!==v)el.value=v;if(p[1]==='mdT'&&+v>5){v='5';el.value=v}if(v!=='')S.d.rg[p[1]]=Math.min(p[1]==='slT'?100:p[1]==='mdT'?5:999999,Math.max(1,+v))}
  else if(p[0]==='rv'){const mk=ymd(P(S.cur)).slice(0,7),o=S.d.rv[mk]||(S.d.rv[mk]={});o[p[1]]=v}
+ else if(p[0]==='sync'){SYF[p[1]]=v.trim();return}
  else if(p[0]==='title'){S.d.title=v;$('#ttl').textContent=v}
  else if(p[0]==='note'){const n=S.d.notes.find(x=>x.id===S.nid);if(!n)return;if(p[1]==='date'){if(!v)return}n[p[1]]=v}
  if(el.tagName==='TEXTAREA')autosize(el);
@@ -966,11 +967,130 @@ document.addEventListener('submit',e=>{
 });
 document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});
 window.addEventListener('pagehide',flush);
+/* ---------- device sync (private GitHub repo) ---------- */
+const SYK='diary.v2.sync';
+let SY={},SYM='',syBusy=false,syT=null;
+const SYF={repo:'',token:''};
+try{SY=JSON.parse(ls.g(SYK)||'{}')||{}}catch(e){SY={}}
+['ts','h','pushed','tomb','shas'].forEach(k=>{if(!SY[k]||typeof SY[k]!=='object')SY[k]={}});
+const syncSave=()=>ls.s(SYK,JSON.stringify(SY));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function hs(v){const s=JSON.stringify(v)||'';let h1=0xdeadbeef^s.length,h2=0x41c6ce57;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0).toString(36)+(h1>>>0).toString(36)}
+function b64u(str){const b=new TextEncoder().encode(str);let s='';for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s)}
+function sm(t){SYM=t;const e=$('#syncmsg');if(e)e.textContent=t}
+function syncStatus(){if(SYM)return SYM;if(!SY.last)return '연결됨 · 아직 동기화 전이에요.';const d=new Date(SY.last);return '연결됨 · 마지막 동기화 '+(d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function syncUi(){
+ if(S.mode!=='mine')return '<div class="set"><span class="lb">기기 동기화</span><p>‘내 다이어리’ 모드에서 사용할 수 있어요.</p></div>';
+ let h='<div class="set"><span class="lb">기기 동기화 (GitHub)</span>';
+ if(SY.repo&&SY.token)h+='<p id="syncmsg">'+esc(syncStatus())+'</p><p style="font-size:11px">저장소 '+esc(SY.repo)+' · 기록과 사진을 기기끼리 맞춰요.</p><div class="gr"><button class="btn sm" data-a="syncNow">🔄 지금 동기화</button><button class="btn sm" data-a="syncOff">연결 해제</button></div>';
+ else h+='<p>비공개 GitHub 저장소를 통해 아이폰·아이패드·맥북의 기록과 사진을 같은 내용으로 맞춰요. 처음 연결은 기록이 가장 많은 기기에서 먼저 하세요.</p><span class="lb" style="margin-top:6px">저장소 (아이디/저장소이름)</span><input class="fld" data-f="sync:repo" placeholder="내아이디/diary-data" autocapitalize="off" autocorrect="off" spellcheck="false"><span class="lb" style="margin-top:12px">접근 토큰</span><input class="fld" type="password" data-f="sync:token" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="gr" style="margin-top:12px"><button class="btn sm blk" data-a="syncOn">연결하고 동기화</button><button class="btn sm" data-a="syncHelp">설정 방법</button></div><p id="syncmsg" style="margin-top:8px;color:var(--red)"></p>';
+ return h+'</div>';
+}
+const shardOf=k=>k.indexOf('d:')===0?'days/'+k.slice(2,9)+'.json':k.indexOf('n:')===0?'notes.json':k==='c'?'gcal.json':'misc.json';
+const isShard=p=>p==='notes.json'||p==='misc.json'||p==='gcal.json'||/^days\/\d{4}-\d{2}\.json$/.test(p);
+function units(){const d=S.d,u={};Object.keys(d.days).forEach(k=>{u['d:'+k]=d.days[k]});d.notes.forEach(n=>{u['n:'+n.id]=n});d.goals.forEach(g=>{u['g:'+g.id]=g});Object.keys(d.memo).forEach(k=>{u['m:'+k]=d.memo[k]});Object.keys(d.wl).forEach(k=>{u['w:'+k]=d.wl[k]});Object.keys(d.rv).forEach(k=>{u['r:'+k]=d.rv[k]});u.s={title:d.title,habits:d.habits,cats:d.cats,rg:d.rg};u.c=d.gcal||[];return u}
+function track(){
+ const u=units();let now=parseInt(ls.g('diary.v2.edit'),10)||Date.now();
+ Object.keys(u).forEach(k=>{const h=hs(u[k]);if(SY.h[k]!==h){SY.h[k]=h;SY.ts[k]=SY.fresh&&SY.ts[k]===undefined?0:now;delete SY.tomb[k]}});
+ Object.keys(SY.h).forEach(k=>{if(!(k in u)){delete SY.h[k];SY.ts[k]=now;SY.tomb[k]=1}});
+ return u}
+function applyUnit(key,val,del){
+ const d=S.d,t=key.slice(0,2),id=key.slice(2);
+ if(key==='s'){if(!del&&val){d.title=val.title;d.habits=val.habits;d.cats=val.cats;d.rg=val.rg}}
+ else if(key==='c')d.gcal=del?[]:val;
+ else if(t==='d:'){if(del)delete d.days[id];else d.days[id]=fix(val)}
+ else if(t==='n:'){d.notes=d.notes.filter(x=>x.id!==id);if(!del)d.notes.push(val)}
+ else if(t==='g:'){d.goals=d.goals.filter(x=>x.id!==id);if(!del)d.goals.push(val)}
+ else{const m=t==='m:'?d.memo:t==='w:'?d.wl:d.rv;if(del)delete m[id];else m[id]=val}
+}
+async function gh(method,path,body,accept){
+ return fetch('https://api.github.com'+path,{method:method,cache:'no-store',headers:Object.assign({Authorization:'Bearer '+SY.token,Accept:accept||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined})}
+function need(r){if(!r.ok){const e=new Error('http'+r.status);e.status=r.status;throw e}return r}
+const photoIds=()=>{const s={};const add=id=>{if(id.charAt(0)==='p')s[id]=1};Object.keys(S.d.days).forEach(k=>S.d.days[k].ph.forEach(add));S.d.notes.forEach(n=>n.ph.forEach(add));return Object.keys(s)};
+const blobUrl=b=>new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=rej;f.readAsDataURL(b)});
+async function doSync(retry){
+ flush();track();sm('동기화 중…');
+ const R='/repos/'+SY.repo;
+ let r=need(await gh('GET',R));const info=await r.json();
+ if(!info.private){const e=new Error('PUBLIC');throw e}
+ const br=info.default_branch||'main',files={};
+ r=await gh('GET',R+'/git/trees/'+encodeURIComponent(br)+'?recursive=1');
+ if(r.status!==409&&r.status!==404){need(r);((await r.json()).tree||[]).forEach(x=>{if(x.type==='blob')files[x.path]=x.sha})}
+ const won=[];
+ for(const p of Object.keys(files).filter(isShard)){
+  if(files[p]===SY.shas[p])continue;
+  const rr=need(await gh('GET',R+'/contents/'+p+'?ref='+encodeURIComponent(br),null,'application/vnd.github.raw+json'));
+  const o=JSON.parse(await rr.text());
+  Object.keys(o.u||{}).forEach(key=>{const x=o.u[key],lt=SY.ts[key];
+   if(lt===undefined||x.t>=lt){applyUnit(key,x.v,!!x.x);SY.ts[key]=x.t;SY.pushed[key]=x.t;if(x.x)SY.tomb[key]=1;else delete SY.tomb[key];won.push(key)}
+   else if(SY.pushed[key]===lt)SY.pushed[key]=undefined});
+  SY.shas[p]=files[p];
+ }
+ if(won.length){S.d=norm(S.d);const u2=units();won.forEach(k=>{if(k in u2)SY.h[k]=hs(u2[k]);else delete SY.h[k]})}
+ const u=units(),dirty={};
+ Object.keys(SY.ts).forEach(k=>{if(SY.ts[k]!==SY.pushed[k]&&(SY.tomb[k]||k in u))(dirty[shardOf(k)]=dirty[shardOf(k)]||[]).push(k)});
+ for(const p of Object.keys(dirty)){
+  const o={v:1,u:{}};
+  Object.keys(SY.ts).forEach(k=>{if(shardOf(k)!==p)return;if(SY.tomb[k])o.u[k]={t:SY.ts[k],x:1};else if(k in u)o.u[k]={t:SY.ts[k],v:u[k]}});
+  const body={message:'sync '+new Date().toISOString(),content:b64u(JSON.stringify(o))};if(files[p])body.sha=files[p];
+  const res=await gh('PUT',R+'/contents/'+p,body);
+  if((res.status===409||res.status===422)&&retry<2){syncSave();return doSync(retry+1)}
+  need(res);const j=await res.json();files[p]=j.content.sha;SY.shas[p]=j.content.sha;
+  Object.keys(SY.ts).forEach(k=>{if(shardOf(k)===p)SY.pushed[k]=SY.ts[k]});
+  syncSave();await sleep(300);
+ }
+ const remoteP={};Object.keys(files).forEach(p=>{const m=/^photos\/(p[^/]+)\.jpg$/.exec(p);if(m)remoteP[m[1]]=1});
+ const local=photoIds(),up=local.filter(id=>PH[id]&&!remoteP[id]),down=local.filter(id=>!PH[id]&&remoteP[id]);
+ let done=0,limited=false;
+ for(const id of up){
+  sm('사진 올리는 중 '+(++done)+'/'+up.length);
+  const res=await gh('PUT',R+'/contents/photos/'+id+'.jpg',{message:'photo',content:PH[id].split(',')[1]});
+  if(res.status===422)continue;
+  if(res.status===403||res.status===429){limited=true;break}
+  need(res);await sleep(800);
+ }
+ done=0;
+ for(const id of down){
+  sm('사진 받는 중 '+(++done)+'/'+down.length);
+  const res=need(await gh('GET',R+'/contents/photos/'+id+'.jpg?ref='+encodeURIComponent(br),null,'application/vnd.github.raw+json'));
+  const src=await blobUrl(new Blob([await res.arrayBuffer()],{type:'image/jpeg'}));PH[id]=src;idb.put(id,src);
+ }
+ SY.fresh=false;SY.last=Date.now();syncSave();
+ if(won.length||down.length){flush();render(true)}
+ sm(limited?'사진 일부는 요청 제한으로 다음 동기화 때 이어서 올려요.':'');
+}
+function syncErr(e){
+ if(e&&e.message==='PUBLIC')return '이 저장소는 공개 상태예요. 일기가 노출되지 않도록 비공개 저장소를 사용해 주세요.';
+ const s=e&&e.status;
+ if(s===401)return '토큰이 올바르지 않거나 만료됐어요.';
+ if(s===403)return '권한이 없거나 요청이 너무 많아요. 토큰의 Contents 읽기·쓰기 권한을 확인해 주세요.';
+ if(s===404)return '저장소를 찾을 수 없어요. 이름과, 토큰이 이 저장소에 접근할 수 있는지 확인해 주세요.';
+ if(e instanceof TypeError)return '인터넷에 연결할 수 없어요. 연결되면 다시 동기화돼요.';
+ return '동기화 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.';
+}
+async function syncRun(){
+ if(S.mode!=='mine'||!SY.repo||!SY.token||syBusy)return;
+ syBusy=true;
+ try{await doSync(0)}catch(e){sm(syncErr(e))}finally{syBusy=false}
+}
+function syncSoon(){if(!SY.repo||S.mode!=='mine')return;clearTimeout(syT);syT=setTimeout(syncRun,10000)}
+Object.assign(A,{
+ syncOn(){
+  const repo=(SYF.repo||'').replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,''),tok=SYF.token||'',e=$('#syncmsg');
+  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){if(e)e.textContent='저장소는 “아이디/저장소이름” 형식으로 적어 주세요.';return}
+  if(!tok){if(e)e.textContent='접근 토큰을 붙여 넣어 주세요.';return}
+  SY={repo:repo,token:tok,ts:{},h:{},pushed:{},tomb:{},shas:{},fresh:true,last:0};SYF.repo='';SYF.token='';syncSave();SYM='';render(true);syncRun()},
+ syncNow(){SYM='';syncRun()},
+ syncOff(){ask('동기화 연결을 해제할까요? 이 기기의 기록은 그대로 남고, 저장소의 기록도 그대로 남아요.','연결 해제',()=>{clearTimeout(syT);SY={ts:{},h:{},pushed:{},tomb:{},shas:{}};SYM='';ls.s(SYK,'{}');render(true)})},
+ syncHelp(){sheet('<h3>동기화 설정 방법</h3><div style="font-size:12.5px;line-height:1.7"><p><b>1. 비공개 저장소 만들기</b><br>github.com → New repository → 이름은 예: diary-data → <b>Private</b> 선택 → Create.</p><p><b>2. 접근 토큰 만들기</b><br>GitHub 프로필 → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token.<br>· Repository access: <b>Only select repositories</b> → diary-data<br>· Permissions → Repository permissions → <b>Contents: Read and write</b><br>· 만료일은 1년 정도로 정하세요. 만료되면 새 토큰으로 바꾸면 돼요.</p><p><b>3. 다이어리에 입력</b><br>저장소 칸에 “내아이디/diary-data”, 토큰 칸에 만든 토큰(github_pat_…)을 붙여 넣고 연결해요.</p><p><b>4. 다른 기기</b><br>첫 기기의 동기화가 끝난 뒤, 다른 기기에서도 같은 저장소와 토큰으로 연결하세요.</p><p style="color:var(--mut)">토큰은 각 기기의 브라우저에만 저장돼요. 연결 전에 백업을 한 번 받아 두세요.</p></div><button class="btn" data-a="closeSh">확인</button>')}
+});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&SY.repo&&Date.now()-(SY.last||0)>30000)syncRun()});
 /* ---------- boot ---------- */
 (async function(){
  let m=null;try{m=JSON.parse(ls.g(META)||'null')}catch(e){}
  if(m){S.mode=m.mode==='mine'?'mine':'sample';S.theme=m.theme==='dark'?'dark':'light';S.mm=m.mm==='photo'?'photo':'text'}
  await idb.open();await loadMode();render(false);
+ if(SY.repo&&S.mode==='mine')setTimeout(syncRun,800);
 })();
 })();
 </script>
