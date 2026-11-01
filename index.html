@@ -142,6 +142,9 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .nl .e{font-size:22px;width:30px;text-align:center}
 .nl b{display:block;font-size:14px}
 .nl small{color:var(--mut);font-size:10.5px}
+.nl>span:nth-child(2){flex:1;min-width:0}
+.nl .th{flex:none;width:64px;height:64px;background-size:cover;background-position:center;background-color:var(--soft);position:relative}
+.nl .th em{position:absolute;right:3px;bottom:3px;font-style:normal;font-size:8px;background:var(--paper);padding:0 4px;border:1px solid var(--faint)}
 .nl p{margin:2px 0 0;font-size:12px;color:var(--mut);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .chips{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0}
 .chip{border:1px solid var(--faint);padding:4px 11px;font-size:11.5px;border-radius:99px}
@@ -373,7 +376,8 @@ function mkSample(){
  const PH={'02':['sp1'],'06':['sp2'],'08':['sp3'],'12':['sp4'],'13':['sp5','sp6','sp12'],'14':['sp7'],'15':['sp8'],'17':['sp9'],'18':['sp10'],'21':['sp11']};
  Object.keys(PH).forEach(k=>{D('2026-10-'+k).ph=PH[k]});
  const N=[['2026-10-03','☕','골목 안 새 카페','장소','연휴 첫날 발견한 작은 카페. 라떼가 고소하고 창가 자리가 좋다.'],['2026-10-04','☕','에티오피아 핸드드립','취미','산미가 생각보다 부드러웠다. 다음엔 물 온도를 1도 낮춰 보기.'],['2026-10-11','🌌','처음 본 은하수','여행','불을 끄자 하늘이 달라졌다. 한참 말없이 올려다봤다.'],['2026-10-13','📚','선셋 테라스에서 읽은 책','책','해 질 무렵 테라스에서 90쪽. 문장이 풍경과 잘 어울렸다.'],['2026-10-17','🏃','한강 러닝 6km','일상','페이스 6분 10초. 바람이 좋아서 멈추기 아까웠다.'],['2026-10-18','🍷','곱창 와인바','장소','의외의 조합인데 잘 맞았다. 재방문 의사 있음.'],['2026-10-21','🎬','숨바꼭질 하는 공이','관람','짧은 전시 영화. 마지막 장면의 소리가 오래 남았다.'],['2026-10-22','🍳','월요일처럼 시작한 목요일','일상','계란과 토스트. 별일 없는 아침이 제일 좋다.'],['2026-09-06','📖','밤에 읽기 좋은 단편집','책','한 편이 20분이라 자기 전에 딱이다.'],['2026-09-20','🏞','양평 산책로','장소','단풍 직전의 초록. 사람이 적어서 좋았다.'],['2026-08-15','🌊','속초 아침 바다','여행','일출 대신 일몰 같은 하늘색. 파도 소리가 크다.']];
- N.forEach((a,i)=>s.notes.push({id:'n'+i,date:a[0],ic:a[1],t:a[2],cat:a[3],body:a[4],ph:[]}));
+ const NP={2:['sp12'],4:['sp5','sp6','sp12'],5:['sp9'],7:['sp11'],9:['sp1','sp9']};
+ N.forEach((a,i)=>s.notes.push({id:'n'+i,date:a[0],ic:a[1],t:a[2],cat:a[3],body:a[4],ph:NP[i]||[]}));
  const G=(scope,key,t,d)=>s.goals.push({id:uid(),scope:scope,key:key,t:t,d:d});
  G('year','2026','책 24권 읽기',false);G('year','2026','운동 주 3회',false);G('year','2026','여행 2번 가기',true);
  G('month','2026-10','여행 짐 체크리스트 완료',true);G('month','2026-10','여행 사진 정리',false);G('month','2026-10','책 두 권 끝내기',true);G('month','2026-10','11월 계획 세우기',false);
@@ -388,6 +392,7 @@ function mkSample(){
 /* ---------- state ---------- */
 const S={mode:'sample',theme:'light',d:null,view:'month',cur:NOW,hist:[],nc:null,nid:null,logIc:'📝',hau:'',ai:{range:'all',anon:true,memo:false},mm:'text',rf:null,pk:null,cb:null,hid:null,hic:'star'};
 let PH={};
+S.nf={a:'',r:''};S.ny='';
 const TABS=['year','month','week','day','tri','review','notes','habit','goal','setting'],TABN={tri:'3 years'};
 const gd=k=>S.d.days[k]||null;
 const wd=k=>S.d.days[k]||(S.d.days[k]=nd());
@@ -429,6 +434,8 @@ function goalBlock(scope,label,key){
  gs.map(g=>'<div class="ck '+(g.d?'on':'')+'"><button class="bx" data-a="tgG" data-id="'+g.id+'" aria-label="완료"></button><span>'+esc(g.t)+'</span><button class="x" data-a="delG" data-id="'+g.id+'">✕</button></div>').join('')+
  '<form class="addf" data-form="goal" data-scope="'+scope+'" data-key="'+key+'"><input placeholder="+ 목표 추가" enterkeyhint="done"><button class="go">↵</button></form>';
 }
+const LOC={'국내':['수도권','경상도','충청도','전라도','강원도','제주도'],'국외':['아시아','유럽','오세아니아','아프리카','북아메리카','남아메리카']};
+const locTxt=n=>[n.area,n.reg].filter(Boolean).join(' · ');
 const MOODS=['','😫','😕','😐','🙂','😆'];
 const WX=[['sun','☀️','맑음'],['pc','🌤','구름조금'],['cl','☁️','흐림'],['rn','🌧','비'],['th','⛈','천둥'],['sn','🌨','눈'],['wd','💨','바람'],['fg','🌫','안개·먼지']];
 const wxE=k=>{const a=WX.find(x=>x[0]===k);return a?a[1]:''};
@@ -517,11 +524,18 @@ function vDay(){
 function vNotes(){
  if(S.nid)return vNote();
  const c=P(S.cur),y=c.getFullYear(),m=c.getMonth(),cats=S.d.cats;
- const yn=S.d.notes.filter(n=>P(n.date).getFullYear()===y);
- if(S.nc!=null){const cat=cats[S.nc],list=yn.filter(n=>n.cat===cat).sort((a,b)=>b.date.localeCompare(a.date));
-  return '<div class="ttl"><h1>'+esc(cat)+'<small>'+y+'</small></h1><button class="pn" data-a="toc">◂ CONTENTS</button></div><hr class="rule">'+(list.map(n=>'<button class="nl" data-a="openNote" data-id="'+n.id+'"><span class="e">'+n.ic+'</span><span><b>'+esc(n.t)+'</b><small>'+n.date.replace(/-/g,'.')+'</small>'+(n.body?'<p>'+esc(n.body)+'</p>':'')+'</span></button>').join('')||'<div class="emp">이 카테고리에는 아직 노트가 없어요.</div>')+'<button class="btn blk wide" data-a="newNote" data-cat="'+S.nc+'">+ 새 노트</button>';}
+ const yn=S.d.notes.slice();
+ if(S.nc!=null){const cat=cats[S.nc],isP=cat==='장소';let list=yn.filter(n=>n.cat===cat).sort((a,b)=>b.date.localeCompare(a.date));
+  const ys=Array.from(new Set(list.map(n=>n.date.slice(0,4)))).sort().reverse();if(S.ny&&ys.indexOf(S.ny)<0)S.ny='';
+  const yc=ys.length>0?'<div class="chips"><button class="chip'+(S.ny?'':' on')+'" data-a="yF" data-v="">전체 연도 '+list.length+'</button>'+ys.map(v=>'<button class="chip'+(S.ny===v?' on':'')+'" data-a="yF" data-v="'+v+'">'+v+' '+list.filter(n=>n.date.indexOf(v)===0).length+'</button>').join('')+'</div>':'';
+  if(S.ny)list=list.filter(n=>n.date.indexOf(S.ny)===0);
+  let fl='';if(isP){const all=list,f=S.nf,ch=(k,v,t,c)=>'<button class="chip'+(((k==='a'?f.a:f.r)===v)?' on':'')+'" data-a="locF" data-k="'+k+'" data-v="'+v+'">'+t+(c!=null?' '+c:'')+'</button>';
+   fl='<div class="chips">'+ch('a','','전체',all.length)+Object.keys(LOC).map(a=>ch('a',a,a,all.filter(n=>n.area===a).length)).join('')+'</div>';
+   if(f.a)fl+='<div class="chips">'+ch('r','','모두')+LOC[f.a].map(r=>ch('r',r,r,all.filter(n=>n.area===f.a&&n.reg===r).length)).join('')+'</div>';
+   list=list.filter(n=>(!f.a||n.area===f.a)&&(!f.r||n.reg===f.r))}
+  return '<div class="ttl"><h1>'+esc(cat)+'<small>'+(S.ny||'ALL')+'</small></h1><button class="pn" data-a="toc">◂ CONTENTS</button></div><hr class="rule">'+yc+fl+(list.map(n=>'<button class="nl" data-a="openNote" data-id="'+n.id+'"><span class="e">'+n.ic+'</span><span><b>'+esc(n.t)+'</b><small>'+n.date.replace(/-/g,'.')+(isP&&locTxt(n)?' · '+esc(locTxt(n)):'')+'</small>'+(n.body?'<p>'+esc(n.body)+'</p>':'')+'</span>'+(n.ph&&n.ph.length?'<span class="th" style="background-image:'+bgOf(n.ph[0])+'">'+(n.ph.length>1?'<em>'+n.ph.length+'</em>':'')+'</span>':'')+'</button>').join('')||'<div class="emp">이 카테고리에는 아직 노트가 없어요.</div>')+'<button class="btn blk wide" data-a="newNote" data-cat="'+S.nc+'">+ 새 노트</button>';}
  let h='<div class="ttl"><h1>Notes</h1></div><hr class="rule">';
- h+='<div class="yrs"><button data-a="yp">◂</button><b>'+y+'</b><button data-a="yn">▸</button></div><span class="lb ctr">CONTENTS</span><div class="toc">'+cats.map((cn,i)=>'<button class="tr" data-a="openCat" data-i="'+i+'"><em>'+pad(i+1)+'</em><b>'+esc(cn)+'</b><i></i><span>'+yn.filter(n=>n.cat===cn).length+'</span></button>').join('')+'</div>';
+ h+='<div style="height:12px"></div><span class="lb ctr">CONTENTS · 전체 노트</span><div class="toc">'+cats.map((cn,i)=>'<button class="tr" data-a="openCat" data-i="'+i+'"><em>'+pad(i+1)+'</em><b>'+esc(cn)+'</b><i></i><span>'+yn.filter(n=>n.cat===cn).length+'</span></button>').join('')+'</div>';
  const rec=yn.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
  h+='<div class="lbr"><span class="lb strong">On</span><span class="lb">'+rec.length+'</span></div><div class="hs">'+(rec.map(n=>'<button class="nc" data-a="openNote" data-id="'+n.id+'">'+((P(NOW)-P(n.date))/864e5<=14&&n.date<=NOW?'<u>ON</u>':'')+'<small>'+n.date.replace(/-/g,'.')+'</small><b>'+esc(n.t)+'</b><span>'+n.ic+' '+esc(n.cat)+'</span></button>').join('')||'<div class="emp">아직 노트가 없어요</div>')+'</div>';
  const mk=y+'-'+pad(m+1),mn=S.d.notes.filter(n=>n.date.indexOf(mk)===0);
@@ -539,6 +553,7 @@ function vNote(){
  '<div class="ni"><button class="icb" data-a="pickIc" data-for="note" style="width:38px;height:38px;font-size:20px">'+n.ic+'</button><input class="nt" data-f="note:t" value="'+esc(n.t)+'" placeholder="제목"></div>'+
  '<div class="ni"><input type="date" data-f="note:date" value="'+n.date+'"></div>'+
  '<span class="lb">CATEGORY</span><div class="chips">'+S.d.cats.map(c=>'<button class="chip'+(c===n.cat?' on':'')+'" data-a="setCat" data-c="'+S.d.cats.indexOf(c)+'">'+esc(c)+'</button>').join('')+'</div>'+
+ (n.cat==='장소'?'<span class="lb" style="margin-top:10px">LOCATION · 국내/국외</span><div class="chips">'+Object.keys(LOC).map(a=>'<button class="chip'+(n.area===a?' on':'')+'" data-a="setLoc" data-k="area" data-v="'+a+'">'+a+'</button>').join('')+'</div>'+(n.area&&LOC[n.area]?'<div class="chips">'+LOC[n.area].map(r=>'<button class="chip'+(n.reg===r?' on':'')+'" data-a="setLoc" data-k="reg" data-v="'+r+'">'+r+'</button>').join('')+'</div>':''):'')+
  '<div class="sec"><textarea class="ta" rows="8" data-f="note:body" placeholder="무엇을 보고, 읽고, 느꼈나요?">'+esc(n.body)+'</textarea></div>'+pstrip(n.ph,'note');
 }
 function habStats(y,m){
@@ -913,10 +928,13 @@ const A={
  delPh(el){delPhoto(el.dataset.id,el.dataset.t)},
  yp(){const d=P(S.cur);d.setDate(1);d.setFullYear(d.getFullYear()-1);S.cur=ymd(d);render(false)},
  yn(){const d=P(S.cur);d.setDate(1);d.setFullYear(d.getFullYear()+1);S.cur=ymd(d);render(false)},
- openCat(el){S.nc=+el.dataset.i;render(false)},toc(){S.nc=null;render(false)},
+ openCat(el){S.nc=+el.dataset.i;S.nf={a:'',r:''};S.ny='';render(false)},
+ yF(el){S.ny=el.dataset.v;render(true)},toc(){S.nc=null;render(false)},
  openNote(el){closeSh();S.nid=el.dataset.id;go('notes',true)},
  newNote(el){newNote(el.dataset.d,el.dataset.cat!=null?+el.dataset.cat:null)},
  noteDay(el){const k=el.dataset.d,nn=S.d.notes.filter(n=>n.date===k);if(!nn.length){newNote(k)}else if(nn.length===1){S.nid=nn[0].id;go('notes',true)}else sheet('<h3>'+k.replace(/-/g,'.')+'</h3>'+nn.map(n=>'<button class="mi" data-a="openNote" data-id="'+n.id+'">'+n.ic+' '+esc(n.t||'(제목 없음)')+'</button>').join('')+'<button class="mi" data-a="newNote" data-d="'+k+'">＋ 새 노트</button>')},
+ setLoc(el){const n=S.d.notes.find(x=>x.id===S.nid);if(!n)return;const k=el.dataset.k,v=el.dataset.v;if(k==='area'){if(n.area===v){n.area='';n.reg=''}else{n.area=v;n.reg=''}}else n.reg=n.reg===v?'':v;save();render(true)},
+ locF(el){const k=el.dataset.k,v=el.dataset.v;if(k==='a'){S.nf={a:v,r:''}}else S.nf.r=v;render(true)},
  setCat(el){const n=S.d.notes.find(x=>x.id===S.nid);n.cat=S.d.cats[+el.dataset.c];save();render(true)},
  delNote(){ask('이 노트를 삭제할까요?','삭제',()=>{const n=S.d.notes.find(x=>x.id===S.nid);S.d.notes=S.d.notes.filter(x=>x.id!==S.nid);if(n&&S.mode==='mine')n.ph.forEach(id=>idb.del(id));S.nid=null;save();if(S.hist.length)A.back();else render(false)})},
  delCat(el){const i=+el.dataset.i,c=S.d.cats[i];if(S.d.notes.some(n=>n.cat===c)){sheet('<h3>사용 중인 카테고리예요</h3><p class="emp">이 카테고리의 노트를 먼저 옮기거나 삭제해 주세요.</p><button class="btn" data-a="closeSh">확인</button>');return}S.d.cats.splice(i,1);save();render(true)},
