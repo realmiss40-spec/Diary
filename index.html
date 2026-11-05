@@ -165,6 +165,10 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .hg .nm svg{flex:none;width:12px;height:12px}
 .hg .p{font-size:9.5px;color:var(--ink);text-align:right}
 .hg .c{display:grid;place-items:center;height:22px}
+.hg button.c{width:100%;padding:0}
+.hg .c.sel{background:var(--soft)}
+.hg .n.sel{color:var(--ink);font-weight:700}
+.hdb{padding:8px 10px;font-size:11px;color:var(--mut)}
 .dt{width:6px;height:6px;border-radius:50%;border:1px solid var(--faint);display:block}
 .dt.s1{background:var(--ink);border-color:var(--ink)}
 .dt.s2{border-color:var(--ink);background:linear-gradient(90deg,var(--ink) 50%,transparent 50%)}
@@ -343,13 +347,13 @@ all(){return new Promise(res=>{const o={};if(!idb.db)return res(o);try{const r=i
 /* ---------- data ---------- */
 const nd=()=>({wx:'',slH:'',slM:'',slS:'',mA:0,mP:0,mv:'',ex:'',stand:'',steps:'',rd:0,pp:[],memo:'',ph:[],habits:{}});
 const fix=d=>{const b=nd();Object.keys(b).forEach(k=>{if(d[k]==null)d[k]=b[k]});return d};
-const defHabits=()=>[{id:'h1',n:'Sleep',ic:'bed',auto:'sl'},{id:'h2',n:'Walk',ic:'walk',auto:'st'},{id:'h3',n:'Workout',ic:'dumbbell'},{id:'h4',n:'Drink water',ic:'drop'},{id:'h5',n:'Mood',ic:'heart',auto:'md'},{id:'h6',n:'Reading',ic:'book',auto:'rd'},{id:'h7',n:'Journal',ic:'doc'},{id:'h8',n:'Night',ic:'moon'}];
+const defHabits=()=>[{id:'h1',n:'Sleep',ic:'bed',auto:'sl'},{id:'h2',n:'Walk',ic:'walk',auto:'st'},{id:'h3',n:'Workout',ic:'dumbbell'},{id:'h4',n:'Drink water',ic:'drop'},{id:'h5',n:'Mood',ic:'heart',auto:'md'},{id:'h6',n:'Reading',ic:'book',auto:'rd'},{id:'h7',n:'Journal',ic:'doc',auto:'jn'},{id:'h8',n:'Night',ic:'moon'}];
 const mkNew=()=>({title:'My Diary',habits:defHabits(),cats:['책','취미','관람','여행','장소','일상'],days:{},notes:[],goals:[],memo:{},wl:{},rv:{},rg:{mv:500,ex:30,st:12,slT:90,stT:6000,mdT:4},gcal:[]});
 function norm(d){const b=mkNew();d=d||{};Object.keys(b).forEach(k=>{if(d[k]==null)d[k]=b[k]});
  d.rg=Object.assign({},b.rg,d.rg);
  d.cats=d.cats.map(c=>c==='감상'?'여행':c).filter((c,i,a)=>a.indexOf(c)===i);
  d.notes.forEach(n=>{if(n.cat==='감상')n.cat='여행'});
- d.habits.forEach(h=>{if(h.auto!==undefined)return;if(h.id==='h5'&&h.n==='Vitamins'){h.n='Mood';h.ic='heart';h.auto='md'}else if(h.id==='h1'&&h.n==='Sleep')h.auto='sl';else if(h.id==='h2'&&h.n==='Walk')h.auto='st';else if(h.id==='h6'&&h.n==='Reading')h.auto='rd'});
+ d.habits.forEach(h=>{if(h.auto!==undefined)return;if(h.id==='h5'&&h.n==='Vitamins'){h.n='Mood';h.ic='heart';h.auto='md'}else if(h.id==='h1'&&h.n==='Sleep')h.auto='sl';else if(h.id==='h2'&&h.n==='Walk')h.auto='st';else if(h.id==='h6'&&h.n==='Reading')h.auto='rd';else if(h.id==='h7'&&h.n==='Journal')h.auto='jn'});
  Object.keys(d.days).forEach(k=>fix(d.days[k]));
  return d}
 const SPH={sp1:'linear-gradient(160deg,#8a9599,#2f3b40)',sp2:'linear-gradient(150deg,#d8b48a,#6b4a2f)',sp3:'linear-gradient(180deg,#2b2f3a,#0f1115)',sp4:'linear-gradient(170deg,#7c9bb4,#1b2a38)',sp5:'linear-gradient(180deg,#f0b27a,#37566e)',sp6:'linear-gradient(160deg,#cdbc9f,#5b4a38)',sp7:'radial-gradient(circle at 50% 45%,#e9b6c0 0,#e9b6c0 22%,#1b1d22 24%)',sp8:'linear-gradient(140deg,#ecc25a,#a2502f)',sp9:'linear-gradient(160deg,#c0b8a8,#59524a)',sp10:'linear-gradient(160deg,#8a3445,#26141a)',sp11:'linear-gradient(160deg,#d6dce1,#7e8a94)',sp12:'linear-gradient(180deg,#e9d7b8,#9aa7a8)'};
@@ -403,6 +407,7 @@ const AUTO={
  sl:{n:'수면 점수',val:(d,g)=>(+d.slS||0)>=g.slT,rule:g=>'수면 점수 '+g.slT+'점 이상',short:g=>g.slT+'점↑',cur:d=>d.slS?d.slS+'점':'미입력'},
  st:{n:'걸음수',val:(d,g)=>(+d.steps||0)>=g.stT,rule:g=>'걸음수 '+Number(g.stT).toLocaleString('ko-KR')+'보 이상',short:g=>Number(g.stT).toLocaleString('ko-KR')+'보↑',cur:d=>d.steps?Number(d.steps).toLocaleString('ko-KR')+'보':'미입력'},
  md:{n:'기분',val:(d,g)=>(+d.mA||0)>=g.mdT&&(+d.mP||0)>=g.mdT,rule:g=>'오전·오후 기분 모두 '+g.mdT+'점 이상',short:g=>g.mdT+'↑',cur:d=>(MOODS[d.mA]||'–')+' '+(MOODS[d.mP]||'–')},
+ jn:{n:'일기 메모',val:d=>!!(d.memo&&d.memo.trim()),rule:()=>'DAY 메모를 입력',short:()=>'메모',cur:d=>d.memo&&d.memo.trim()?'작성함':'미입력'},
  rd:{n:'독서',val:d=>!!d.rd,rule:()=>'독서 ‘읽음’ 체크',short:()=>'읽음',cur:d=>d.rd?'읽음':'안 읽음'}};
 const autoOf=h=>h&&h.auto&&AUTO[h.auto]?AUTO[h.auto]:null;
 let GC=null;
@@ -574,10 +579,10 @@ function vHabit(){
  let h=ttl('Habit',y);
  h+='<div class="st4"><div><b>'+s.n+'<small>개</small></b><span>진행 중인 습관</span></div><div><b>'+s.done+'/'+s.n+'</b><span>선택일 완료</span></div><div><b>'+s.pct+'<small>%</small></b><span>이 달 전체</span></div><div>'+(s.best?'<div class="rd">'+ic(s.best.ic,13)+'<span style="font-size:11px;margin:0;color:var(--ink)">'+esc(s.best.n)+'</span></div><b style="font-size:13px;margin-top:2px">'+Math.round(s.best.s)+'일</b>':'<b>–</b>')+'<span>이 달 최고의 습관</span></div></div>';
  h+='<div style="border-top:1px solid var(--faint);margin:10px 0 12px"></div><div class="lbr" style="margin-top:6px"><span class="lb">'+y+'</span><span class="lb">하루 달성 비율</span></div>'+heat(y);
- h+='<div class="lbr"><span class="lb strong">'+pad(P(S.cur).getDate())+'일 체크 <span class="lb" style="display:inline;margin-left:6px">'+MS[m]+'</span></span><button class="lb" data-a="goDay" data-d="'+S.cur+'">DAY ›</button></div><div class="hrow">'+hs.map(x=>{const v=hv(S.cur,x.id);return '<button class="hb s'+v+(autoOf(x)?' au':'')+'" data-a="cyc" data-id="'+x.id+'"><i>'+ic(x.ic,16)+'</i><span>'+esc(x.n)+'</span></button>'}).join('')+'</div>';
+ h+='<div class="lbr"><span style="display:flex;align-items:center;gap:2px"><button class="hdb" data-a="hDay" data-n="-1" aria-label="전날">◂</button><span class="lb strong" style="min-width:112px;text-align:center">'+MS[m]+' '+pad(P(S.cur).getDate())+'일 · '+EN[P(S.cur).getDay()]+'</span><button class="hdb" data-a="hDay" data-n="1" aria-label="다음날">▸</button></span><span style="display:flex;gap:12px">'+(S.cur===NOW?'':'<button class="lb" data-a="hToday">오늘</button>')+'<button class="lb" data-a="goDay" data-d="'+S.cur+'">DAY ›</button></span></div><div class="hrow">'+hs.map(x=>{const v=hv(S.cur,x.id);return '<button class="hb s'+v+(autoOf(x)?' au':'')+'" data-a="cyc" data-id="'+x.id+'"><i>'+ic(x.ic,16)+'</i><span>'+esc(x.n)+'</span></button>'}).join('')+'</div>';
  h+='<div class="lbr"><span class="lb strong">'+MONTHS[m]+'</span><span class="lb">월간 습관표</span></div>';
- h+='<div class="hg" style="grid-template-columns:78px repeat('+n+',1fr) 26px"><div></div>'+Array.from({length:n},(_,i)=>'<div class="n">'+(i+1)+'</div>').join('')+'<div class="n" style="text-align:right">%</div><div></div>'+Array.from({length:n},(_,i)=>'<div class="n">'+'SMTWTFS'.charAt(new Date(y,m,i+1).getDay())+'</div>').join('')+'<div></div>';
- hs.forEach(x=>{let sum=0;let cells='';for(let i=1;i<=n;i++){const k=y+'-'+pad(m+1)+'-'+pad(i),v=hv(k,x.id);if(i<=el)sum+=sc(v);cells+='<div class="c"><i class="dt s'+v+(i>el?' f':'')+'"></i></div>'}
+ h+='<div class="hg" style="grid-template-columns:78px repeat('+n+',1fr) 26px"><div></div>'+Array.from({length:n},(_,i)=>'<div class="n'+(y+'-'+pad(m+1)+'-'+pad(i+1)===S.cur?' sel':'')+'">'+(i+1)+'</div>').join('')+'<div class="n" style="text-align:right">%</div><div></div>'+Array.from({length:n},(_,i)=>'<div class="n">'+'SMTWTFS'.charAt(new Date(y,m,i+1).getDay())+'</div>').join('')+'<div></div>';
+ hs.forEach(x=>{let sum=0;let cells='';for(let i=1;i<=n;i++){const k=y+'-'+pad(m+1)+'-'+pad(i),v=hv(k,x.id);if(i<=el)sum+=sc(v);cells+='<button class="c'+(k===S.cur?' sel':'')+'" data-a="selDay" data-d="'+k+'" aria-label="'+k+'"><i class="dt s'+v+(i>el?' f':'')+'"></i></button>'}
   h+='<button class="nm" data-a="editH" data-id="'+x.id+'">'+ic(x.ic,12)+'<span style="overflow:hidden;text-overflow:ellipsis">'+esc(x.n)+'</span></button>'+cells+'<div class="p">'+(el?Math.round(sum/el*100):0)+'</div>';});
  h+='</div><button class="btn wide sm" data-a="editH" data-id="">+ 습관 추가</button><p class="emp" style="margin-top:10px">아이콘을 한 번 누르면 ●(완료), 두 번 누르면 ◐(절반), 세 번 누르면 비워져요. AUTO 표시 습관은 DAY 입력으로 자동 체크돼요 (수면 점수 ≥ '+S.d.rg.slT+'점 · 걸음수 ≥ '+Number(S.d.rg.stT).toLocaleString('ko-KR')+'보 · 독서 읽음 · 기분 오전·오후 모두 ≥ '+S.d.rg.mdT+'점).</p>';
  return h;
@@ -674,7 +679,7 @@ function ask(msg,label,fn){S.cb=fn;sheet('<h3>'+esc(msg)+'</h3><div class="gr" s
 function emojiSheet(){sheet('<h3>아이콘 선택</h3><div class="eg">'+EMO.map(e=>'<button data-a="emo" data-e="'+e+'">'+e+'</button>').join('')+'</div>')}
 function habitSheet(id){
  const h=S.d.habits.find(x=>x.id===id);S.hid=id||null;S.hic=h?h.ic:'star';S.hau=h&&h.auto?h.auto:'';
- sheet('<h3>'+(h?'습관 편집':'습관 추가')+'</h3><input class="fld" id="hn" placeholder="습관 이름" value="'+esc(h?h.n:'')+'"><div class="ig">'+Object.keys(ICONS).map(k=>'<button data-a="hic" data-k="'+k+'" class="'+(k===S.hic?'on':'')+'">'+ic(k,20)+'</button>').join('')+'</div><span class="lb">DAY 자동 연동</span><div class="chips" id="aus">'+[['','없음 (직접 체크)'],['sl','수면 점수'],['st','걸음수'],['rd','독서'],['md','기분 (오전·오후)']].map(a=>'<button class="chip'+(a[0]===S.hau?' on':'')+'" data-a="hau" data-k="'+a[0]+'">'+a[1]+'</button>').join('')+'</div><p class="emp" style="margin:0 0 10px">기준은 설정 탭의 ‘습관 자동 연동 기준’에서 바꿔요.</p><div class="gr"><button class="btn blk" data-a="saveH">저장</button>'+(h?'<button class="btn" data-a="delH" style="color:var(--red);border-color:var(--red)">삭제</button>':'')+'<button class="btn" data-a="closeSh">취소</button></div>');
+ sheet('<h3>'+(h?'습관 편집':'습관 추가')+'</h3><input class="fld" id="hn" placeholder="습관 이름" value="'+esc(h?h.n:'')+'"><div class="ig">'+Object.keys(ICONS).map(k=>'<button data-a="hic" data-k="'+k+'" class="'+(k===S.hic?'on':'')+'">'+ic(k,20)+'</button>').join('')+'</div><span class="lb">DAY 자동 연동</span><div class="chips" id="aus">'+[['','없음 (직접 체크)'],['sl','수면 점수'],['st','걸음수'],['rd','독서'],['jn','DAY 메모'],['md','기분 (오전·오후)']].map(a=>'<button class="chip'+(a[0]===S.hau?' on':'')+'" data-a="hau" data-k="'+a[0]+'">'+a[1]+'</button>').join('')+'</div><p class="emp" style="margin:0 0 10px">기준은 설정 탭의 ‘습관 자동 연동 기준’에서 바꿔요.</p><div class="gr"><button class="btn blk" data-a="saveH">저장</button>'+(h?'<button class="btn" data-a="delH" style="color:var(--red);border-color:var(--red)">삭제</button>':'')+'<button class="btn" data-a="closeSh">취소</button></div>');
 }
 function searchSheet(){sheet('<input class="srin" id="sq" placeholder="🔍 일기·일정·노트 검색" autocomplete="off"><div id="sres"><div class="emp">검색어를 입력하세요</div></div>');setTimeout(()=>{const e=$('#sq');if(e)e.focus()},50)}
 function doSearch(q){
@@ -889,6 +894,9 @@ const A={
  prev(){nav(-1)},next(){nav(1)},
  tdy(){S.cur=NOW;render(false)},
  goV(el){closeSh();go(el.dataset.v)},
+ hDay(el){S.cur=add(S.cur,+el.dataset.n);render(true)},
+ hToday(){S.cur=NOW;render(true)},
+ selDay(el){S.cur=el.dataset.d;render(true)},
  goWk(el){closeSh();S.cur=el.dataset.d;go('week')},
  openRv(el){closeSh();S.cur=el.dataset.d;S.nid=null;go('review')},
  back(){const h=S.hist.pop();if(!h)return;S.view=h[0];S.cur=h[1];S.nc=h[2];S.nid=h[3];render(false)},
