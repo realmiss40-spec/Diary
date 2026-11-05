@@ -799,23 +799,25 @@ function gcalUrl(k,d){
 const csvc=v=>{v=String(v==null?'':v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
 function aiBuild(){
  const o=S.ai,days=S.d.days;
- let keys=Object.keys(days).filter(k=>k<=NOW&&written(days[k])).sort();
+ const nb={};S.d.notes.forEach(n=>{(nb[n.date]=nb[n.date]||[]).push(n)});
+ const uniq=a=>a.filter((x,i)=>x&&a.indexOf(x)===i);
+ let keys=Array.from(new Set(Object.keys(days).filter(k=>written(days[k])).concat(Object.keys(nb)))).filter(k=>k<=NOW).sort();
  if(o.range==='1y'){const lo=add(NOW,-364);keys=keys.filter(k=>k>=lo)}else if(o.range==='1m'){const lo=add(NOW,-29);keys=keys.filter(k=>k>=lo)}
  if(!keys.length)return null;
- const cnt={};keys.forEach(k=>days[k].pp.forEach(n=>{cnt[n]=(cnt[n]||0)+1}));
+ const cnt={};keys.forEach(k=>(days[k]||nd()).pp.forEach(n=>{cnt[n]=(cnt[n]||0)+1}));
  const order=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||(a<b?-1:1)),map={};
  order.forEach((n,i)=>{map[n]='사람'+(i+1)});
  const nm=n=>o.anon?map[n]:n;
  const hs=S.d.habits;
- const head=['date','weekday','month','week_of_year','day_of_year','weather','sleep_min','sleep_score','mood_am','mood_pm','mood_avg','move_kcal','exercise_min','stand_hours','steps','read','people_count','met_anyone','people'].concat(o.memo?['memo']:[]).concat(hs.map(h=>'habit_'+h.n.replace(/\s+/g,'_')));
+ const head=['date','weekday','month','week_of_year','day_of_year','weather','sleep_min','sleep_score','mood_am','mood_pm','mood_avg','move_kcal','exercise_min','stand_hours','steps','read','people_count','met_anyone','people','has_daily_record','note_count','note_cats','note_loc','trip'].concat(o.memo?['memo','note_text']:[]).concat(hs.map(h=>'habit_'+h.n.replace(/\s+/g,'_')));
  const num=v=>v===''||v==null?'':(+v);
  const rows=keys.map(k=>{
-  const d=days[k],dt=P(k),y=dt.getFullYear();
+  const has=!!days[k]&&written(days[k]),d=days[k]||nd(),ns=nb[k]||[],dt=P(k),y=dt.getFullYear();
   const sm=(d.slH!==''||d.slM!=='')?(+d.slH||0)*60+(+d.slM||0):'';
   const mv=[d.mA,d.mP].filter(x=>x>0),avg=mv.length?Math.round(mv.reduce((a,b)=>a+b,0)/mv.length*10)/10:'';
-  const r=[k,EN[dt.getDay()],dt.getMonth()+1,isoW(k).w,Math.round((dt-new Date(y,0,0))/864e5),(WX.find(a=>a[0]===d.wx)||[])[2]||'',sm,num(d.slS),d.mA||'',d.mP||'',avg,num(d.mv),num(d.ex),num(d.stand),num(d.steps),d.rd?1:0,d.pp.length,d.pp.length?1:0,d.pp.map(nm).join('|')];
-  if(o.memo)r.push((d.memo||'').replace(/\s+/g,' ').trim());
-  hs.forEach(h=>r.push(hv(k,h.id)));
+  const r=[k,EN[dt.getDay()],dt.getMonth()+1,isoW(k).w,Math.round((dt-new Date(y,0,0))/864e5),(WX.find(a=>a[0]===d.wx)||[])[2]||'',sm,num(d.slS),d.mA||'',d.mP||'',avg,num(d.mv),num(d.ex),num(d.stand),num(d.steps),has?(d.rd?1:0):'',has?d.pp.length:'',has?(d.pp.length?1:0):'',d.pp.map(nm).join('|'),has?1:0,ns.length,uniq(ns.map(n=>n.cat)).join('|'),uniq(ns.filter(n=>n.area).map(locTxt)).join('|'),ns.some(n=>n.cat==='여행')?1:0];
+  if(o.memo){r.push((d.memo||'').replace(/\s+/g,' ').trim());r.push(ns.map(n=>(n.t||'')+(n.body?': '+n.body.replace(/\s+/g,' ').trim().slice(0,200):'')).join(' | '))}
+  hs.forEach(h=>r.push(has?hv(k,h.id):''));
   return r.map(csvc).join(',');
  });
  const csv=[head.map(csvc).join(',')].concat(rows).join('\n');
@@ -824,8 +826,12 @@ function aiBuild(){
  const L=[];
  L.push('# 요청');
  L.push('아래는 내가 매일 기록한 개인 다이어리 데이터(CSV)야. 너는 데이터 분석가로서 이 기록을 분석해서 내 생활 패턴을 알려줘.','');
- L.push('- 기록 기간: '+first+' ~ '+last+' ('+span+'일 중 '+keys.length+'일 기록)');
+ const nDaily=keys.filter(k=>days[k]&&written(days[k])).length,nNoteOnly=keys.length-nDaily,hasTrip=keys.some(k=>(nb[k]||[]).some(n=>n.cat==='여행'));
+ L.push('- 기록 기간: '+first+' ~ '+last+' ('+span+'일 중 '+keys.length+'일 기록 · 일상 기록 '+nDaily+'일, 노트만 쓴 날 '+nNoteOnly+'일)');
  L.push('- 기록이 없는 날짜는 CSV에 행이 없어(미기록). 결측으로 취급해줘.');
+ if(nNoteOnly)L.push('- has_daily_record가 0인 날은 그날 노트만 쓰고 일상 지표(수면·기분·걸음수·습관 등)는 기록하지 않은 날이야. 이 지표들은 0이 아니라 결측이야. 이상치로 분류하거나 평균에 넣지 말고 해당 지표 분석에서는 제외해줘.');
+ L.push('- note_cats, note_loc: 그날 쓴 노트의 카테고리와 장소 태그야. trip=1인 날은 여행 노트를 쓴 날이야.');
+ if(hasTrip)L.push('- 여행 중에는 일상 기록을 안 쓰거나 평소와 지표가 크게 다를 수 있어. 그건 이상치나 기록 습관의 문제가 아니라 “여행”으로 해석해줘. CSV에 행이 없는 날이 trip=1인 날 바로 앞뒤로 이어져 있으면 여행 기간일 가능성이 높으니 그 구간도 여행으로 묶어서 봐줘.');
  L.push('- 빈칸은 입력하지 않은 값이야. 0으로 계산하지 말고 제외해줘.');
  L.push('- people이 비어 있는 날은 “아무도 만나지 않은 날”로 간주해줘.');
  if(o.anon)L.push('- 개인정보 보호를 위해 사람 이름은 “사람1, 사람2…”로 바꿨어. 숫자가 작을수록 자주 만난 사람이야.');
@@ -839,6 +845,8 @@ function aiBuild(){
  L.push('- steps: 걸음수 / read: 독서 여부(1=읽음)');
  L.push('- people_count: 만난 사람 수 / met_anyone: 누군가 만났는지(1/0) / people: 만난 사람('+(o.anon?'코드':'이름')+', | 로 구분)');
  if(o.memo)L.push('- memo: 그날의 짧은 메모');
+ L.push('- has_daily_record: 그날 일상 기록(수면·기분·활동·메모 등)을 입력했는지(1/0) / note_count: 그날 쓴 노트 수 / note_cats: 노트 카테고리(| 로 구분) / note_loc: 장소 노트의 국내·국외, 지역 태그 / trip: 여행 노트를 쓴 날(1/0)');
+ if(o.memo)L.push('- note_text: 그날 노트의 제목과 내용 일부');
  L.push('- 습관 컬럼:');
  L.push('  - '+habDesc);
  L.push('','# 분석해줘');
@@ -847,8 +855,9 @@ function aiBuild(){
  L.push('3. 수면: sleep_score, sleep_min과 같은 날 기분의 관계, 그리고 전날 수면과 다음 날 기분의 관계를 알려줘.');
  L.push('4. 독서와 습관: 독서한 날, 습관을 많이 달성한 날의 기분 차이를 봐줘.');
  if(o.range==='1m')L.push('5. 주 단위 흐름: 주별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 한 달 안에서 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지거나 좋아진 주가 있는지 알려줘.');else L.push('5. 시기(계절·월): 월별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 평소보다 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지는 시기가 있는지 알려줘.');
- if(keys.some(k=>days[k].wx))L.push('5-2. 날씨: weather별로 mood_am, mood_pm, mood_avg, sleep_score, steps, exercise_min, 사람을 만난 비율(met_anyone)의 평균을 표로 보여줘. 비·눈·흐린 날과 맑은 날을 묶어서도 비교하고, 날씨가 나쁜 날에 내가 습관이나 활동을 덜 하는지도 알려줘. 날씨 기록이 없는 날은 제외해줘.');
+ if(keys.some(k=>(days[k]||{}).wx))L.push('5-2. 날씨: weather별로 mood_am, mood_pm, mood_avg, sleep_score, steps, exercise_min, 사람을 만난 비율(met_anyone)의 평균을 표로 보여줘. 비·눈·흐린 날과 맑은 날을 묶어서도 비교하고, 날씨가 나쁜 날에 내가 습관이나 활동을 덜 하는지도 알려줘. 날씨 기록이 없는 날은 제외해줘.');
  L.push('6. 요일 패턴이 있는지 알려줘.');
+ if(hasTrip)L.push('6-2. 여행: trip=1인 날과 그 앞뒤 기록 없는 구간을 여행 기간으로 묶어서, 여행 전·중·후의 기분, 수면 점수, 걸음수, 사람을 만난 비율을 평소와 비교해줘. 여행 직후 일상으로 돌아오는 데 며칠 걸렸는지도 알려줘. 여행 중 일상 지표가 비어 있는 날은 제외해줘.');
  L.push('7. 위 모두를 종합해서 “가장 의미 있는 발견 3가지”와, 내가 앞으로 기록하면 분석이 더 정확해질 항목 3가지를 제안해줘.');
  {let c=0,a=L.indexOf('# 분석해줘'),z=L.length;for(let q=a+1;q<z;q++){if(/^\d+(-\d+)?\. /.test(L[q]))L[q]=L[q].replace(/^\d+(-\d+)?\./,()=>(++c)+'.')}}
  L.push('','# 지켜줘야 할 것');
