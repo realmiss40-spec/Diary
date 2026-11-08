@@ -400,7 +400,7 @@ function mkSample(){
  return s;
 }
 /* ---------- state ---------- */
-const S={mode:'sample',theme:'light',d:null,view:'month',cur:NOW,hist:[],nc:null,nid:null,logIc:'📝',hau:'',ai:{range:'all',anon:true,memo:false},mm:'text',rf:null,pk:null,cb:null,hid:null,hic:'star'};
+const S={mode:'sample',theme:'light',d:null,view:'month',cur:NOW,hist:[],nc:null,nid:null,logIc:'📝',hau:'',ai:{range:'all',anon:true,memo:false,cy:false},mm:'text',rf:null,pk:null,cb:null,hid:null,hic:'star'};
 let PH={};
 S.nf={a:'',r:''};S.ny='';S.nq='';
 const TABS=['year','month','week','day','tri','review','notes','habit','goal','setting'],TABN={tri:'3 years'};
@@ -889,6 +889,25 @@ function gcalUrl(k,d){
 }
 /* ---------- AI export ---------- */
 const csvc=v=>{v=String(v==null?'':v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+const CYR=/생리|월경/,CYX=/예정|곧|다가|올 ?(것|듯|거)|할 ?(것|듯|거)|같(은|다|아)|싶|전에|전이|시작 ?전|아직|늦|불순|통|끝|째|중[이인에]?|안 ?(했|해|한|와|오|하|왔)|않/;
+const dd=(a,b)=>Math.round((P(a)-P(b))/864e5);
+function cyItems(){
+ const rg=S.d.rg,X=rg.cyX||[],A=rg.cyA||[],it=[];
+ Object.keys(S.d.days).forEach(k=>{const m=S.d.days[k].memo||'';if(CYR.test(m)&&!CYX.test(m))it.push({k:k,m:m,man:0})});
+ A.forEach(k=>{const x=it.find(y=>y.k===k);if(x)x.man=1;else it.push({k:k,m:(S.d.days[k]&&S.d.days[k].memo)||'',man:1})});
+ it.sort((a,b)=>a.k<b.k?-1:1);let last='';
+ it.forEach(x=>{if(!x.man&&X.indexOf(x.k)>=0)x.st='x';else if(!x.man&&last&&dd(x.k,last)<10)x.st='dup';else{x.st='on';last=x.k}});
+ return it;
+}
+const cyStarts=()=>cyItems().filter(x=>x.st==='on').map(x=>x.k);
+function cyInfo(k,st){
+ let i=-1;for(let j=0;j<st.length;j++){if(st[j]<=k)i=j;else break}
+ if(i<0)return['',''];const cd=dd(k,st[i])+1;if(cd>45)return['',''];
+ const nx=st[i+1],gap=nx?dd(nx,st[i]):0;
+ if(cd<=5)return[cd,'생리중'];
+ if(nx&&gap<=45)return[cd,dd(nx,k)<=7?'생리전7일':'그외'];
+ return[cd,cd<=21?'그외':''];
+}
 function aiBuild(){
  const o=S.ai,days=S.d.days;
  const nb={};S.d.notes.forEach(n=>{(nb[n.date]=nb[n.date]||[]).push(n)});
@@ -900,14 +919,15 @@ function aiBuild(){
  const order=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||(a<b?-1:1)),map={};
  order.forEach((n,i)=>{map[n]='사람'+(i+1)});
  const nm=n=>o.anon?map[n]:n;
- const hs=S.d.habits;
- const head=['date','weekday','month','week_of_year','day_of_year','weather','sleep_min','sleep_score','mood_am','mood_pm','mood_avg','move_kcal','exercise_min','stand_hours','steps','daylight_min','read','people_count','met_anyone','people','has_daily_record','note_count','note_cats','note_loc','trip'].concat(o.memo?['memo','note_text']:[]).concat(hs.map(h=>'habit_'+h.n.replace(/\s+/g,'_')));
+ const hs=S.d.habits,cyS=o.cy?cyStarts():[];
+ const head=['date','weekday','month','week_of_year','day_of_year','weather','sleep_min','sleep_score','mood_am','mood_pm','mood_avg','move_kcal','exercise_min','stand_hours','steps','daylight_min','read','people_count','met_anyone','people','has_daily_record','note_count','note_cats','note_loc','trip'].concat(o.cy?['cycle_day','cycle_phase']:[]).concat(o.memo?['memo','note_text']:[]).concat(hs.map(h=>'habit_'+h.n.replace(/\s+/g,'_')));
  const num=v=>v===''||v==null?'':(+v);
  const rows=keys.map(k=>{
   const has=!!days[k]&&written(days[k]),d=days[k]||nd(),ns=nb[k]||[],dt=P(k),y=dt.getFullYear();
   const sm=(d.slH!==''||d.slM!=='')?(+d.slH||0)*60+(+d.slM||0):'';
   const mv=[d.mA,d.mP].filter(x=>x>0),avg=mv.length?Math.round(mv.reduce((a,b)=>a+b,0)/mv.length*10)/10:'';
   const r=[k,EN[dt.getDay()],dt.getMonth()+1,isoW(k).w,Math.round((dt-new Date(y,0,0))/864e5),(WX.find(a=>a[0]===d.wx)||[])[2]||'',sm,num(d.slS),d.mA||'',d.mP||'',avg,num(d.mv),num(d.ex),num(d.stand),num(d.steps),num(d.dl),has?(d.rd?1:0):'',has?d.pp.length:'',has?(d.pp.length?1:0):'',d.pp.map(nm).join('|'),has?1:0,ns.length,uniq(ns.map(n=>n.cat)).join('|'),uniq(ns.filter(n=>n.area).map(locTxt)).join('|'),ns.some(n=>n.cat==='여행')?1:0];
+  if(o.cy){const ci=cyInfo(k,cyS);r.push(ci[0],ci[1])}
   if(o.memo){r.push((d.memo||'').replace(/\s+/g,' ').trim());r.push(ns.map(n=>(n.t||'')+(n.body?': '+n.body.replace(/\s+/g,' ').trim().slice(0,200):'')).join(' | '))}
   hs.forEach(h=>r.push(has?hv(k,h.id):''));
   return r.map(csvc).join(',');
@@ -927,6 +947,7 @@ function aiBuild(){
  L.push('- 빈칸은 입력하지 않은 값이야. 0으로 계산하지 말고 제외해줘.');
  L.push('- people이 비어 있는 날은 “아무도 만나지 않은 날”로 간주해줘.');
  if(o.anon)L.push('- 개인정보 보호를 위해 사람 이름은 “사람1, 사람2…”로 바꿨어. 숫자가 작을수록 자주 만난 사람이야.');
+ if(o.cy)L.push('- 생리는 시작한 날만 기록했고 기간은 5일로 가정했어. 시작일(위 cycle_day=1인 날)은 다이어리에서 추려낸 것이라 일부 틀릴 수 있어.');
  if(o.range==='1m')L.push('- 기록 기간이 최근 한 달이라 표본이 적어. 모든 결론은 “경향” 수준으로만 말해줘.');else if(span<365)L.push('- 기록 기간이 1년 미만이라 계절·시기 분석은 “경향” 수준으로만 말해줘.');
  L.push('','# 컬럼 설명');
  L.push('- date: 날짜 / weekday: 요일 / month: 월 / week_of_year: 연중 몇 번째 주 / day_of_year: 연중 몇 번째 날');
@@ -936,6 +957,7 @@ function aiBuild(){
  L.push('- move_kcal: 활동링 움직이기(kcal) / exercise_min: 운동(분) / stand_hours: 일어서기(시간)');
  L.push('- steps: 걸음수 / daylight_min: 일광시간(분, 애플워치) / read: 독서 여부(1=읽음)');
  L.push('- people_count: 만난 사람 수 / met_anyone: 누군가 만났는지(1/0) / people: 만난 사람('+(o.anon?'코드':'이름')+', | 로 구분)');
+ if(o.cy)L.push('- cycle_day: 가장 최근 생리 시작일을 1일로 센 주기 일수 / cycle_phase: 생리중(시작일부터 5일), 생리전7일(다음 생리 시작 전 7일), 그외 / 둘 다 빈칸이면 주기를 알 수 없는 날');
  if(o.memo)L.push('- memo: 그날의 짧은 메모');
  L.push('- has_daily_record: 그날 일상 기록(수면·기분·활동·메모 등)을 입력했는지(1/0) / note_count: 그날 쓴 노트 수 / note_cats: 노트 카테고리(| 로 구분) / note_loc: 장소 노트의 국내·국외, 지역 태그 / trip: 여행 노트를 쓴 날(1/0)');
  if(o.memo)L.push('- note_text: 그날 노트의 제목과 내용 일부');
@@ -949,6 +971,7 @@ function aiBuild(){
  if(keys.some(k=>(days[k]||{}).dl))L.push('4-2. 일광시간: daylight_min이 많은 날과 적은 날(기준 '+S.d.rg.dlT+'분)의 같은 날 기분, 같은 날과 다음 날의 sleep_score를 비교해줘. 날씨(weather)와 계절·월에 따라 일광시간이 어떻게 달라지는지도 알려줘.');
  if(o.range==='1m')L.push('5. 주 단위 흐름: 주별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 한 달 안에서 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지거나 좋아진 주가 있는지 알려줘.');else L.push('5. 시기(계절·월): 월별로 mood_avg, steps, exercise_min, sleep_score의 평균을 표로 보여주고, 평소보다 기분이나 활력(걸음수·활동량·수면)이 눈에 띄게 낮아지는 시기가 있는지 알려줘.');
  if(keys.some(k=>(days[k]||{}).wx))L.push('5-2. 날씨: weather별로 mood_am, mood_pm, mood_avg, sleep_score, steps, exercise_min, 사람을 만난 비율(met_anyone)의 평균을 표로 보여줘. 비·눈·흐린 날과 맑은 날을 묶어서도 비교하고, 날씨가 나쁜 날에 내가 습관이나 활동을 덜 하는지도 알려줘. 날씨 기록이 없는 날은 제외해줘.');
+ if(o.cy){const cs=cyS.length;L.push('5-3. 생리 주기: cycle_phase(생리중, 생리전7일, 그외)별로 mood_am, mood_pm, mood_avg, sleep_min, sleep_score, steps, exercise_min, 사람을 만난 비율(met_anyone)의 평균을 표로 보여줘. cycle_day별로 기분이 가장 낮거나 높은 시기가 있는지도 알려줘.'+(cs>=3?' 시작일 간격(주기 길이)이 얼마나 일정한지도 계산해줘.':' (생리 시작일이 '+cs+'번뿐이라 주기 길이는 계산하지 말고, 모든 비교는 참고 수준으로만 말해줘.)')+' cycle_phase가 빈칸인 날은 제외해줘.')}
  L.push('6. 요일 패턴이 있는지 알려줘.');
  if(hasTrip)L.push('6-2. 여행: trip=1인 날과 그 앞뒤 기록 없는 구간을 여행 기간으로 묶어서, 여행 전·중·후의 기분, 수면 점수, 걸음수, 사람을 만난 비율을 평소와 비교해줘. 여행 직후 일상으로 돌아오는 데 며칠 걸렸는지도 알려줘. 여행 중 일상 지표가 비어 있는 날은 제외해줘.');
  L.push('7. 위 모두를 종합해서 “가장 의미 있는 발견 3가지”와, 내가 앞으로 기록하면 분석이 더 정확해질 항목 3가지를 제안해줘.');
@@ -967,12 +990,18 @@ function aiSheet(){
  let h='<h3>AI 분석용 내보내기</h3>'+(S.mode==='sample'?'<p class="emp" style="font-size:12px">지금은 예시 데이터예요. 흐름을 시험해 보기용이에요.</p>':'')+
  '<span class="lb">기간</span><div class="chips">'+ch('range','all','전체')+ch('range','1y','최근 1년')+ch('range','1m','최근 1달')+'</div>'+
  '<span class="lb">사람 이름</span><div class="chips">'+ch('anon','true','익명 처리 (사람1, 사람2…)')+ch('anon','false','실명 그대로')+'</div>'+
- '<span class="lb">메모</span><div class="chips">'+ch('memo','false','제외')+ch('memo','true','포함')+'</div>';
+ '<span class="lb">메모</span><div class="chips">'+ch('memo','false','제외')+ch('memo','true','포함')+'</div>'+
+ '<span class="lb">생리 주기</span><div class="chips">'+ch('cy','false','제외')+ch('cy','true','포함')+'</div>';
  if(!r){return sheet(h+'<p class="emp">내보낼 기록이 없어요.</p><button class="btn" data-a="closeSh">닫기</button>')}
  const len=r.text.length;
  h+='<p class="emp" style="font-size:12px;margin-top:10px">기록 <b>'+r.n+'일</b> ('+r.first.replace(/-/g,'.')+' ~ '+r.last.replace(/-/g,'.')+') · 글자 수 약 '+Math.round(len/1000)+'천자'+(len>120000?'<br><b>분량이 커요.</b> 파일로 첨부하거나 ‘최근 1년’을 고르세요.':'')+'</p>';
  h+='<div class="gr"><button class="btn blk" data-a="aiShare">📤 파일로 공유·저장</button><button class="btn" data-a="aiCopy">📋 전체 복사</button></div><p id="aimsg" class="emp" style="font-size:12px"></p>';
  if(o.anon&&r.order.length)h+='<span class="lb">이름 대조표 (이 기기에만 보여요)</span><p class="emp" style="font-size:12px">'+r.order.slice(0,12).map(n=>r.map[n]+' = '+esc(n)+' ('+r.cnt[n]+'일)').join('<br>')+(r.order.length>12?'<br>… 외 '+(r.order.length-12)+'명':'')+'</p>';
+ if(o.cy){const it=cyItems(),on=it.filter(x=>x.st==='on').length,shown=it.slice(-16);
+  h+='<span class="lb">생리 시작일로 인식한 날</span><p class="emp" style="font-size:12px;margin:2px 0 6px">메모에 ‘생리’나 ‘월경’이 들어간 날을 찾았어요. ‘예정’, ‘안 했다’, ‘생리통’처럼 시작이 아닌 말이 같이 있으면 빼요. 틀린 날은 ✕로 빼고, 빠진 날은 아래에서 추가해 주세요. (지금 시작일 <b>'+on+'</b>번)</p>'+
+  (shown.length?shown.slice().reverse().map(x=>'<div class="arow" style="align-items:flex-start;gap:6px;margin:3px 0;'+(x.st==='on'?'':'opacity:.5')+'"><span style="width:78px;flex:none;font-size:12.5px">'+x.k.replace(/-/g,'.')+'</span><span style="flex:1;font-size:12px;color:var(--mut)">'+(x.man?'(직접 추가) ':x.st==='dup'?'(10일 안 중복) ':'')+esc(x.m.replace(/\s+/g,' ').slice(0,28))+'</span><button class="btn sm" data-a="cyTog" data-d="'+x.k+'">'+(x.st==='x'?'되돌리기':'✕ 빼기')+'</button></div>').join('')+(it.length>16?'<p class="emp" style="font-size:11.5px">오래된 '+(it.length-16)+'건은 생략했어요.</p>':''):'<p class="emp" style="font-size:12px">찾은 날이 없어요.</p>')+
+  '<div class="arow" style="margin-top:6px;gap:6px"><input type="date" id="cya" class="fld" style="flex:1"><button class="btn sm" data-a="cyAdd">＋ 시작일 추가</button></div>';
+ }
  sheet(h+'<button class="btn" data-a="closeSh" style="margin-top:8px">닫기</button>');
 }
 function aiMsg(t){const e=$('#aimsg');if(e)e.textContent=t}
@@ -1005,7 +1034,11 @@ const A={
  delPp(el){wd(S.cur).pp.splice(+el.dataset.i,1);save();render(true)},
  mm(el){S.mm=el.dataset.m;meta();render(true)},
  aiOpen(){aiSheet()},
- aiOpt(el){const k=el.dataset.k,v=el.dataset.v;S.ai[k]=(k==='anon'||k==='memo')?v==='true':v;aiSheet()},
+ aiOpt(el){const k=el.dataset.k,v=el.dataset.v;S.ai[k]=(k==='anon'||k==='memo'||k==='cy')?v==='true':v;aiSheet()},
+ cyTog(el){const k=el.dataset.d,rg=S.d.rg,A=rg.cyA||[],X=rg.cyX||[];
+  if(A.indexOf(k)>=0)rg.cyA=A.filter(x=>x!==k);else rg.cyX=X.indexOf(k)>=0?X.filter(x=>x!==k):X.concat(k);
+  save();aiSheet()},
+ cyAdd(){const i=$('#cya'),k=i&&i.value;if(!/^\d{4}-\d{2}-\d{2}$/.test(k||''))return;const rg=S.d.rg,A=rg.cyA||[];if(A.indexOf(k)<0)rg.cyA=A.concat(k);rg.cyX=(rg.cyX||[]).filter(x=>x!==k);save();aiSheet()},
  aiShare(){const r=aiBuild();if(!r)return;let f=null;try{f=new File([r.text],r.name,{type:'text/plain'})}catch(e){}
   if(f&&navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:'다이어리 AI 분석용'}).then(()=>aiMsg('공유 메뉴에서 선택한 곳에 저장·전달했어요.')).catch(e=>{if(e&&e.name!=='AbortError')aiDl(r)})}else aiDl(r)},
  aiCopy(){const r=aiBuild();if(!r)return;const t=r.text;
