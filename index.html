@@ -543,7 +543,7 @@ function vNotes(){
    fl='<div class="chips">'+ch('a','','전체',all.length)+Object.keys(LOC).map(a=>ch('a',a,a,all.filter(n=>n.area===a).length)).join('')+'</div>';
    if(f.a)fl+='<div class="chips">'+ch('r','','모두')+LOC[f.a].map(r=>ch('r',r,r,all.filter(n=>n.area===f.a&&n.reg===r).length)).join('')+'</div>';
    list=list.filter(n=>(!f.a||n.area===f.a)&&(!f.r||n.reg===f.r))}
-  return '<div class="ttl"><h1>'+esc(cat)+'<small>'+(S.ny||'ALL')+'</small></h1><button class="pn" data-a="toc">◂ CONTENTS</button></div><hr class="rule">'+yc+fl+(list.map(n=>'<button class="nl" data-a="openNote" data-id="'+n.id+'"><span class="e">'+n.ic+'</span><span><b>'+esc(n.t)+'</b><small>'+n.date.replace(/-/g,'.')+(isP&&locTxt(n)?' · '+esc(locTxt(n)):'')+'</small>'+(n.body?'<p>'+esc(n.body)+'</p>':'')+'</span>'+(n.ph&&n.ph.length?'<span class="th" style="background-image:'+bgOf(n.ph[0])+'">'+(n.ph.length>1?'<em>'+n.ph.length+'</em>':'')+'</span>':'')+'</button>').join('')||'<div class="emp">이 카테고리에는 아직 노트가 없어요.</div>')+'<button class="btn blk wide" data-a="newNote" data-cat="'+S.nc+'">+ 새 노트</button>';}
+  return '<div class="ttl"><h1>'+esc(cat)+'<small>'+(S.ny||'ALL')+'</small></h1><button class="pn" data-a="toc">◂ CONTENTS</button></div><hr class="rule">'+yc+fl+(list.map(n=>'<button class="nl" data-a="openNote" data-id="'+n.id+'"><span class="e">'+n.ic+'</span><span><b>'+esc(n.t)+'</b><small>'+n.date.replace(/-/g,'.')+(isP&&locTxt(n)?' · '+esc(locTxt(n)):'')+(n.place?' · 📍'+esc(n.place):'')+'</small>'+(n.body?'<p>'+esc(n.body)+'</p>':'')+'</span>'+(n.ph&&n.ph.length?'<span class="th" style="background-image:'+bgOf(n.ph[0])+'">'+(n.ph.length>1?'<em>'+n.ph.length+'</em>':'')+'</span>':'')+'</button>').join('')||'<div class="emp">이 카테고리에는 아직 노트가 없어요.</div>')+'<button class="btn blk wide" data-a="newNote" data-cat="'+S.nc+'">+ 새 노트</button>';}
  let h='<div class="ttl"><h1>Notes</h1></div><hr class="rule">';
  h+='<div style="height:12px"></div><span class="lb ctr">CONTENTS · 전체 노트</span><div class="toc">'+cats.map((cn,i)=>'<button class="tr" data-a="openCat" data-i="'+i+'"><em>'+pad(i+1)+'</em><b>'+esc(cn)+'</b><i></i><span>'+yn.filter(n=>n.cat===cn).length+'</span></button>').join('')+'</div>';
  const rec=yn.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
@@ -564,7 +564,7 @@ function vNote(){
  '<div class="ni"><input type="date" data-f="note:date" value="'+n.date+'"></div>'+
  '<span class="lb">CATEGORY</span><div class="chips">'+S.d.cats.map(c=>'<button class="chip'+(c===n.cat?' on':'')+'" data-a="setCat" data-c="'+S.d.cats.indexOf(c)+'">'+esc(c)+'</button>').join('')+'</div>'+
  (n.cat==='장소'?'<span class="lb" style="margin-top:10px">LOCATION · 국내/국외</span><div class="chips">'+Object.keys(LOC).map(a=>'<button class="chip'+(n.area===a?' on':'')+'" data-a="setLoc" data-k="area" data-v="'+a+'">'+a+'</button>').join('')+'</div>'+(n.area&&LOC[n.area]?'<div class="chips">'+LOC[n.area].map(r=>'<button class="chip'+(n.reg===r?' on':'')+'" data-a="setLoc" data-k="reg" data-v="'+r+'">'+r+'</button>').join('')+'</div>':''):'')+
- '<div class="sec"><textarea class="ta" rows="8" data-f="note:body" placeholder="무엇을 보고, 읽고, 느꼈나요?">'+esc(n.body)+'</textarea></div>'+pstrip(n.ph,'note');
+ '<div class="sec"><textarea class="ta" rows="8" data-f="note:body" placeholder="무엇을 보고, 읽고, 느꼈나요?">'+esc(n.body)+'</textarea></div>'+pstrip(n.ph,'note')+(n.geo?geoBlock(n):(n.ph.length?'<div class="sec"><span class="lb">📍 사진 위치</span><p class="emp" style="font-size:11.5px">사진에 위치 정보가 없어요. 아이폰에서 사진을 고를 때 아래쪽 ‘옵션’에서 ‘위치’를 켠 뒤 다시 올려 보세요.</p></div>':''));
 }
 function habStats(y,m){
  const hs=S.d.habits,el=elapsed(y,m);let tot=0,best=null;
@@ -691,7 +691,7 @@ function doSearch(q){
  q=q.trim().toLowerCase();const out=[];if(!q){$('#sres').innerHTML='<div class="emp">검색어를 입력하세요</div>';return}
  Object.keys(S.d.days).sort().reverse().forEach(k=>{const d=S.d.days[k];const txt=[d.memo].concat(d.pp||[]).filter(Boolean);const hit=txt.find(t=>t.toLowerCase().indexOf(q)>=0);if(hit)out.push('<button class="sr" data-a="goDay" data-d="'+k+'"><small>'+k.replace(/-/g,'.')+' · DAY</small><span>'+esc(hit)+'</span></button>')});
  (S.d.gcal||[]).filter(e=>e.t.toLowerCase().indexOf(q)>=0).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,15).forEach(e=>out.push('<button class="sr" data-a="goDay" data-d="'+e.d+'"><small>'+e.d.replace(/-/g,'.')+' · CALENDAR</small><span>'+esc((e.tm?e.tm+' ':'')+e.t)+'</span></button>'));
- S.d.notes.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(n=>{if((n.t+' '+n.body+' '+n.cat).toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openNote" data-id="'+n.id+'"><small>'+n.date.replace(/-/g,'.')+' · NOTE · '+esc(n.cat)+'</small><span>'+n.ic+' '+esc(n.t)+'</span></button>')});
+ S.d.notes.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(n=>{if((n.t+' '+n.body+' '+n.cat+' '+(n.place||'')).toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openNote" data-id="'+n.id+'"><small>'+n.date.replace(/-/g,'.')+' · NOTE · '+esc(n.cat)+'</small><span>'+n.ic+' '+esc(n.t)+'</span></button>')});
  {const RN={one:'한 문장',book:'책',video:'영상',event:'사건',place:'장소',spend:'지출'};Object.keys(S.d.rv||{}).sort().reverse().forEach(mk=>{const o=S.d.rv[mk];Object.keys(RN).forEach(f=>{const t=o[f];if(t&&t.toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openRv" data-d="'+mk+'-01"><small>'+mk.replace('-','.')+' · REVIEW · '+RN[f]+'</small><span>'+esc(t)+'</span></button>')})})}
  $('#sres').innerHTML=out.slice(0,40).join('')||'<div class="emp">결과가 없어요</div>';
 }
@@ -705,7 +705,7 @@ async function loadMode(){
 function shrink(f){return new Promise((res,rej)=>{const url=URL.createObjectURL(f),im=new Image();im.onload=()=>{const M=1000,r=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',.74))};im.onerror=()=>{URL.revokeObjectURL(url);rej()};im.src=url})}
 async function addPhotos(files,t){
  const arr=t==='note'?S.d.notes.find(n=>n.id===S.nid).ph:wd(S.cur).ph;
- for(const f of files){try{const src=await shrink(f),id='p'+uid();PH[id]=src;if(S.mode==='mine')idb.put(id,src);arr.push(id)}catch(e){}}
+ for(const f of files){try{if(t==='note'){const nn=S.d.notes.find(n=>n.id===S.nid);if(nn&&!nn.geo){const gp=await readGps(f);if(gp)nn.geo=gp}}const src=await shrink(f),id='p'+uid();PH[id]=src;if(S.mode==='mine')idb.put(id,src);arr.push(id)}catch(e){}}
  save();render(true);
 }
 function delPhoto(id,t){const arr=t==='note'?S.d.notes.find(n=>n.id===S.nid).ph:wd(S.cur).ph,i=arr.indexOf(id);if(i>=0)arr.splice(i,1);if(id.charAt(0)==='p'&&S.mode==='mine'){delete PH[id];idb.del(id)}save();closeSh();render(true)}
@@ -1126,6 +1126,88 @@ Object.assign(A,{
  syncHelp(){sheet('<h3>동기화 설정 방법</h3><div style="font-size:12.5px;line-height:1.7"><p><b>1. 비공개 저장소 만들기</b><br>github.com → New repository → 이름은 예: diary-data → <b>Private</b> 선택 → Create.</p><p><b>2. 접근 토큰 만들기</b><br>GitHub 프로필 → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token.<br>· Repository access: <b>Only select repositories</b> → diary-data<br>· Permissions → Repository permissions → <b>Contents: Read and write</b><br>· 만료일은 1년 정도로 정하세요. 만료되면 새 토큰으로 바꾸면 돼요.</p><p><b>3. 다이어리에 입력</b><br>저장소 칸에 “내아이디/diary-data”, 토큰 칸에 만든 토큰(github_pat_…)을 붙여 넣고 연결해요.</p><p><b>4. 다른 기기</b><br>첫 기기의 동기화가 끝난 뒤, 다른 기기에서도 같은 저장소와 토큰으로 연결하세요.</p><p style="color:var(--mut)">토큰은 각 기기의 브라우저에만 저장돼요. 연결 전에 백업을 한 번 받아 두세요.</p></div><button class="btn" data-a="closeSh">확인</button>')}
 });
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&SY.repo&&Date.now()-(SY.last||0)>30000)syncRun()});
+/* ---------- photo location ---------- */
+async function readGps(f){
+ try{
+  const v=new DataView(await f.slice(0,262144).arrayBuffer());
+  if(v.getUint16(0)!==0xFFD8)return null;
+  let o=2;
+  while(o<v.byteLength-10){
+   const m=v.getUint16(o);if((m&0xFF00)!==0xFF00)break;
+   const len=v.getUint16(o+2);
+   if(m===0xFFE1&&v.getUint32(o+4)===0x45786966){
+    const t=o+10,le=v.getUint16(t)===0x4949,u16=p=>v.getUint16(p,le),u32=p=>v.getUint32(p,le);
+    const find=(ifd,tag)=>{const n=u16(ifd);for(let i=0;i<n;i++){const e=ifd+2+i*12;if(u16(e)===tag)return e}return -1};
+    const g=find(t+u32(t+4),0x8825);if(g<0)return null;
+    const gi=t+u32(g+8),la=find(gi,2),lo=find(gi,4);if(la<0||lo<0)return null;
+    const dms=e=>{const p=t+u32(e+8);let s=0;for(let i=0;i<3;i++){const d=u32(p+i*8+4);s+=(d?u32(p+i*8)/d:0)/Math.pow(60,i)}return s};
+    const ref=tag=>{const e=find(gi,tag);return e<0?'':String.fromCharCode(v.getUint8(e+8))};
+    let lat=dms(la),lon=dms(lo);if(ref(1)==='S')lat=-lat;if(ref(3)==='W')lon=-lon;
+    if(!isFinite(lat)||!isFinite(lon)||(lat===0&&lon===0)||Math.abs(lat)>90||Math.abs(lon)>180)return null;
+    return{lat:+lat.toFixed(5),lon:+lon.toFixed(5)};
+   }
+   o+=2+len;
+  }
+ }catch(e){}
+ return null;
+}
+const KR=[[125.9,37.65],[126.6,37.95],[127.4,38.3],[128.4,38.63],[128.7,38.3],[129.4,37.2],[129.5,36.0],[129.45,35.4],[129.3,35.0],[128.9,34.8],[128.5,34.7],[127.7,34.5],[127.0,34.3],[126.3,34.3],[126.1,34.8],[126.3,35.5],[126.5,36.0],[126.1,36.7],[126.2,37.0],[126.5,37.3]];
+function inPoly(x,y,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+function geoClass(lat,lon){
+ const box=(a,b,c,d)=>lat>=a&&lat<=b&&lon>=c&&lon<=d;
+ if(box(33.0,33.65,126.1,127.0))return{area:'국내',reg:'제주도'};
+ if(box(37.1,37.6,130.7,131.95))return{area:'국내',reg:'경상도'};
+ if(inPoly(lon,lat,KR)){
+  let r;
+  if(lat>=37.0&&((lon>=127.65&&lat>=37.5)||lon>=127.85||(lat>=38.0&&lon>=127.2)))r='강원도';
+  else if(lat>=36.95&&lat<=38.4&&lon>=126.2&&lon<(lat>=37.5?127.65:127.85))r='수도권';
+  else if(lat>=36.0&&lat<37.0&&lon<128.15)r='충청도';
+  else if(lat<36.0&&lon<127.7)r='전라도';
+  else r='경상도';
+  return{area:'국내',reg:r};
+ }
+ let r='아시아';
+ if((lat<-10&&lon>112)||(lat<0&&lon>140&&lon<=180)||(lon<-140&&lat>-30&&lat<30))r='오세아니아';
+ else if(lon>=-82&&lon<=-34&&lat>=-56&&lat<=13)r='남아메리카';
+ else if(lon>=-170&&lon<=-50&&lat>=7&&lat<=84)r='북아메리카';
+ else if((lat>=35.9&&lat<=72&&lon>=-25&&lon<=32)||(lat>=34.8&&lat<=36.6&&lon>=22&&lon<=28.5))r='유럽';
+ else if((lon>=-20&&lon<=34&&lat>=-35&&lat<=37.5)||(lon>34&&lon<=52&&lat>=-35&&lat<=12))r='아프리카';
+ return{area:'국외',reg:r};
+}
+const KRSTATE=[['서울','수도권'],['경기','수도권'],['인천','수도권'],['강원','강원도'],['충청','충청도'],['충남','충청도'],['충북','충청도'],['대전','충청도'],['세종','충청도'],['전라','전라도'],['전북','전라도'],['전남','전라도'],['광주','전라도'],['제주','제주도'],['경상','경상도'],['경북','경상도'],['경남','경상도'],['부산','경상도'],['대구','경상도'],['울산','경상도']];
+function placeInfo(j,lat,lon){
+ const a=j.address||{},cc=(a.country_code||'').toLowerCase(),uq=x=>x.filter((v,i)=>v&&x.indexOf(v)===i);
+ let parts=uq([a.suburb||a.neighbourhood||a.quarter,a.village||a.town||a.city_district,a.city||a.county,a.state||a.province]);
+ let place=parts.join(' ');
+ if(j.name&&place.indexOf(j.name)<0&&parts.indexOf(j.name)<0)place=j.name+' · '+place;
+ if(cc&&cc!=='kr'&&a.country)place+=(place?', ':'')+a.country;
+ let sug=geoClass(lat,lon);
+ if(cc==='kr'){const st=a.state||a.province||'',h=KRSTATE.find(x=>st.indexOf(x[0])===0);sug={area:'국내',reg:h?h[1]:sug.reg}}
+ else if(cc&&sug.area==='국내')sug={area:'국외',reg:'아시아'};
+ return{place:place.trim(),sug:sug};
+}
+function geoBlock(n){
+ const g=n.geo,s=n.sug||geoClass(g.lat,g.lon),mp='https://maps.apple.com/?ll='+g.lat+','+g.lon+'&q='+encodeURIComponent(n.place||n.t||'사진 위치');
+ return '<div class="sec"><span class="lb">📍 사진 위치</span><div style="padding:6px 0 4px;font-size:13px;line-height:1.6">'+(n.place?esc(n.place)+'<br>':'')+'<small style="color:var(--mut)">'+g.lat.toFixed(4)+', '+g.lon.toFixed(4)+'</small></div>'+
+ '<div class="gr"><a class="btn sm" target="_blank" rel="noopener" href="'+mp+'">지도 보기</a><button class="btn sm" data-a="findPlace">'+(n.place?'지명 다시 찾기':'지명 찾기')+'</button><button class="btn sm" data-a="geoDel">위치 삭제</button></div>'+
+ (n.cat==='장소'?'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px"><span style="font-size:12px;color:var(--mut)">추천 태그 · '+esc(s.area+' · '+s.reg)+(n.sug?'':' (좌표 기준 근사치)')+'</span><button class="btn sm" data-a="geoTag">적용</button></div>':'')+
+ '<p class="emp" id="geomsg" style="font-size:11px">‘지명 찾기’를 누르면 이 사진의 좌표가 OpenStreetMap 서비스로 전송돼요.</p></div>';
+}
+Object.assign(A,{
+ geoDel(){const n=S.d.notes.find(x=>x.id===S.nid);if(!n)return;delete n.geo;delete n.place;delete n.sug;save();render(true)},
+ geoTag(){const n=S.d.notes.find(x=>x.id===S.nid);if(!n||!n.geo)return;const s=n.sug||geoClass(n.geo.lat,n.geo.lon);n.area=s.area;n.reg=s.reg;save();render(true)},
+ async findPlace(){
+  const n=S.d.notes.find(x=>x.id===S.nid);if(!n||!n.geo)return;const m=()=>$('#geomsg');
+  if(m())m().textContent='지명을 찾는 중…';
+  try{
+   const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=17&addressdetails=1&accept-language=ko&lat='+n.geo.lat+'&lon='+n.geo.lon);
+   if(!r.ok)throw new Error('http');
+   const j=await r.json(),info=placeInfo(j,n.geo.lat,n.geo.lon);
+   if(!info.place)throw new Error('empty');
+   n.place=info.place;n.sug=info.sug;save();render(true);
+  }catch(e){if(m())m().textContent='지명을 찾지 못했어요. 인터넷 연결을 확인하거나, 미리보기 화면이 아닌 GitHub 주소에서 사용해 주세요.'}
+ }
+});
 /* ---------- boot ---------- */
 (async function(){
  let m=null;try{m=JSON.parse(ls.g(META)||'null')}catch(e){}
