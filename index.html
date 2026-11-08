@@ -573,7 +573,7 @@ function vNote(){
  const n=S.d.notes.find(x=>x.id===S.nid);if(!n){S.nid=null;return vNotes()}
  return '<div class="ttl"><button class="pn" data-a="back">◂ NOTES</button><button class="pn" data-a="delNote" style="color:var(--red)">삭제</button></div><hr class="rule">'+
  '<div class="ni"><button class="icb" data-a="pickIc" data-for="note" style="width:38px;height:38px;font-size:20px">'+n.ic+'</button><input class="nt" data-f="note:t" value="'+esc(n.t)+'" placeholder="제목"></div>'+
- '<div class="ni"><input type="date" data-f="note:date" value="'+n.date+'"></div>'+
+ '<div class="ni"><input type="date" data-f="note:date" value="'+n.date+'"></div>'+(S.dn&&S.dn.id===n.id?'<p id="dnmsg" class="emp" style="font-size:11.5px;margin:0 0 6px">📷 사진 촬영일로 날짜를 바꿨어요 · <button data-a="dnUndo" style="text-decoration:underline">원래대로 ('+S.dn.prev.slice(5).replace('-','/')+')</button></p>':'')+
  '<span class="lb">CATEGORY</span><div class="chips">'+S.d.cats.map(c=>'<button class="chip'+(c===n.cat?' on':'')+'" data-a="setCat" data-c="'+S.d.cats.indexOf(c)+'">'+esc(c)+'</button>').join('')+'</div>'+
  (n.cat==='장소'?'<span class="lb" style="margin-top:10px">LOCATION · 국내/국외</span><div class="chips">'+Object.keys(LOC).map(a=>'<button class="chip'+(n.area===a?' on':'')+'" data-a="setLoc" data-k="area" data-v="'+a+'">'+a+'</button>').join('')+'</div>'+(n.area&&LOC[n.area]?'<div class="chips">'+LOC[n.area].map(r=>'<button class="chip'+(n.reg===r?' on':'')+'" data-a="setLoc" data-k="reg" data-v="'+r+'">'+r+'</button>').join('')+'</div>':''):'')+
  '<div class="sec"><textarea class="ta" rows="8" data-f="note:body" placeholder="무엇을 보고, 읽고, 느꼈나요?">'+esc(n.body)+'</textarea></div>'+pstrip(n.ph,'note')+(n.geo?geoBlock(n):(n.ph.length?'<div class="sec"><span class="lb">📍 사진 위치</span><p class="emp" style="font-size:11.5px">사진에 위치 정보가 없어요. 아이폰에서 사진을 고를 때 아래쪽 ‘옵션’에서 ‘위치’를 켠 뒤 다시 올려 보세요.</p></div>':''));
@@ -717,7 +717,9 @@ async function loadMode(){
 function shrink(f){return new Promise((res,rej)=>{const url=URL.createObjectURL(f),im=new Image();im.onload=()=>{const M=1000,r=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',.74))};im.onerror=()=>{URL.revokeObjectURL(url);rej()};im.src=url})}
 async function addPhotos(files,t){
  const arr=t==='note'?S.d.notes.find(n=>n.id===S.nid).ph:wd(S.cur).ph;
- for(const f of files){try{if(t==='note'){const nn=S.d.notes.find(n=>n.id===S.nid);if(nn&&!nn.geo){const gp=await readGps(f);if(gp)nn.geo=gp}}const src=await shrink(f),id='p'+uid();PH[id]=src;if(S.mode==='mine')idb.put(id,src);arr.push(id)}catch(e){}}
+ const hadPh=!!arr.length;let shot='';
+ for(const f of files){try{if(t==='note'){const nn=S.d.notes.find(n=>n.id===S.nid);if(nn&&!nn.geo){const gp=await readGps(f);if(gp)nn.geo=gp}if(nn&&!hadPh){const sd=await readShot(f);if(sd&&(!shot||sd<shot))shot=sd}}const src=await shrink(f),id='p'+uid();PH[id]=src;if(S.mode==='mine')idb.put(id,src);arr.push(id)}catch(e){}}
+ if(t==='note'&&shot&&!hadPh){const nn=S.d.notes.find(n=>n.id===S.nid);if(nn&&nn.date!==shot){S.dn={id:nn.id,prev:nn.date,to:shot};nn.date=shot}}
  save();render(true);
 }
 function delPhoto(id,t){const arr=t==='note'?S.d.notes.find(n=>n.id===S.nid).ph:wd(S.cur).ph,i=arr.indexOf(id);if(i>=0)arr.splice(i,1);if(id.charAt(0)==='p'&&S.mode==='mine'){delete PH[id];idb.del(id)}save();closeSh();render(true)}
@@ -998,7 +1000,7 @@ function onField(e){
  else if(p[0]==='sync'){SYF[p[1]]=v.trim();return}
  else if(p[0]==='nq'){S.nq=v;const e=$('#nlist');if(e)e.innerHTML=noteListHtml();return}
  else if(p[0]==='title'){S.d.title=v;$('#ttl').textContent=v}
- else if(p[0]==='note'){const n=S.d.notes.find(x=>x.id===S.nid);if(!n)return;if(p[1]==='date'){if(!v)return}n[p[1]]=v}
+ else if(p[0]==='note'){const n=S.d.notes.find(x=>x.id===S.nid);if(!n)return;if(p[1]==='date'){if(!v)return;S.dn=null;{const e=$('#dnmsg');if(e)e.remove()}}n[p[1]]=v}
  if(el.tagName==='TEXTAREA')autosize(el);
  save();
 }
@@ -1164,6 +1166,30 @@ async function readGps(f){
  }catch(e){}
  return null;
 }
+async function readShot(f){
+ try{
+  const v=new DataView(await f.slice(0,262144).arrayBuffer());
+  if(v.getUint16(0)!==0xFFD8)return '';
+  let o=2;
+  while(o<v.byteLength-10){
+   const m=v.getUint16(o);if((m&0xFF00)!==0xFF00)break;
+   const len=v.getUint16(o+2);
+   if(m===0xFFE1&&v.getUint32(o+4)===0x45786966){
+    const t=o+10,le=v.getUint16(t)===0x4949,u16=p=>v.getUint16(p,le),u32=p=>v.getUint32(p,le);
+    const find=(ifd,tag)=>{const n=u16(ifd);for(let i=0;i<n;i++){const e=ifd+2+i*12;if(u16(e)===tag)return e}return -1};
+    const str=e=>{const c=u32(e+4),p=c>4?t+u32(e+8):e+8;let r='';for(let i=0;i<c&&i<20;i++){const ch=v.getUint8(p+i);if(!ch)break;r+=String.fromCharCode(ch)}return r};
+    const ifd0=t+u32(t+4),ex=find(ifd0,0x8769);let d='';
+    if(ex>=0){const ei=t+u32(ex+8);let e=find(ei,0x9003);if(e<0)e=find(ei,0x9004);if(e>=0)d=str(e)}
+    if(!d){const e=find(ifd0,0x0132);if(e>=0)d=str(e)}
+    const m2=/^(\d{4}):(\d{2}):(\d{2})/.exec(d);
+    if(m2&&+m2[1]>1990&&+m2[2]>=1&&+m2[2]<=12&&+m2[3]>=1&&+m2[3]<=31)return m2[1]+'-'+m2[2]+'-'+m2[3];
+    return '';
+   }
+   o+=2+len;
+  }
+ }catch(e){}
+ return '';
+}
 const KR=[[125.9,37.65],[126.6,37.95],[127.4,38.3],[128.4,38.63],[128.7,38.3],[129.4,37.2],[129.5,36.0],[129.45,35.4],[129.3,35.0],[128.9,34.8],[128.5,34.7],[127.7,34.5],[127.0,34.3],[126.3,34.3],[126.1,34.8],[126.3,35.5],[126.5,36.0],[126.1,36.7],[126.2,37.0],[126.5,37.3]];
 function inPoly(x,y,P){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
 function geoClass(lat,lon){
@@ -1207,6 +1233,7 @@ function geoBlock(n){
  '<p class="emp" id="geomsg" style="font-size:11px">‘지명 찾기’를 누르면 이 사진의 좌표가 OpenStreetMap 서비스로 전송돼요.</p></div>';
 }
 Object.assign(A,{
+ dnUndo(){const n=S.d.notes.find(x=>x.id===S.nid);if(n&&S.dn&&S.dn.id===n.id){n.date=S.dn.prev;S.dn=null;save();render(true)}},
  geoDel(){const n=S.d.notes.find(x=>x.id===S.nid);if(!n)return;delete n.geo;delete n.place;delete n.sug;save();render(true)},
  geoTag(){const n=S.d.notes.find(x=>x.id===S.nid);if(!n||!n.geo)return;const s=n.sug||geoClass(n.geo.lat,n.geo.lon);n.area=s.area;n.reg=s.reg;save();render(true)},
  async findPlace(){
