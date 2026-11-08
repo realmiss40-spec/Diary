@@ -145,6 +145,8 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .nl>span:nth-child(2){flex:1;min-width:0}
 .nl .th{flex:none;width:64px;height:64px;background-size:cover;background-position:center;background-color:var(--soft);position:relative}
 .nl .th em{position:absolute;right:3px;bottom:3px;font-style:normal;font-size:8px;background:var(--paper);padding:0 4px;border:1px solid var(--faint)}
+.fabw{position:sticky;bottom:12px;height:0;pointer-events:none}
+.fab{pointer-events:auto;position:absolute;right:0;bottom:0;width:54px;height:54px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:28px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.28)}
 .nl p{margin:2px 0 0;font-size:12px;color:var(--mut);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .chips{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0}
 .chip{border:1px solid var(--faint);padding:4px 11px;font-size:11.5px;border-radius:99px}
@@ -214,6 +216,8 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .sr small{color:var(--mut);font-size:10.5px;display:block}
 .sr span{font-size:12.5px;display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .srin{border-bottom:1.5px solid var(--ink);padding:8px 0;font-size:15px}
+#nq.srin{border:0;background:transparent;padding:7px 0;font-size:13px;margin-bottom:4px}
+#nq.srin::placeholder{color:var(--mut);opacity:.7}
 .vt{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:-2px 0 8px}
 .vt .seg button{padding:7px 16px;font-size:11.5px}
 .mc span{font-size:7px}
@@ -398,7 +402,7 @@ function mkSample(){
 /* ---------- state ---------- */
 const S={mode:'sample',theme:'light',d:null,view:'month',cur:NOW,hist:[],nc:null,nid:null,logIc:'📝',hau:'',ai:{range:'all',anon:true,memo:false},mm:'text',rf:null,pk:null,cb:null,hid:null,hic:'star'};
 let PH={};
-S.nf={a:'',r:''};S.ny='';
+S.nf={a:'',r:''};S.ny='';S.nq='';
 const TABS=['year','month','week','day','tri','review','notes','habit','goal','setting'],TABN={tri:'3 years'};
 const gd=k=>S.d.days[k]||null;
 const wd=k=>S.d.days[k]||(S.d.days[k]=nd());
@@ -531,6 +535,14 @@ function vDay(){
  h+='<div class="sec"><button class="btn sm" data-a="goV" data-v="tri">📖 3년 일기로 보기 ›</button></div>';
  return h;
 }
+const fab=c=>'<div class="fabw"><button class="fab" data-a="newNote"'+(c!==''&&c!=null?' data-cat="'+c+'"':'')+' aria-label="새 노트">＋</button></div>';
+const noteRow=(n,isP)=>'<button class="nl" data-a="openNote" data-id="'+n.id+'"><span class="e">'+n.ic+'</span><span><b>'+esc(n.t)+'</b><small>'+n.date.replace(/-/g,'.')+(isP&&locTxt(n)?' · '+esc(locTxt(n)):'')+(n.place?' · 📍'+esc(n.place):'')+'</small>'+(n.body?'<p>'+esc(n.body)+'</p>':'')+'</span>'+(n.ph&&n.ph.length?'<span class="th" style="background-image:'+bgOf(n.ph[0])+'">'+(n.ph.length>1?'<em>'+n.ph.length+'</em>':'')+'</span>':'')+'</button>';
+function catNotes(){const cat=S.d.cats[S.nc],isP=cat==='장소';let list=S.d.notes.filter(n=>n.cat===cat).sort((a,b)=>b.date.localeCompare(a.date));
+ if(S.ny)list=list.filter(n=>n.date.indexOf(S.ny)===0);
+ if(isP)list=list.filter(n=>(!S.nf.a||n.area===S.nf.a)&&(!S.nf.r||n.reg===S.nf.r));
+ const q=(S.nq||'').trim().toLowerCase();if(q)list=list.filter(n=>((n.t||'')+' '+(n.body||'')+' '+(n.place||'')+' '+locTxt(n)).toLowerCase().indexOf(q)>=0);
+ return list}
+function noteListHtml(){const isP=S.d.cats[S.nc]==='장소',list=catNotes();return list.map(n=>noteRow(n,isP)).join('')||'<div class="emp">'+((S.nq||'').trim()?'검색 결과가 없어요.':'이 카테고리에는 아직 노트가 없어요.')+'</div>'}
 function vNotes(){
  if(S.nid)return vNote();
  const c=P(S.cur),y=c.getFullYear(),m=c.getMonth(),cats=S.d.cats;
@@ -543,7 +555,7 @@ function vNotes(){
    fl='<div class="chips">'+ch('a','','전체',all.length)+Object.keys(LOC).map(a=>ch('a',a,a,all.filter(n=>n.area===a).length)).join('')+'</div>';
    if(f.a)fl+='<div class="chips">'+ch('r','','모두')+LOC[f.a].map(r=>ch('r',r,r,all.filter(n=>n.area===f.a&&n.reg===r).length)).join('')+'</div>';
    list=list.filter(n=>(!f.a||n.area===f.a)&&(!f.r||n.reg===f.r))}
-  return '<div class="ttl"><h1>'+esc(cat)+'<small>'+(S.ny||'ALL')+'</small></h1><button class="pn" data-a="toc">◂ CONTENTS</button></div><hr class="rule">'+yc+fl+(list.map(n=>'<button class="nl" data-a="openNote" data-id="'+n.id+'"><span class="e">'+n.ic+'</span><span><b>'+esc(n.t)+'</b><small>'+n.date.replace(/-/g,'.')+(isP&&locTxt(n)?' · '+esc(locTxt(n)):'')+(n.place?' · 📍'+esc(n.place):'')+'</small>'+(n.body?'<p>'+esc(n.body)+'</p>':'')+'</span>'+(n.ph&&n.ph.length?'<span class="th" style="background-image:'+bgOf(n.ph[0])+'">'+(n.ph.length>1?'<em>'+n.ph.length+'</em>':'')+'</span>':'')+'</button>').join('')||'<div class="emp">이 카테고리에는 아직 노트가 없어요.</div>')+'<button class="btn blk wide" data-a="newNote" data-cat="'+S.nc+'">+ 새 노트</button>';}
+  return '<div class="ttl"><h1>'+esc(cat)+'<small>'+(S.ny||'ALL')+'</small></h1><button class="pn" data-a="toc">◂ CONTENTS</button></div><hr class="rule"><input class="srin" id="nq" data-f="nq:q" placeholder="🔍 이 카테고리에서 검색" autocomplete="off" value="'+esc(S.nq||'')+'">'+yc+fl+'<div id="nlist">'+noteListHtml()+'</div><div style="height:64px"></div>'+fab(S.nc);}
  let h='<div class="ttl"><h1>Notes</h1></div><hr class="rule">';
  h+='<div style="height:12px"></div><span class="lb ctr">CONTENTS · 전체 노트</span><div class="toc">'+cats.map((cn,i)=>'<button class="tr" data-a="openCat" data-i="'+i+'"><em>'+pad(i+1)+'</em><b>'+esc(cn)+'</b><i></i><span>'+yn.filter(n=>n.cat===cn).length+'</span></button>').join('')+'</div>';
  const rec=yn.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
@@ -554,7 +566,7 @@ function vNotes(){
  h+='<div class="ng">'+['S','M','T','W','T','F','S'].map(x=>'<div class="h">'+x+'</div>').join('');
  for(let i=0;i<weeks*7;i++){const k=add(start,i),inM=P(k).getMonth()===m,nn=S.d.notes.filter(n=>n.date===k);
   h+='<button class="nd'+(inM?'':' out')+(k===NOW?' tod':'')+'" data-a="noteDay" data-d="'+k+'"><small>'+P(k).getDate()+'</small>'+(nn.length?nn[0].ic:'')+'</button>';}
- h+='</div><button class="btn blk wide" data-a="newNote">+ 새 노트</button>';
+ h+='</div><div style="height:64px"></div>'+fab('');
  return h;
 }
 function vNote(){
@@ -951,7 +963,7 @@ const A={
  delPh(el){delPhoto(el.dataset.id,el.dataset.t)},
  yp(){const d=P(S.cur);d.setDate(1);d.setFullYear(d.getFullYear()-1);S.cur=ymd(d);render(false)},
  yn(){const d=P(S.cur);d.setDate(1);d.setFullYear(d.getFullYear()+1);S.cur=ymd(d);render(false)},
- openCat(el){S.nc=+el.dataset.i;S.nf={a:'',r:''};S.ny='';render(false)},
+ openCat(el){S.nc=+el.dataset.i;S.nf={a:'',r:''};S.ny='';S.nq='';render(false)},
  yF(el){S.ny=el.dataset.v;render(true)},toc(){S.nc=null;render(false)},
  openNote(el){closeSh();S.nid=el.dataset.id;go('notes',true)},
  newNote(el){newNote(el.dataset.d,el.dataset.cat!=null?+el.dataset.cat:null)},
@@ -984,6 +996,7 @@ function onField(e){
  else if(p[0]==='rg'){v=v.replace(/\D/g,'');if(el.value!==v)el.value=v;if(p[1]==='mdT'&&+v>5){v='5';el.value=v}if(v!=='')S.d.rg[p[1]]=Math.min(p[1]==='slT'||p[1]==='slH'?100:p[1]==='mdT'?5:p[1]==='dlT'||p[1]==='dlH'?1440:999999,Math.max(/H$/.test(p[1])?0:1,+v))}
  else if(p[0]==='rv'){const mk=ymd(P(S.cur)).slice(0,7),o=S.d.rv[mk]||(S.d.rv[mk]={});o[p[1]]=v}
  else if(p[0]==='sync'){SYF[p[1]]=v.trim();return}
+ else if(p[0]==='nq'){S.nq=v;const e=$('#nlist');if(e)e.innerHTML=noteListHtml();return}
  else if(p[0]==='title'){S.d.title=v;$('#ttl').textContent=v}
  else if(p[0]==='note'){const n=S.d.notes.find(x=>x.id===S.nid);if(!n)return;if(p[1]==='date'){if(!v)return}n[p[1]]=v}
  if(el.tagName==='TEXTAREA')autosize(el);
