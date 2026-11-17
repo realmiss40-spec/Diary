@@ -24,10 +24,10 @@ textarea{resize:none;display:block;overflow:hidden}
 #ring.ping circle.o{animation:pg .9s ease}
 @keyframes pg{0%{stroke:var(--ink);stroke-width:3}100%{stroke:currentColor;stroke-width:1.6}}
 #view{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 18px 28px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-#tabs{display:flex;overflow-x:auto;border-top:1px solid var(--faint);scrollbar-width:none;flex:none;padding:8px 14px 6px;gap:4px}
+#tabs{display:flex;align-items:flex-start;overflow-x:auto;border-top:1px solid var(--faint);background:var(--soft);scrollbar-width:none;flex:none;padding:0 14px 9px;gap:3px}
 #tabs::-webkit-scrollbar{display:none}
-#tabs button{flex:none;padding:8px 13px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--faint);color:var(--mut);background:var(--paper)}
-#tabs button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+#tabs button{flex:none;margin-top:-1px;padding:8px 13px 8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);background:var(--soft);background:color-mix(in srgb,var(--paper) 40%,var(--faint));border:1px solid var(--faint);border-top:0;border-radius:0 0 11px 11px;transition:padding .15s}
+#tabs button.on{background:var(--paper);color:var(--ink);font-weight:600;padding-bottom:13px;border-top:1px solid var(--paper);margin-top:-1px;position:relative;z-index:1}
 #strip{flex:none;text-align:left;padding:0 18px calc(env(safe-area-inset-bottom,0px) + 8px);min-height:calc(env(safe-area-inset-bottom,0px) + 8px)}
 #strip button{font-size:9px;letter-spacing:.08em;color:var(--mut);background:var(--soft);padding:3px 10px;border-radius:99px}
 .ttl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-top:6px}
@@ -272,7 +272,7 @@ a.btn{color:inherit;text-decoration:none}
 .y3 .yx{font-size:11.5px;color:var(--mut);margin-top:5px}
 .y3 .yp{display:flex;gap:4px;margin-top:8px}
 .y3 .yp .ph{width:72px;height:72px;flex:none}
-@media(hover:none){#app{height:100vh;height:100dvh;margin:0 auto;border-radius:0;box-shadow:none}}
+@media(hover:none){#app{--sy:max(10px,env(safe-area-inset-top));--sb:max(10px,env(safe-area-inset-bottom));width:calc(100% - 20px);height:calc(100vh - var(--sy) - var(--sb));height:calc(100dvh - var(--sy) - var(--sb));margin:var(--sy) auto var(--sb);border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,.14)}#hd{padding-top:12px}}
 @media(hover:none){input:not(.nu):not(.nt),textarea,select{font-size:16px!important}}
 .wrv{display:block;width:100%;text-align:left;padding:5px 0}
 .wrv small{display:inline;font-size:9.5px;letter-spacing:.06em;color:var(--mut);margin-right:8px;white-space:nowrap}
@@ -302,6 +302,7 @@ html.one #app{max-width:440px}
 html.wide #app{max-width:min(1360px,calc(100vw - 24px))}
 html.wide #view2{display:block;flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;padding:4px 18px 28px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-left:1px solid var(--faint)}
 @media(min-width:500px) and (hover:hover) and (pointer:fine){html.wide #app{height:min(calc(100dvh - 32px),980px);border-radius:24px}}
+#view::-webkit-scrollbar,#view2::-webkit-scrollbar{width:14px;background:transparent}#view::-webkit-scrollbar-track,#view2::-webkit-scrollbar-track{background:transparent}#view::-webkit-scrollbar-thumb,#view2::-webkit-scrollbar-thumb{background:var(--paper);border-radius:7px}#view::-webkit-scrollbar-button:single-button,#view2::-webkit-scrollbar-button:single-button{display:block;width:14px;height:14px;background-color:transparent;background-repeat:no-repeat;background-position:center}#view::-webkit-scrollbar-button:single-button:vertical:decrement,#view2::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 4.5 10.5 9.5H3.5z' fill='%238f8c87'/%3E%3C/svg%3E")}#view::-webkit-scrollbar-button:single-button:vertical:increment,#view2::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 9.5 3.5 4.5H10.5z' fill='%238f8c87'/%3E%3C/svg%3E")}[data-theme=dark] #view::-webkit-scrollbar-button:single-button:vertical:decrement,[data-theme=dark] #view2::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 4.5 10.5 9.5H3.5z' fill='%237f7d79'/%3E%3C/svg%3E")}[data-theme=dark] #view::-webkit-scrollbar-button:single-button:vertical:increment,[data-theme=dark] #view2::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M7 9.5 3.5 4.5H10.5z' fill='%237f7d79'/%3E%3C/svg%3E")}
 @media print{#hd,#tabs,#strip{display:none}#app{height:auto}#view{overflow:visible}}
 </style>
 <div id="app">
