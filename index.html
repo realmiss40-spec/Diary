@@ -24,10 +24,10 @@ textarea{resize:none;display:block;overflow:hidden}
 #ring.ping circle.o{animation:pg .9s ease}
 @keyframes pg{0%{stroke:var(--ink);stroke-width:3}100%{stroke:currentColor;stroke-width:1.6}}
 #view{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 18px 28px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-#tabs{display:flex;align-items:flex-start;overflow-x:auto;border-top:1px solid var(--faint);background:var(--soft);scrollbar-width:none;flex:none;padding:0 14px 9px;gap:3px}
+#tabs{display:flex;align-items:flex-start;overflow-x:auto;background:var(--paper);scrollbar-width:none;flex:none;padding:0 14px 12px;gap:3px}
 #tabs::-webkit-scrollbar{display:none}
-#tabs button{flex:none;margin-top:-1px;padding:8px 13px 8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);background:var(--soft);background:color-mix(in srgb,var(--paper) 40%,var(--faint));border:1px solid var(--faint);border-top:0;border-radius:0 0 11px 11px;transition:padding .15s}
-#tabs button.on{background:var(--paper);color:var(--ink);font-weight:600;padding-bottom:13px;border-top:1px solid var(--paper);margin-top:-1px;position:relative;z-index:1}
+#tabs button{flex:1 0 auto;margin-top:-1px;padding:8px 13px 8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);background:var(--faint);background:color-mix(in srgb,var(--paper) 25%,var(--faint));border:1px solid var(--faint);border-top:0;border-radius:0 0 11px 11px;box-shadow:0 3px 5px -1px rgba(0,0,0,.16);transition:padding .15s}
+#tabs button.on{background:var(--paper);color:var(--ink);font-weight:600;padding-bottom:13px;border-top:1px solid var(--paper);margin-top:-1px;position:relative;z-index:1;box-shadow:0 4px 7px -1px rgba(0,0,0,.22)}
 #strip{flex:none;text-align:left;padding:0 18px calc(env(safe-area-inset-bottom,0px) + 8px);min-height:calc(env(safe-area-inset-bottom,0px) + 8px)}
 #strip button{font-size:9px;letter-spacing:.08em;color:var(--mut);background:var(--soft);padding:3px 10px;border-radius:99px}
 .ttl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-top:6px}
