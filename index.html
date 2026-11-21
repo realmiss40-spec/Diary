@@ -508,8 +508,12 @@ function rqPick(){
  }
  if(RQ.id){RQS.seen.push(RQ.id);RQS.id=RQ.id;if(RQS.d!==NOW){RQS.d=NOW;RQS.n=0}rqSave()}
 }
+function rqDone(){
+ const d=gd(S.cur),m=d&&d.memo;if(!m)return false;
+ return Object.keys(RQD).some(c=>RQD[c].some(q=>m.indexOf('Q. '+q)>=0));
+}
 function rqHtml(){
- if(!RQS.on)return '';
+ if(!RQS.on||rqDone())return '<div id="rqw"></div>';
  if(RQ.day!==S.cur){RQ.open=false;RQ.day=S.cur}
  if(!RQ.open)return '<div id="rqw" class="rqw"><button class="rqc" data-a="rqOpen">💭 질문 받기'+(rqSeason()?' · 🎄 올해 회고':'')+'</button></div>';
  const cs=[['all','전체']].concat(RQC.filter(c=>c[0]!=='ye'||rqSeason()));
