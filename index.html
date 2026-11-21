@@ -560,7 +560,7 @@ function meta(){ls.s(META,JSON.stringify({mode:S.mode,theme:S.theme,mm:S.mm,lay:
 /* ---------- nav ---------- */
 function go(v,keep,nid){S.hist.push([S.view,S.cur,S.nc,S.nid]);if(S.hist.length>40)S.hist.shift();S.view=v;if(nid!==undefined)S.nid=nid;if(!keep){S.nc=null}render(false)}
 function nav(n){const v=S.view,c=S.cur;
- if(v==='day'||v==='tri')S.cur=add(c,n);else if(v==='week')S.cur=add(c,7*n);else if(v==='year'||(v==='review'&&S.rvm==='y')){const d=P(c);d.setDate(1);d.setFullYear(d.getFullYear()+n);S.cur=ymd(d)}else S.cur=shiftM(c,n);
+ if(v==='day'||v==='tri')S.cur=add(c,n);else if(v==='week')S.cur=add(c,7*n);else if(v==='year'||(v==='review'&&S.rvm==='y'&&!LAYW)){const d=P(c);d.setDate(1);d.setFullYear(d.getFullYear()+n);S.cur=ymd(d)}else S.cur=shiftM(c,n);
  S.cur=S.cur;render(false)}
 /* ---------- view builders ---------- */
 const nvb='<div class="pn"><button data-a="prev">◂ PREV</button><i></i><button class="tdy" data-a="tdy">TODAY</button><i></i><button data-a="next">NEXT ▸</button></div>';
@@ -794,12 +794,13 @@ function vTri(){
  return h;
 }
 function vReview(){
+ const MD=LAYW?'m':S.rvm;
  const c=P(S.cur),y=c.getFullYear(),m=c.getMonth(),n=dim(y,m),mk=ymd(c).slice(0,7),r=S.d.rv[mk]||{};
  let wr=0,ms=0,mc=0;
  for(let i=1;i<=n;i++){const d=gd(mk+'-'+pad(i));if(!d)continue;if(written(d))wr++;[d.mA,d.mP].forEach(x=>{if(x>0){ms+=x;mc++}})}
  const nn=S.d.notes.filter(x=>x.date.indexOf(mk)===0).length,hp=habStats(y,m).pct;
- let h=ttl('Review',S.rvm==='y'?String(y):MONTHS[m]+' '+y)+rvSeg();
- if(S.rvm==='y')return h+vReviewY(y);
+ let h=ttl('Review',MD==='y'?String(y):MONTHS[m]+' '+y)+(LAYW?'':rvSeg());
+ if(MD==='y')return h+vReviewY(y);
  h+='<div class="st4"><div><b>'+wr+'<small>일</small></b><span>기록한 날</span></div><div><b>'+nn+'<small>개</small></b><span>노트</span></div><div><b>'+(mc?(ms/mc).toFixed(1):'–')+'</b><span>평균 기분 (5점)</span></div><div><b>'+hp+'<small>%</small></b><span>습관 달성률</span></div></div>';
  {const wl=[],seen={};for(let i=1;i<=n;i++){const k=mk+'-'+pad(i),ws=wkStart(k),wk=wkKey(k);if(seen[wk])continue;seen[wk]=1;const t=S.d.wl[wk];if(t&&t.trim())wl.push('<button class="wrv" data-a="goWk" data-d="'+(ws<mk+'-01'?mk+'-01':ws)+'"><small>'+ws.slice(5).replace('-','.')+' – '+add(ws,6).slice(5).replace('-','.')+'</small><span>'+esc(t)+'</span></button>')}
   h+='<div class="sec wsec"><span class="lb">🗓 WEEKS · 이 달의 한 줄 모음</span>'+(wl.length?wl.join(''):'<div class="emp">이 달에 쓴 주간 한 줄이 아직 없어요. WEEK 탭의 PERIOD LOG에 적어 보세요.</div>')+'</div>'}
@@ -839,9 +840,10 @@ const VIEWS={year:vYear,month:vMonth,week:vWeek,day:vDay,tri:vTri,review:vReview
 /* ---------- render ---------- */
 function autosize(el){el.style.height='auto';el.style.height=Math.max(26,el.scrollHeight)+'px'}
 let LAYW=false,R2K='',LW0=0;
-const SOLO=['review','goal','setting'];
+const SOLO=['goal','setting'];
 const paneL=()=>!LAYW?VIEWS[S.view]():S.view==='notes'?vNotes(true):(S.view==='day'||S.view==='tri')?vTri():VIEWS[S.view]();
 function paneR(){
+ if(S.view==='review'){const y=P(S.cur).getFullYear();return '<div class="ttl"><h1>Year<small>'+y+'</small></h1><div class="pn"><button data-a="yPrev">◂ '+(y-1)+'</button><i></i><button data-a="yNext">'+(y+1)+' ▸</button></div></div><hr class="rule">'+vReviewY(y)}
  if(S.view==='notes')return '<div class="ttl"><h1>Calendar</h1></div><hr class="rule">'+notesCal();
  return vDay();
 }
@@ -857,6 +859,8 @@ function refreshOther(){if(!LAYW)return;clearTimeout(refreshOther.t);refreshOthe
  const a=document.activeElement;
  if(SOLO.indexOf(S.view)>=0)return;const v=$('#view'),t=v.scrollTop;v.innerHTML=paneL();v.scrollTop=t;v.querySelectorAll('textarea').forEach(autosize)
  if(a&&a.focus&&a.isConnected)try{a.focus()}catch(e){}},60)}
+function refreshRight(){if(!LAYW||S.view!=='review')return;clearTimeout(refreshRight.t);refreshRight.t=setTimeout(()=>{
+ const v2=$('#view2'),t=v2.scrollTop;v2.innerHTML=paneR();v2.scrollTop=t;v2.querySelectorAll('textarea').forEach(autosize)},60)}
 function render(keep){
  const v=$('#view'),v2=$('#view2'),top=keep?v.scrollTop:0,k2=S.cur+'|'+S.view,top2=keep&&R2K===k2?v2.scrollTop:0;
  const solo=LAYW&&SOLO.indexOf(S.view)>=0;document.documentElement.classList.toggle('solo',solo);document.documentElement.classList.toggle('wide',LAYW);document.documentElement.classList.toggle('one',S.lay==='one');
@@ -1200,6 +1204,8 @@ const A={
  goWk(el){closeSh();S.cur=el.dataset.d;go('week')},
  openRv(el){closeSh();S.cur=el.dataset.d;S.nid=null;S.rvm='m';go('review')},
  rvCat(el){S.rvc=S.rvc===el.dataset.c?'':el.dataset.c;render(true)},
+ yPrev(){S.cur=shiftM(S.cur,-12);render(true)},
+ yNext(){S.cur=shiftM(S.cur,12);render(true)},
  rvMode(el){S.rvm=el.dataset.m==='y'?'y':'m';render(true)},
  back(){const h=S.hist.pop();if(!h)return;S.view=h[0];S.cur=h[1];S.nc=h[2];S.nid=h[3];render(false)},
  tab(el){closeSh();const had=S.nid;S.nid=null;if(S.view===el.dataset.v&&S.nc==null){if(had)render(false);else $('#view').scrollTop=0;return}go(el.dataset.v)},
@@ -1561,7 +1567,7 @@ Object.assign(A,{
   const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0;top:0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');ok()}catch(e){el.textContent='복사 실패'}ta.remove()};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok).catch(fb);else fb()}
 });
-document.addEventListener('focusout',e=>{if(!LAYW)return;const t=e.target;if(!t||!t.closest)return;if(t.closest('#view2')||t.closest('#nm'))refreshOther()});
+document.addEventListener('focusout',e=>{if(!LAYW)return;const t=e.target;if(!t||!t.closest)return;if(t.closest('#view2')||t.closest('#nm'))refreshOther();else if(S.view==='review'&&t.closest('#view'))refreshRight()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&LAYW&&S.view==='notes'&&S.nid&&!$('#sh').classList.contains('on')){S.nid=null;render(true)}});
 let rsT=0;const onRs=()=>{clearTimeout(rsT);rsT=setTimeout(()=>{if(innerWidth===LW0)return;if(relay())render(true);else LW0=innerWidth},150)};
 addEventListener('resize',onRs);addEventListener('orientationchange',onRs);
