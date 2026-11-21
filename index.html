@@ -323,6 +323,11 @@ html.wide #view2{display:block;flex:1;min-width:0;overflow-y:auto;overflow-x:hid
 .rqk .t button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .rqk .b{display:flex;gap:8px;align-items:center;margin-top:2px}
 .rqk .b .go{font-size:12px;font-weight:600;background:var(--ink);color:var(--paper);border-radius:99px;padding:6px 14px}
+.rvc{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.rvc button{font-size:12px;border:1px solid var(--faint);border-radius:99px;padding:6px 12px;background:var(--soft);color:var(--ink)}
+.rvc button small{font-size:10px;color:var(--mut);margin-left:2px}
+.rvc button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.rvc button.on small{color:var(--paper);opacity:.7}
 .rqk .b .sh small{font-size:10px;opacity:.7}
 .rqk .b .sh,.rqk .b .x{font-size:12px;color:var(--mut);padding:6px 6px}
 .rqk .b .x{margin-left:auto}
@@ -555,7 +560,7 @@ function meta(){ls.s(META,JSON.stringify({mode:S.mode,theme:S.theme,mm:S.mm,lay:
 /* ---------- nav ---------- */
 function go(v,keep,nid){S.hist.push([S.view,S.cur,S.nc,S.nid]);if(S.hist.length>40)S.hist.shift();S.view=v;if(nid!==undefined)S.nid=nid;if(!keep){S.nc=null}render(false)}
 function nav(n){const v=S.view,c=S.cur;
- if(v==='day'||v==='tri')S.cur=add(c,n);else if(v==='week')S.cur=add(c,7*n);else if(v==='year'){const d=P(c);d.setDate(1);d.setFullYear(d.getFullYear()+n);S.cur=ymd(d)}else S.cur=shiftM(c,n);
+ if(v==='day'||v==='tri')S.cur=add(c,n);else if(v==='week')S.cur=add(c,7*n);else if(v==='year'||(v==='review'&&S.rvm==='y')){const d=P(c);d.setDate(1);d.setFullYear(d.getFullYear()+n);S.cur=ymd(d)}else S.cur=shiftM(c,n);
  S.cur=S.cur;render(false)}
 /* ---------- view builders ---------- */
 const nvb='<div class="pn"><button data-a="prev">◂ PREV</button><i></i><button class="tdy" data-a="tdy">TODAY</button><i></i><button data-a="next">NEXT ▸</button></div>';
@@ -793,7 +798,8 @@ function vReview(){
  let wr=0,ms=0,mc=0;
  for(let i=1;i<=n;i++){const d=gd(mk+'-'+pad(i));if(!d)continue;if(written(d))wr++;[d.mA,d.mP].forEach(x=>{if(x>0){ms+=x;mc++}})}
  const nn=S.d.notes.filter(x=>x.date.indexOf(mk)===0).length,hp=habStats(y,m).pct;
- let h=ttl('Review',MONTHS[m]+' '+y);
+ let h=ttl('Review',S.rvm==='y'?String(y):MONTHS[m]+' '+y)+rvSeg();
+ if(S.rvm==='y')return h+vReviewY(y);
  h+='<div class="st4"><div><b>'+wr+'<small>일</small></b><span>기록한 날</span></div><div><b>'+nn+'<small>개</small></b><span>노트</span></div><div><b>'+(mc?(ms/mc).toFixed(1):'–')+'</b><span>평균 기분 (5점)</span></div><div><b>'+hp+'<small>%</small></b><span>습관 달성률</span></div></div>';
  {const wl=[],seen={};for(let i=1;i<=n;i++){const k=mk+'-'+pad(i),ws=wkStart(k),wk=wkKey(k);if(seen[wk])continue;seen[wk]=1;const t=S.d.wl[wk];if(t&&t.trim())wl.push('<button class="wrv" data-a="goWk" data-d="'+(ws<mk+'-01'?mk+'-01':ws)+'"><small>'+ws.slice(5).replace('-','.')+' – '+add(ws,6).slice(5).replace('-','.')+'</small><span>'+esc(t)+'</span></button>')}
   h+='<div class="sec wsec"><span class="lb">🗓 WEEKS · 이 달의 한 줄 모음</span>'+(wl.length?wl.join(''):'<div class="emp">이 달에 쓴 주간 한 줄이 아직 없어요. WEEK 탭의 PERIOD LOG에 적어 보세요.</div>')+'</div>'}
@@ -802,6 +808,31 @@ function vReview(){
   h+='<textarea class="ta" rows="2" data-f="rv:'+f[0]+'" placeholder="'+f[3]+'">'+esc(r[f[0]]||'')+'</textarea></div>';
  });
  h+='<div class="sec one"><span class="lb">이번 달을 한 문장으로</span><textarea class="ta" rows="2" data-f="rv:one" placeholder="'+MONTHS[m]+'을 한 문장으로">'+esc(r.one||'')+'</textarea></div>';
+ return h;
+}
+
+const rvSeg=()=>'<div class="seg" style="margin:10px 0 4px"><button class="'+(S.rvm==='y'?'':'on')+'" data-a="rvMode" data-m="m">월별</button><button class="'+(S.rvm==='y'?'on':'')+'" data-a="rvMode" data-m="y">연간</button></div>';
+function vReviewY(y){
+ const yk='Y'+y,ro=S.d.rv[yk]||{};
+ let wr=0,nn=S.d.notes.filter(x=>x.date.indexOf(y+'-')===0).length,ms=0,mc=0,hs=0,hc=0;
+ for(let m=0;m<12;m++){const n=dim(y,m),mk=y+'-'+pad(m+1);let any=0;
+  for(let i=1;i<=n;i++){const d=gd(mk+'-'+pad(i));if(!d)continue;if(written(d)){wr++;any=1}[d.mA,d.mP].forEach(x=>{if(x>0){ms+=x;mc++}})}
+  if(any){hs+=habStats(y,m).pct;hc++}}
+ let h='<div class="st4"><div><b>'+wr+'<small>일</small></b><span>기록한 날</span></div><div><b>'+nn+'<small>개</small></b><span>노트</span></div><div><b>'+(mc?(ms/mc).toFixed(1):'–')+'</b><span>평균 기분 (5점)</span></div><div><b>'+(hc?Math.round(hs/hc):0)+'<small>%</small></b><span>습관 달성률</span></div></div>';
+ h+='<div class="sec one"><span class="lb">올해를 한 문장으로</span><textarea class="ta" rows="2" data-f="ry:one" placeholder="'+y+'년을 한 문장으로">'+esc(ro.one||'')+'</textarea></div>';
+ h+='<div class="sec"><span class="lb">올해 회고</span><textarea class="ta" rows="5" data-f="ry:text" placeholder="올해를 돌아보며 자유롭게 적어 보세요">'+esc(ro.text||'')+'</textarea></div>';
+ h+='<div class="lbr"><span class="lb" style="font-size:11px;letter-spacing:.08em">MONTHLY REVIEWS · 모아 보기</span></div>';
+ const F=[['book','📚','BOOK','읽은 책'],['video','🎬','VIDEO','본 영상'],['event','⚡','EVENT','기억에 남는 일'],['place','📍','PLACE','가 본 곳'],['spend','💳','SPEND','지출']],data={};
+ F.forEach(f=>{const L=[];for(let m=0;m<12;m++){const mk=y+'-'+pad(m+1),o=S.d.rv[mk],t=o&&o[f[0]];if(t&&t.trim())L.push('<button class="wrv" data-a="openRv" data-d="'+mk+'-01"><small>'+MS[m]+'</small><span>'+esc(t)+'</span></button>')}data[f[0]]=L});
+ {const L=[];Object.keys(S.d.days).filter(k=>k.indexOf(y+'-')===0).sort().forEach(k=>{const m=S.d.days[k].memo||'';if(m.indexOf('Q. ')<0)return;
+   const ls=m.split('\n');for(let i=0;i<ls.length;i++){const ln=ls[i];if(ln.indexOf('Q. ')!==0)continue;const q=ln.slice(3);if(!Object.keys(RQD).some(c=>RQD[c].indexOf(q)>=0))continue;
+    let a=[];for(let t=i+1;t<ls.length;t++){if(ls[t].trim()===''&&a.length)break;if(ls[t].trim()==='')continue;a.push(ls[t].indexOf('A. ')===0&&!a.length?ls[t].slice(3):ls[t])}
+    L.push('<button class="wrv" data-a="goDay" data-d="'+k+'"><small>'+k.slice(5).replace('-','.')+'</small><span><i style="font-style:normal;color:var(--mut);font-size:11.5px">'+esc(q)+'</i><br>'+(a.join(' ').trim()?esc(a.join('\n').trim()):'<i style="font-style:normal;color:var(--mut)">(아직 답이 없어요)</i>')+'</span></button>')}});
+  data.qa=L}
+ const cur=S.rvc&&data[S.rvc]?S.rvc:'';
+ h+='<div class="rvc">'+F.concat([['qa','💭','연말 질문','']]).map(f=>'<button class="'+(cur===f[0]?'on':'')+'" data-a="rvCat" data-c="'+f[0]+'">'+f[1]+' '+(f[2]==='연말 질문'?'질문 답':f[2])+' <small>'+data[f[0]].length+'</small></button>').join('')+'</div>';
+ if(cur){const f=F.concat([['qa','💭','질문 답','']]).find(x=>x[0]===cur);h+='<div class="sec wsec"><span class="lb">'+f[1]+' '+f[2]+(f[3]?' · '+f[3]:'')+' · '+y+'</span>'+(data[cur].length?data[cur].join(''):'<div class="emp">아직 적은 게 없어요.</div>')+'</div>'}
+ else h+='<div class="emp">버튼을 누르면 올해 적은 내용을 모아서 보여 줘요.</div>';
  return h;
 }
 const VIEWS={year:vYear,month:vMonth,week:vWeek,day:vDay,tri:vTri,review:vReview,notes:vNotes,habit:vHabit,goal:vGoal,setting:vSetting};
@@ -856,7 +887,7 @@ function doSearch(q){
  Object.keys(S.d.days).sort().reverse().forEach(k=>{const d=S.d.days[k];const txt=[d.memo].concat(d.pp||[]).filter(Boolean);const hit=txt.find(t=>t.toLowerCase().indexOf(q)>=0);if(hit)out.push('<button class="sr" data-a="goDay" data-d="'+k+'"><small>'+k.replace(/-/g,'.')+' · DAY</small><span>'+esc(hit)+'</span></button>')});
  (S.d.gcal||[]).filter(e=>e.t.toLowerCase().indexOf(q)>=0).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,15).forEach(e=>out.push('<button class="sr" data-a="goDay" data-d="'+e.d+'"><small>'+e.d.replace(/-/g,'.')+' · CALENDAR</small><span>'+esc((e.tm?e.tm+' ':'')+e.t)+'</span></button>'));
  S.d.notes.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(n=>{if((n.t+' '+n.body+' '+n.cat+' '+(n.place||'')).toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openNote" data-id="'+n.id+'"><small>'+n.date.replace(/-/g,'.')+' · NOTE · '+esc(n.cat)+'</small><span>'+n.ic+' '+esc(n.t)+'</span></button>')});
- {const RN={one:'한 문장',book:'책',video:'영상',event:'사건',place:'장소',spend:'지출'};Object.keys(S.d.rv||{}).sort().reverse().forEach(mk=>{const o=S.d.rv[mk];Object.keys(RN).forEach(f=>{const t=o[f];if(t&&t.toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openRv" data-d="'+mk+'-01"><small>'+mk.replace('-','.')+' · REVIEW · '+RN[f]+'</small><span>'+esc(t)+'</span></button>')})})}
+ {const RN={one:'한 문장',book:'책',video:'영상',event:'사건',place:'장소',spend:'지출'};Object.keys(S.d.rv||{}).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort().reverse().forEach(mk=>{const o=S.d.rv[mk];Object.keys(RN).forEach(f=>{const t=o[f];if(t&&t.toLowerCase().indexOf(q)>=0)out.push('<button class="sr" data-a="openRv" data-d="'+mk+'-01"><small>'+mk.replace('-','.')+' · REVIEW · '+RN[f]+'</small><span>'+esc(t)+'</span></button>')})})}
  $('#sres').innerHTML=out.slice(0,40).join('')||'<div class="emp">결과가 없어요</div>';
 }
 /* ---------- data ops ---------- */
@@ -1167,7 +1198,9 @@ const A={
  hToday(){S.cur=NOW;render(true)},
  selDay(el){S.cur=el.dataset.d;render(true)},
  goWk(el){closeSh();S.cur=el.dataset.d;go('week')},
- openRv(el){closeSh();S.cur=el.dataset.d;S.nid=null;go('review')},
+ openRv(el){closeSh();S.cur=el.dataset.d;S.nid=null;S.rvm='m';go('review')},
+ rvCat(el){S.rvc=S.rvc===el.dataset.c?'':el.dataset.c;render(true)},
+ rvMode(el){S.rvm=el.dataset.m==='y'?'y':'m';render(true)},
  back(){const h=S.hist.pop();if(!h)return;S.view=h[0];S.cur=h[1];S.nc=h[2];S.nid=h[3];render(false)},
  tab(el){closeSh();const had=S.nid;S.nid=null;if(S.view===el.dataset.v&&S.nc==null){if(had)render(false);else $('#view').scrollTop=0;return}go(el.dataset.v)},
  goDay(el){closeSh();S.cur=el.dataset.d;S.nid=null;if(LAYW&&['year','month','week','day','tri'].indexOf(S.view)>=0){render(true);return}go('day')},
@@ -1258,6 +1291,7 @@ function onField(e){
  else if(p[0]==='wl')S.d.wl[wkKey(wkStart(S.cur))]=v;
  else if(p[0]==='rg'){v=v.replace(/\D/g,'');if(el.value!==v)el.value=v;if(p[1]==='mdT'&&+v>5){v='5';el.value=v}if(v!=='')S.d.rg[p[1]]=Math.min(p[1]==='slT'||p[1]==='slH'?100:p[1]==='mdT'?5:p[1]==='dlT'||p[1]==='dlH'?1440:999999,Math.max(/H$/.test(p[1])?0:1,+v))}
  else if(p[0]==='rv'){const mk=ymd(P(S.cur)).slice(0,7),o=S.d.rv[mk]||(S.d.rv[mk]={});o[p[1]]=v}
+ else if(p[0]==='ry'){const k='Y'+P(S.cur).getFullYear(),o=S.d.rv[k]||(S.d.rv[k]={});o[p[1]]=v}
  else if(p[0]==='sync'){SYF[p[1]]=v.trim();return}
  else if(p[0]==='nq'){S.nq=v;const e=$('#nlist');if(e)e.innerHTML=noteListHtml();return}
  else if(p[0]==='title'){S.d.title=v;$('#ttl').textContent=v}
