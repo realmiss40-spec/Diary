@@ -314,6 +314,18 @@ html.wide #view2{display:block;flex:1;min-width:0;overflow-y:auto;overflow-x:hid
 #sw{display:none;position:fixed;left:0;right:0;top:0;z-index:99999;padding:calc(env(safe-area-inset-top,0px) + 8px) 14px 10px;background:#b4493c;color:#fff;font-size:13px;line-height:1.45}
 #sw.on{display:block}#sw.w{background:#c98a1b}
 #sw button{font-size:12px;border:1px solid rgba(255,255,255,.7);border-radius:6px;padding:2px 9px;margin:6px 6px 0 0;color:#fff}
+.rqw{margin:8px 0 6px}
+.rqc{font-size:11.5px;color:var(--mut);background:var(--soft);border:1px solid var(--faint);border-radius:99px;padding:5px 12px}
+.rqk{border:1px solid var(--faint);border-radius:14px;background:var(--soft);padding:12px 14px}
+.rqk .q{font-size:14.5px;line-height:1.55;margin:8px 0 10px;word-break:keep-all}
+.rqk .t{display:flex;flex-wrap:wrap;gap:5px}
+.rqk .t button{font-size:10.5px;color:var(--mut);border:1px solid var(--faint);border-radius:99px;padding:3px 9px;background:var(--paper)}
+.rqk .t button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.rqk .b{display:flex;gap:8px;align-items:center;margin-top:2px}
+.rqk .b .go{font-size:12px;font-weight:600;background:var(--ink);color:var(--paper);border-radius:99px;padding:6px 14px}
+.rqk .b .sh small{font-size:10px;opacity:.7}
+.rqk .b .sh,.rqk .b .x{font-size:12px;color:var(--mut);padding:6px 6px}
+.rqk .b .x{margin-left:auto}
 .qbar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;margin:8px 0 6px}.qbar i{display:block;height:100%;background:var(--ink)}
 .qbar.w i{background:#c98a1b}.qbar.d i{background:var(--red)}
 @media print{#hd,#tabs,#strip{display:none}#app{height:auto}#view{overflow:visible}}
@@ -466,6 +478,53 @@ const sc=v=>v===1?1:v===2?.5:0;
 const dayRatio=k=>{const hs=S.d.habits;return hs.length?hs.reduce((a,h)=>a+sc(hv(k,h.id)),0)/hs.length:0};
 function elapsed(y,m){const n=dim(y,m),t=P(NOW);if(y<t.getFullYear()||(y===t.getFullYear()&&m<t.getMonth()))return n;if(y===t.getFullYear()&&m===t.getMonth())return t.getDate();return 0}
 
+/* ---------- 회고 질문 ---------- */
+const RQC=[['me','나에 대해'],['yr','올해의 경험'],['lk','좋고 싫은 것'],['mo','즐기는 것·돈'],['nw','요즘의 나'],['ye','🎄 연말']];
+const RQD={
+me:['나를 가장 잘 표현하는 단어 세 개는?','요즘 내가 가장 자주 하는 걱정은 뭘까?','남들은 모르지만 나는 아는 내 장점은?','나는 어떤 순간에 가장 나다웠나?','나는 어떤 사람으로 기억되고 싶나?','나를 기운 나게 하는 말은 어떤 말일까?','어릴 때의 나와 지금의 나, 가장 달라진 점은?','나도 모르게 자꾸 반복하는 행동이 있다면?','화가 났을 때 나는 어떻게 하는 편일까?','나 자신에게 가장 자주 하는 말은?'],
+yr:['올해 처음 해 본 일 중 가장 기억에 남는 건?','올해 가장 크게 웃었던 날은 언제였나?','올해 힘들었지만 지나고 나니 괜찮았던 일은?','올해 나를 가장 많이 바꾼 사람이나 사건은?','올해 가장 용기 냈던 순간은?','올해 다녀온 곳 중 다시 가고 싶은 곳은?','올해 새로 알게 된 나의 모습은?','올해 가장 많이 했던 말이나 생각은?','올해 놓치고 싶지 않았던 순간은?','올해 가장 뿌듯했던 일은?'],
+lk:['요즘 가장 좋아하는 소리, 냄새, 장면은?','이유 없이 싫은 것 하나는?','평생 질리지 않을 것 같은 음식은?','나를 기분 좋게 만드는 사소한 습관은?','절대 못 참는 것과 의외로 잘 참는 것은?','가장 좋아하는 계절과 그 이유는?','자꾸 다시 보게 되는 영화나 책이 있다면?','요즘 빠져 있는 취향 하나는?','듣기만 해도 기분 좋아지는 노래는?','좋아하는 사람의 어떤 모습에 마음이 가나?'],
+mo:['쉬는 날 아무 계획이 없다면 가장 하고 싶은 일은?','요즘 아깝지 않게 쓴 돈은 어디에 썼나?','돈이 많아도 아끼고 싶은 것과 없어도 쓰고 싶은 것은?','올해 사길 잘했다고 생각하는 물건은?','나에게 쓰는 돈 중 가장 만족스러운 항목은?','시간이 갑자기 하루 생기면 무엇을 할까?','요즘 사고 싶어서 마음에 담아 둔 것은?','돈 때문에 포기했던 일 중 지금도 아쉬운 건?','나에게 여유란 어떤 상태일까?','즐겨 하는 취미 중 앞으로 더 키우고 싶은 건?'],
+nw:['요즘 하루 중 가장 좋아하는 시간은?','이번 주에 나를 지치게 한 것과 살린 것은?','요즘 자꾸 생각나는 장면이나 말은?','오늘 자기 전에 나에게 해 주고 싶은 말은?','요즘 몸이 보내는 신호는 뭐야?','요즘 연락하고 싶은 사람은 누구야?','최근에 고마웠던 일은?','요즘 잘 지키고 있는 습관과 놓치고 있는 습관은?','오늘 기분을 날씨로 말하면?','이번 주 나에게 점수를 준다면 몇 점일까?'],
+ye:['올해의 한 줄 제목을 붙인다면?','올해 가장 잘한 결정과 후회되는 결정은?','올해 읽거나 본 것 중 하나만 남긴다면?','올해 고마웠던 사람에게 하고 싶은 말은?','내년의 나에게 부탁하고 싶은 것 세 가지는?','올해 놓아주고 싶은 것 하나는?','올해 달성한 목표와 못 이룬 목표는?','올해 나에게 주고 싶은 선물은?','올해 가장 달라진 일상의 모습은?','내년에 꼭 해 보고 싶은 일 한 가지는?']
+};
+const RQK='diary.v2.rq';
+const RQMAX=5;let RQS={on:true,seen:[],d:'',n:0,id:''},RQ={open:false,day:'',c:'all',id:''};
+try{const o=JSON.parse(localStorage.getItem(RQK)||'null');if(o){RQS.on=o.on!==false;RQS.seen=Array.isArray(o.seen)?o.seen.slice(-60):[];if(o.d===NOW){RQS.d=o.d;RQS.n=+o.n||0;RQS.id=o.id||''}}}catch(e){}
+const rqSave=()=>{try{localStorage.setItem(RQK,JSON.stringify(RQS))}catch(e){}};
+const rqSeason=()=>{const m=NOW.slice(5);return m>='11-20'&&m<='12-31'};
+function rqText(id){const a=id.split(':');return (RQD[a[0]]||[])[+a[1]]||''}
+const rqLeft=()=>RQS.d===NOW?Math.max(0,RQMAX-RQS.n):RQMAX;
+function rqPick(){
+ const season=rqSeason();let cats;
+ if(RQ.c!=='all')cats=[RQ.c];
+ else if(season&&Math.random()<.6)cats=['ye'];
+ else cats=['me','yr','lk','mo','nw'];
+ for(let t=0;t<2;t++){
+  const ids=[];cats.forEach(c=>RQD[c].forEach((_,i)=>ids.push(c+':'+i)));
+  let pool=ids.filter(x=>RQS.seen.indexOf(x)<0&&x!==RQ.id);
+  if(!pool.length){RQS.seen=RQS.seen.filter(x=>ids.indexOf(x)<0);pool=ids.filter(x=>x!==RQ.id)}
+  if(pool.length){RQ.id=pool[Math.floor(Math.random()*pool.length)];break}
+ }
+ if(RQ.id){RQS.seen.push(RQ.id);RQS.id=RQ.id;if(RQS.d!==NOW){RQS.d=NOW;RQS.n=0}rqSave()}
+}
+function rqHtml(){
+ if(!RQS.on)return '';
+ if(RQ.day!==S.cur){RQ.open=false;RQ.day=S.cur}
+ if(!RQ.open)return '<div id="rqw" class="rqw"><button class="rqc" data-a="rqOpen">💭 질문 받기'+(rqSeason()?' · 🎄 올해 회고':'')+'</button></div>';
+ const cs=[['all','전체']].concat(RQC.filter(c=>c[0]!=='ye'||rqSeason()));
+ return '<div id="rqw" class="rqw"><div class="rqk"><div class="t">'+cs.map(c=>'<button class="'+(RQ.c===c[0]?'on':'')+'"'+(rqLeft()>0||RQ.c===c[0]?'':' disabled style="opacity:.4"')+' data-a="rqCat" data-c="'+c[0]+'">'+c[1]+'</button>').join('')+'</div><p class="q">'+esc(rqText(RQ.id))+'</p><div class="b"><button class="go" data-a="rqUse">이 질문에 답하기</button>'+(rqLeft()>0?'<button class="sh" data-a="rqNext">🔀 다른 질문 <small>'+rqLeft()+'</small></button>':'<span class="sh">오늘은 여기까지 · 이 질문으로 써 봐요</span>')+'<button class="x" data-a="rqClose" aria-label="닫기">✕</button></div></div></div>';
+}
+function rqRender(){const e=document.getElementById('rqw');if(e)e.outerHTML=rqHtml()}
+function rqUse(){
+ const ta=document.querySelector('textarea[data-f="day:memo"]');if(!ta)return;
+ const pre='Q. '+rqText(RQ.id)+'\nA. ',cur=ta.value.trim();
+ ta.value=pre+(cur?'\n\n'+cur:'');
+ ta.dispatchEvent(new Event('input',{bubbles:true}));
+ RQ.open=false;rqRender();
+ try{ta.focus();ta.setSelectionRange(pre.length,pre.length)}catch(e){}
+}
+
 /* ---------- storage monitor ---------- */
 const QMAX=5*1024*1024;let swDis=false,swFail=false,lastChk=0;
 function lsUse(){let t=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);t+=(k.length+(localStorage.getItem(k)||'').length)*2}}catch(e){}return t}
@@ -583,7 +642,7 @@ function vDay(){
  const cnt={};Object.keys(S.d.days).forEach(kk=>S.d.days[kk].pp.forEach(n=>{cnt[n]=(cnt[n]||0)+1}));
  const sug=Object.keys(cnt).filter(n=>d.pp.indexOf(n)<0).sort((a,b)=>cnt[b]-cnt[a]).slice(0,8);
  h+='<div class="sec"><span class="lb">PEOPLE · 만난 사람</span>'+(d.pp.length?'<div class="chips">'+d.pp.map((n,i)=>'<span class="chip on">'+esc(n)+' <button data-a="delPp" data-i="'+i+'" aria-label="삭제">✕</button></span>').join('')+'</div>':'')+'<form class="addf" data-form="pp"><input placeholder="+ 이름 추가" enterkeyhint="done"><button class="go">↵</button></form>'+(sug.length?'<div class="chips">'+sug.map(n=>'<button class="chip" data-a="addPp" data-n="'+esc(n)+'">+ '+esc(n)+'</button>').join('')+'</div>':'')+'</div>';
- h+='<div class="sec"><span class="lb">MEMO · 메모</span><textarea class="ta" rows="4" data-f="day:memo" placeholder="오늘 하루를 적어 보세요">'+esc(d.memo)+'</textarea></div>';
+ h+='<div class="sec"><span class="lb">MEMO · 메모</span>'+rqHtml()+'<textarea class="ta" rows="4" data-f="day:memo" placeholder="오늘 하루를 적어 보세요">'+esc(d.memo)+'</textarea></div>';
  {const ge=gev(k);h+='<div class="sec"><span class="lb">CALENDAR · 일정</span>'+(ge.length?ge.map(e=>'<div class="evr"><u>'+(e.tm||'종일')+'</u><span>'+esc(e.t)+'</span></div>').join(''):'<div class="emp">가져온 일정이 없어요.</div>')+'<a class="btn sm" style="margin-top:6px" target="_blank" rel="noopener" href="'+gcalUrl(k,d)+'">＋ Google 캘린더에 추가</a></div>'}
  h+='<div class="sec"><span class="lb">PHOTO</span>'+pstrip(d.ph,'day')+'</div>';
  const nn=S.d.notes.filter(n=>n.date===k);
@@ -691,6 +750,7 @@ function vSetting(){
  '<div class="set" style="border:0;padding-top:0"><span class="lb">다이어리 이름</span><input class="fld" data-f="title" value="'+esc(S.d.title)+'"></div>'+
  '<div class="set"><span class="lb">데이터</span><p>'+(sm?'지금은 <b>예시 데이터</b>를 보고 있어요. 여기서 바꾼 내용은 저장되지 않아요.':'내 다이어리 · 이 기기의 브라우저에 저장돼요.')+'</p><div class="seg"><button class="'+(sm?'on':'')+'" data-a="mode" data-m="sample">예시 데이터</button><button class="'+(sm?'':'on')+'" data-a="mode" data-m="mine">내 다이어리</button></div></div>'+
  '<div class="set"><span class="lb">넓은 화면 (아이패드·맥북 가로)</span><p>가로로 넓은 화면에서는 두 쪽으로 보여 줘요. 월·주·연·습관은 왼쪽에 고른 화면, 오른쪽에 선택한 날의 DAY예요. 3 YEARS와 DAY는 둘 다 왼쪽 3 YEARS, 오른쪽 DAY예요. 노트는 왼쪽에 카테고리, 오른쪽에 달력이고 노트 글은 가운데 창으로 열려요. 회고·목표·설정은 한 칸을 크게 써요. 예전처럼 한 칸으로만 보려면 ‘한 쪽만’을 고르세요.</p><div class="seg" style="margin-top:6px"><button class="'+(S.lay==='one'?'':'on')+'" data-a="lay" data-m="auto">두 쪽 (자동)</button><button class="'+(S.lay==='one'?'on':'')+'" data-a="lay" data-m="one">한 쪽만</button></div></div>'+
+ '<div class="set"><span class="lb">회고 질문</span><p>DAY 메모 위에 "💭 질문 받기" 버튼이 보여요. 누를 때만 질문이 나오고, 끄면 버튼도 사라져요. 11월 20일부터 연말까지는 연말 회고 질문이 더 자주 나와요.</p><div class="seg" style="margin-top:6px"><button class="'+(RQS.on?'on':'')+'" data-a="rqSet" data-m="1">ON</button><button class="'+(RQS.on?'':'on')+'" data-a="rqSet" data-m="0">OFF</button></div></div>'+
  '<div class="set"><span class="lb">테마</span><div class="seg" style="margin-top:6px"><button class="'+(S.theme==='light'?'on':'')+'" data-a="theme" data-m="light">LIGHT</button><button class="'+(S.theme==='dark'?'on':'')+'" data-a="theme" data-m="dark">DARK</button></div></div>'+
  '<div class="set"><span class="lb">습관</span>'+S.d.habits.map(x=>'<button class="hl2" data-a="editH" data-id="'+x.id+'">'+ic(x.ic,16)+'<span>'+esc(x.n)+'</span><small style="color:var(--mut)">편집 ›</small></button>').join('')+'<button class="btn sm" data-a="editH" data-id="" style="margin-top:6px">+ 습관 추가</button></div>'+
  '<div class="set"><span class="lb">습관 자동 연동 기준</span><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px"><div class="arow"><span style="width:90px">수면 점수</span><input class="nu sm" style="width:72px" inputmode="numeric" pattern="[0-9]*" maxlength="3" data-f="rg:slT" value="'+S.d.rg.slT+'"><small>점 이상이면 달성</small></div><div class="arow"><span style="width:90px">걸음수</span><input class="nu sm" style="width:72px" inputmode="numeric" pattern="[0-9]*" maxlength="6" data-f="rg:stT" value="'+S.d.rg.stT+'"><small>보 이상이면 달성</small></div><div class="arow"><span style="width:90px">일광시간</span><input class="nu sm" style="width:72px" inputmode="numeric" pattern="[0-9]*" maxlength="4" data-f="rg:dlT" value="'+S.d.rg.dlT+'"><small>분 이상이면 달성</small></div><div class="arow"><span style="width:90px">기분</span><input class="nu sm" style="width:72px" inputmode="numeric" pattern="[1-5]" maxlength="1" data-f="rg:mdT" value="'+S.d.rg.mdT+'"><small>점 이상 (오전·오후 모두)</small></div></div><span class="lb" style="margin-top:16px">절반 달성 기준</span><p style="margin:2px 0 8px;color:var(--mut);font-size:11.5px">달성 기준에는 못 미치지만 이 값 이상이면 ◐(절반)으로 체크돼요. 0을 넣으면 사용하지 않아요. 기분은 오전·오후 중 한쪽만 기준 이상이면 절반이에요.</p><div style="display:flex;flex-direction:column;gap:8px"><div class="arow"><span style="width:90px">수면 점수</span><input class="nu sm" style="width:72px" inputmode="numeric" pattern="[0-9]*" maxlength="3" data-f="rg:slH" value="'+S.d.rg.slH+'"><small>점 이상이면 절반</small></div><div class="arow"><span style="width:90px">걸음수</span><input class="nu sm" style="width:72px" inputmode="numeric" pattern="[0-9]*" maxlength="6" data-f="rg:stH" value="'+S.d.rg.stH+'"><small>보 이상이면 절반</small></div><div class="arow"><span style="width:90px">일광시간</span><input class="nu sm" style="width:72px" inputmode="numeric" pattern="[0-9]*" maxlength="4" data-f="rg:dlH" value="'+S.d.rg.dlH+'"><small>분 이상이면 절반</small></div></div></div>'+
@@ -1173,6 +1233,12 @@ const A={
  delH(){const id=S.hid;ask('이 습관을 삭제할까요? 지금까지의 체크 기록도 함께 사라져요.','삭제',()=>{S.d.habits=S.d.habits.filter(x=>x.id!==id);Object.keys(S.d.days).forEach(k=>{delete S.d.days[k].habits[id]});save();render(true)})},
  mode(el){const m=el.dataset.m;if(m===S.mode)return;S.mode=m;meta();loadMode().then(()=>{render(false)})},
  theme(el){S.theme=el.dataset.m;meta();render(true)},
+ rqOpen(){if(RQS.d===NOW&&RQS.id&&rqText(RQS.id))RQ.id=RQS.id;else rqPick();RQ.open=true;RQ.day=S.cur;rqRender()},
+ rqNext(){if(rqLeft()<1)return;RQS.n++;RQS.d=NOW;rqPick();rqRender()},
+ rqCat(el){if(el.dataset.c===RQ.c||rqLeft()<1)return;RQ.c=el.dataset.c;RQS.n++;RQS.d=NOW;rqPick();rqRender()},
+ rqUse(){rqUse()},
+ rqClose(){RQ.open=false;rqRender()},
+ rqSet(el){RQS.on=el.dataset.m==='1';rqSave();RQ.open=false;render(true)},
  export(){
   if(S.mode!=='mine'){sheet('<h3>예시 데이터 모드예요</h3><p class="emp">‘내 다이어리’로 전환한 뒤 백업할 수 있어요.</p><button class="btn" data-a="closeSh">확인</button>');return}
   const used={};const mark=id=>{if(PH[id])used[id]=PH[id]};Object.keys(S.d.days).forEach(k=>S.d.days[k].ph.forEach(mark));S.d.notes.forEach(n=>n.ph.forEach(mark));
