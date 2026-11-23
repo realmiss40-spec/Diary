@@ -1,0 +1,462 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Morning Pages</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap">
+<style>
+/* Layout: one paper card like Diary Book, folder tabs below, a calendar-sticker date block above a 14-line ruled sheet. */
+:root{
+  --bg:#e6e4e0;--paper:#fcfbf9;--ink:#181818;--mut:#8f8c87;--faint:#dcd9d3;--soft:#f1efeb;
+  --red:#b4493c;--blue:#3b62a8;--shadow:rgba(0,0,0,.16);
+  --stk:#f6f4ef;--stk-tab:#cdcbc6;--stk-pin:#4a4a48;--stk-ink:#1b1b1b;--stk-red:#b4493c;--stk-blue:#3b62a8;
+  --serif:'Playfair Display','Didot','Bodoni 72',Georgia,serif;
+  --sans:"Avenir Next","SF Pro Text",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#050505;--paper:#161616;--ink:#ecebe8;--mut:#7f7d79;--faint:#333230;--soft:#202020;--red:#e07a6c;--blue:#8aa9e6;--shadow:rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#050505;--paper:#161616;--ink:#ecebe8;--mut:#7f7d79;--faint:#333230;--soft:#202020;--red:#e07a6c;--blue:#8aa9e6;--shadow:rgba(0,0,0,.5);color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;-webkit-text-size-adjust:100%;
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;justify-content:center}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation;text-align:inherit}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+input,textarea{font:inherit;color:inherit;border:0;background:transparent;outline:0;border-radius:0;width:100%;-webkit-appearance:none;appearance:none}
+textarea{resize:none;display:block}
+#app{width:100%;max-width:440px;height:100%;max-height:920px;align-self:center;display:flex;flex-direction:column;background:var(--paper);border-radius:28px;box-shadow:0 10px 30px var(--shadow);overflow:hidden;position:relative}
+@media(min-width:620px){#app{max-width:640px}}
+#hd{display:flex;align-items:center;gap:8px;padding:14px 18px 8px;flex:none}
+#hd .t{flex:1;font-size:15px;font-weight:500;letter-spacing:-.01em}
+#ring{width:32px;height:32px;display:grid;place-items:center;color:var(--mut)}
+#ring.ping circle.o{animation:pg .9s ease}
+@keyframes pg{0%{stroke:var(--ink);stroke-width:3}100%{stroke:currentColor;stroke-width:1.6}}
+@media(prefers-reduced-motion:reduce){#ring.ping circle.o{animation:none}}
+#view{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 18px 28px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#tabs{display:flex;align-items:flex-start;overflow-x:auto;background:var(--paper);scrollbar-width:none;flex:none;padding:0 14px 10px;gap:3px}
+#tabs::-webkit-scrollbar{display:none}
+#tabs button{flex:1 0 auto;text-align:center;margin-top:-1px;padding:8px 13px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);background:var(--soft);border:1px solid var(--faint);border-top:0;border-radius:0 0 11px 11px;box-shadow:0 3px 5px -1px var(--shadow);transition:padding .15s}
+#tabs button.on{background:var(--paper);color:var(--ink);font-weight:600;padding-bottom:13px;box-shadow:0 4px 7px -1px var(--shadow)}
+.lb{display:block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:500}
+.ttl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-top:6px;flex-wrap:wrap}
+h1{margin:0;font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-spacing:.06em}
+.pn{display:flex;gap:8px;align-items:center;font-size:9.5px;letter-spacing:.1em;color:var(--mut);flex:none}
+.pn button{padding:8px 0;color:var(--mut)}
+.pn button.tdy{color:var(--ink);font-weight:600}
+.pn i{width:1px;height:9px;background:var(--faint)}
+.rule{border:0;border-top:1.5px solid var(--ink);margin:6px 0 12px}
+.emp{color:var(--mut);font-size:12px;padding:8px 0}
+.note{color:var(--mut);font-size:11px;margin:8px 0}
+.btn{display:inline-block;border:1px solid var(--ink);padding:9px 16px;font-size:12px;letter-spacing:.04em;text-align:center}
+.btn.blk{background:var(--ink);color:var(--paper)}
+.btn.sm{padding:6px 12px;font-size:11px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 0}
+.chip{border:1px solid var(--faint);padding:4px 11px;font-size:12px;border-radius:99px;white-space:nowrap}
+.chip small{color:var(--mut);margin-left:5px;font-size:10px}
+.seg{display:flex;border:1px solid var(--ink);width:fit-content}
+.seg button{padding:6px 16px;font-size:11.5px}
+.seg button.on{background:var(--ink);color:var(--paper)}
+/* today */
+.top{display:flex;gap:16px;align-items:flex-start;padding:10px 0 14px}
+.stkw{flex:none;width:108px}
+.stkw small{display:block;margin-top:9px;font-size:9px;color:var(--mut);line-height:1.35}
+.stk{display:block;width:108px;background:var(--stk);color:var(--stk-ink);box-shadow:0 1px 0 rgba(0,0,0,.05),0 6px 14px var(--shadow);text-align:center;font-family:var(--serif)}
+.stk span{display:block}
+.stk .tab{height:15px;background:var(--stk-tab);position:relative}
+.stk .tab::before,.stk .tab::after{content:"";position:absolute;top:5px;width:5px;height:5px;border-radius:50%;background:var(--stk-pin)}
+.stk .tab::before{left:15px}.stk .tab::after{right:15px}
+.stk .m{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding-top:11px}
+.stk .n{font-size:48px;line-height:1.05;font-weight:700}
+.stk .w{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 0 13px}
+.stk.sat{color:var(--stk-blue)}
+.stk.red{color:var(--stk-red)}
+.side{flex:1;min-width:0}
+.big{display:flex;align-items:baseline;gap:4px;margin-top:2px}
+.big b{font-size:34px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.big span{font-size:12px;color:var(--mut)}
+.segs{display:flex;gap:2px;margin:8px 0 6px}
+.segs i{flex:1;height:6px;background:var(--faint);position:relative;overflow:hidden;border-radius:1px}
+.segs i b{position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(0)}
+.sub{font-size:11px;color:var(--mut);font-variant-numeric:tabular-nums}
+.sub.ok{color:var(--ink);font-weight:600}
+.side .pn{margin-top:8px}
+.sheet{border-top:1.5px solid var(--ink);padding-top:4px}
+.pg{--lh:32px;display:block;width:100%;overflow:hidden;font-size:16px;line-height:var(--lh);padding:0 2px;min-height:calc(var(--lh)*14);
+  background-image:linear-gradient(var(--mut),var(--mut)),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--lh) - 1px),var(--faint) calc(var(--lh) - 1px),var(--faint) var(--lh));
+  background-size:100% 1px,100% var(--lh);background-position:0 var(--gy,447px),0 0;background-repeat:no-repeat,repeat;background-attachment:local,local}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
+.seal{border:1px solid var(--faint);background:var(--soft);padding:18px 16px;margin-top:4px}
+.seal h2{margin:2px 0 2px;font-size:17px;font-weight:600}
+.seal .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.txt{white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--faint)}
+/* month */
+.stat{display:flex;gap:22px;padding:2px 0 12px}
+.stat b{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.stat span{font-size:9px;letter-spacing:.1em;color:var(--mut)}
+.mg{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--ink)}
+.dw{font-size:8px;letter-spacing:.14em;color:var(--mut);text-align:center;padding:6px 0 4px;border-bottom:1px solid var(--faint)}
+.dw.sat{color:var(--blue)}.dw.sun{color:var(--red)}
+.mc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;aspect-ratio:1/1.05;border-bottom:1px solid var(--faint);min-width:0}
+.mc b{font-size:12px;font-weight:600;line-height:1;min-width:20px;height:20px;display:inline-grid;place-items:center}
+.mc.sat b{color:var(--blue)}.mc.red b{color:var(--red)}
+.mc.out{visibility:hidden}
+.mc.tod b{background:var(--ink);color:var(--paper);border-radius:50%}
+.mc.sel{background:var(--soft)}
+.mc:disabled{opacity:.35}
+.mk{width:8px;height:8px;border-radius:50%;border:1px solid var(--faint)}
+.mk.h{background:linear-gradient(90deg,var(--ink) 50%,transparent 50%);border-color:var(--ink)}
+.mk.f{background:var(--ink);border-color:var(--ink)}
+.leg{display:flex;gap:14px;font-size:10px;color:var(--mut);padding:10px 0;align-items:center}
+.leg .mk{display:inline-block;margin-right:5px;vertical-align:-1px}
+/* insight */
+.ir{display:grid;grid-template-columns:46px 1fr auto;gap:10px;padding:10px 0;border-top:1px solid var(--faint);align-items:start}
+.ir.first{border-top:1px solid var(--ink)}
+.ir .d b{display:block;font-size:17px;font-weight:600;line-height:1}
+.ir .d span{font-size:8px;letter-spacing:.12em;color:var(--mut)}
+.ir .d.sat b{color:var(--blue)}.ir .d.red b{color:var(--red)}
+.ir .chips{padding:0}
+.ir .m{font-size:10.5px;color:var(--mut);text-align:right;line-height:1.5;white-space:nowrap;font-variant-numeric:tabular-nums}
+.cmp{padding:12px 0;border-top:1px solid var(--faint)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.two small{display:block;font-size:10px;color:var(--mut)}
+.two > div{min-width:0}
+.sec{margin:20px 0 6px}
+/* setting */
+.set{padding:12px 0;border-top:1px solid var(--faint)}
+.set p{margin:2px 0 8px;color:var(--mut);font-size:11.5px}
+.fld{border-bottom:1px solid var(--ink);padding:6px 0;font-size:16px;font-weight:500}
+.gr{display:flex;gap:8px;flex-wrap:wrap}
+.nrow{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.nrow label{display:block}
+.nu{width:64px;text-align:center;font-size:24px;font-weight:600;border-bottom:1.5px solid var(--ink);padding:2px 0;font-variant-numeric:tabular-nums}
+.err{color:var(--red)}
+</style>
+<div id="app">
+  <header id="hd">
+    <div class="t">Morning Pages</div>
+    <div id="ring" title="저장 상태"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle class="o" cx="12" cy="12" r="9" stroke-dasharray="2 2.6"/><path d="M8.5 12.5l2.4 2.4 4.6-5"/></svg></div>
+  </header>
+  <main id="view"></main>
+  <nav id="tabs">
+    <button data-a="tab" data-t="today">Today</button>
+    <button data-a="tab" data-t="month">Month</button>
+    <button data-a="tab" data-t="insight">Insight</button>
+    <button data-a="tab" data-t="setting">Setting</button>
+  </nav>
+</div>
+<script>
+(function(){
+'use strict';
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const P=s=>{const a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])};
+const add=(s,n)=>{const d=P(s);d.setDate(d.getDate()+n);return ymd(d)};
+const dim=(y,m)=>new Date(y,m+1,0).getDate();
+const tdy=()=>ymd(new Date());
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtN=n=>Number(n).toLocaleString('ko-KR');
+const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const SHORT=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const HF={'01-01':'신정','03-01':'삼일절','05-05':'어린이날','06-06':'현충일','08-15':'광복절','10-03':'개천절','10-09':'한글날','12-25':'성탄절'};
+const H26={'2026-02-16':1,'2026-02-17':1,'2026-02-18':1,'2026-03-02':1,'2026-05-24':1,'2026-05-25':1,'2026-06-03':1,'2026-08-17':1,'2026-09-24':1,'2026-09-25':1,'2026-09-26':1,'2026-10-05':1};
+const hol=k=>!!(H26[k]||HF[k.slice(5)]);
+const LH=32;
+/* ---------- storage ---------- */
+const KEY='mp.v1',SYK='mp.sy',DDK='mp.dd';
+const mem={};
+const ls={g(k){try{const v=localStorage.getItem(k);if(v!=null)return v}catch(e){}return mem[k]==null?null:mem[k]},s(k,v){mem[k]=v;try{localStorage.setItem(k,v)}catch(e){}}};
+const jp=(s,d)=>{try{return s?JSON.parse(s):d}catch(e){return d}};
+let M=Object.assign({days:{},cfg:{},loc:{}},jp(ls.g(KEY),{}));
+M.cfg=Object.assign({ll:25,ln:14,ts:0},M.cfg);
+M.loc=Object.assign({theme:'auto',peek:false},M.loc);
+if(!M.days||typeof M.days!=='object')M.days={};
+let SY=Object.assign({repo:'',token:'',last:0,shas:{},pushed:{},dshas:{}},jp(ls.g(SYK),{}));
+let DD=jp(ls.g(DDK),{});
+const S={tab:'today',date:tdy(),mon:tdy().slice(0,8)+'01',kx:null,show:null,hasAI:false,dead:false,msg:'',syf:{repo:'',token:''}};
+let pst=null;
+function persist(){clearTimeout(pst);ls.s(KEY,JSON.stringify(M))}
+function saveSoon(){clearTimeout(pst);pst=setTimeout(persist,250)}
+const saveSY=()=>ls.s(SYK,JSON.stringify(SY));
+function ping(){const r=$('#ring');if(!r)return;r.classList.remove('ping');void r.offsetWidth;r.classList.add('ping')}
+function save(){saveSoon();ping();syncSoon()}
+/* ---------- model ---------- */
+const target=()=>M.cfg.ll*M.cfg.ln;
+const cnt=t=>Array.from(String(t||'').replace(/[\r\n]/g,'')).length;
+const gd=k=>M.days[k]||null;
+const wd=k=>M.days[k]||(M.days[k]={t:'',c:0,k:[],ks:'',sealed:false,hd:0,ts:0,kh:''});
+const isRed=k=>{const d=gd(k);if(d&&d.hd===1)return true;if(d&&d.hd===-1)return false;return P(k).getDay()===0||hol(k)};
+const dcls=k=>isRed(k)?'red':(P(k).getDay()===6?'sat':'');
+function togHol(k){const auto=P(k).getDay()===0||hol(k),want=!isRed(k),d=wd(k);d.hd=(want===auto)?0:(want?1:-1);d.ts=Date.now();save();render()}
+const hashTxt=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36)+'.'+t.length};
+function streak(){const dn=x=>{const d=gd(x);return !!d&&d.c>=target()};let k=tdy();if(!dn(k))k=add(k,-1);let n=0;while(dn(k)){n++;k=add(k,-1)}return n}
+function autoSeal(){const t=tdy();let ch=false;Object.keys(M.days).forEach(k=>{const d=M.days[k];if(k<t&&d.c>0&&!d.sealed){d.sealed=true;if(!d.k.length){d.k=localKw(d.t);d.ks='local';d.kh=hashTxt(d.t)}d.ts=Date.now();ch=true}});if(ch){persist();syncSoon()}}
+/* ---------- keywords ---------- */
+const STOP=new Set('오늘 어제 내일 아침 진짜 정말 너무 그냥 일단 하지만 그리고 그래서 그런데 근데 이제 아직 다시 계속 조금 많이 같다 같은 있다 없다 있는 없는 하다 했다 한다 생각 느낌 뭔가 어떻게 그래도 그러면 이렇게 저렇게 그렇게 우리 나는 내가 저는 제가 때문 지금 해서 해야 하는 하면 되는 된다 됐다 이런 저런 그런 어떤 모든 하나 우선 바로 역시 아마 사실 결국 먼저 나중'.split(' '));
+const JOSA=/(으로|에서|에게|까지|부터|처럼|보다|하고|이랑|이다|입니다|했다|한다|하는|했는데|인데|이고|은|는|이|가|을|를|의|에|로|와|과|도|만|랑)$/;
+function localKw(text){const m=String(text||'').match(/[가-힣]{2,}|[A-Za-z]{3,}/g)||[],f={};m.forEach(w=>{if(/[가-힣]/.test(w)){const s=w.replace(JOSA,'');if(s.length>=2)w=s}if(STOP.has(w))return;f[w]=(f[w]||0)+1});return Object.keys(f).sort((a,b)=>(f[b]-f[a])||(b.length-a.length)).slice(0,5)}
+function cleanKw(r){if(!Array.isArray(r))return[];const o=[];r.forEach(x=>{const s=String(x).replace(/["'\[\]{}.,!?]/g,'').trim();if(s&&s.length<=14&&o.indexOf(s)<0)o.push(s)});return o.slice(0,5)}
+let samplePromise=null;
+function getSample(){if(!samplePromise)samplePromise=(async()=>{try{if(window.claude&&window.claude.use){const s=await window.claude.use('sample');return s&&typeof s.json==='function'?s:null}}catch(e){}return null})();return samplePromise}
+async function extract(k,force){
+  const d=gd(k);if(!d||!d.c)return;
+  const h=hashTxt(d.t);if(d.kh===h&&d.k.length&&!force)return;
+  S.kx={date:k,st:'run'};render();
+  let ks=null,src='',code='';
+  const sample=S.dead?null:await getSample();
+  if(sample){
+    try{
+      const prompt='아래는 한 사람이 아침에 손 가는 대로 쏟아낸 글입니다. 이 글에서 주제, 걱정, 감정, 바람을 가장 잘 드러내는 핵심 키워드를 5개 이내로 뽑아 주세요.\n규칙: 한국어 명사 또는 짧은 명사구(1~3어절), 사람 이름과 고유명사는 제외, 문장 금지, 원문을 인용하거나 요약하지 말고 키워드만.\n반드시 JSON 문자열 배열 하나만 출력하세요. 예: ["불안","마감","운동"]\n\n---\n'+String(d.t).slice(0,6000);
+      ks=cleanKw(await sample.json(prompt,{modelTier:'quick'}));
+      if(ks.length)src='ai';
+    }catch(e){code=(e&&e.code)||'upstream_error';if(['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].indexOf(code)>=0)S.dead=true}
+  }
+  if(!ks||!ks.length){ks=localKw(d.t);src='local'}
+  d.k=ks;d.ks=src;d.kh=h;d.ts=Date.now();persist();
+  S.kx=code?{date:k,st:'err',code:code}:null;
+  render();syncSoon();
+}
+function kxNote(k){
+  const x=S.kx;if(!x||x.date!==k)return '';
+  if(x.st==='run')return '<p class="note">Claude가 키워드를 뽑는 중이에요…</p>';
+  if(x.code==='not_granted'||x.code==='sampling_disabled')return '<p class="note">Claude 사용을 허용하지 않아 앱 안의 단어 빈도로 뽑았어요.</p>';
+  if(x.code==='rate_limited')return '<p class="note">요청이 많아 앱 안의 방식으로 뽑았어요. 잠시 뒤에 다시 시도해 보세요.</p>';
+  return '<p class="note">Claude 연결이 불안정해 앱 안의 방식으로 뽑았어요.</p>';
+}
+/* ---------- views ---------- */
+const chipsHtml=a=>(a&&a.length?'<div class="chips">'+a.map(w=>'<span class="chip">'+esc(w)+'</span>').join('')+'</div>':'');
+function stkHtml(k){const d=P(k);return '<button class="stk '+dcls(k)+'" data-a="hol" aria-label="날짜 블록. 눌러서 공휴일 표시를 바꿔요"><span class="tab"></span><span class="m">'+MON[d.getMonth()]+'</span><span class="n">'+d.getDate()+'</span><span class="w">'+DAYS[d.getDay()]+'</span></button>'}
+function vToday(){
+  const k=S.date,d=gd(k),today=tdy(),sealed=!!(d&&d.sealed&&d.c>0);
+  const pager='<div class="pn"><button data-a="prev">◂ PREV</button><i></i><button class="tdy" data-a="tdy">TODAY</button><i></i><button data-a="next"'+(k>=today?' disabled':'')+'>NEXT ▸</button></div>';
+  let h='<div class="top"><div class="stkw">'+stkHtml(k)+'<small>날짜를 누르면 공휴일 표시가 바뀌어요</small></div><div class="side"><span class="lb">PAGE</span><div class="big"><b id="lnNow">0.0</b><span>/ '+M.cfg.ln+'줄</span></div><div class="segs" id="segs">'+'<i><b></b></i>'.repeat(Math.min(M.cfg.ln,60))+'</div><div class="sub" id="cnt"></div>'+pager+'</div></div>';
+  if(sealed){
+    const canCont=k===today||M.loc.peek,ai=S.hasAI&&!S.dead&&d.ks==='local'&&!(S.kx&&S.kx.st==='run');
+    h+='<div class="seal"><span class="lb">SEALED</span><h2>봉인된 모닝페이지</h2><div class="sub">'+fmtN(d.c)+'자 · '+(d.c/M.cfg.ll).toFixed(1)+'줄</div>'+
+      (d.k.length?chipsHtml(d.k):(S.kx&&S.kx.st==='run'?'':'<p class="note">키워드가 아직 없어요.</p>'))+kxNote(k)+
+      (d.ks==='local'&&d.k.length&&!(S.kx&&S.kx.date===k)?'<p class="note">앱 안에서 단어 빈도로 뽑은 키워드예요.</p>':'')+
+      '<div class="acts">'+(canCont?'<button class="btn sm" data-a="cont">이어 쓰기</button>':'')+
+      (!d.k.length?'<button class="btn sm" data-a="reai">키워드 뽑기</button>':'')+(ai?'<button class="btn sm" data-a="reai">Claude로 다시 뽑기</button>':'')+
+      (M.loc.peek?'<button class="btn sm" data-a="show">'+(S.show===k?'본문 닫기':'본문 보기')+'</button>':'')+'</div>'+
+      (M.loc.peek&&S.show===k?'<div class="txt">'+esc(d.t)+'</div>':'')+'</div>';
+  }else{
+    h+='<div class="sheet"><textarea id="pg" class="pg" rows="'+M.cfg.ln+'" spellcheck="false" aria-label="모닝페이지" placeholder="생각나는 대로 적어요" style="--gy:'+(M.cfg.ln*LH-1)+'px;min-height:'+(M.cfg.ln*LH)+'px"></textarea></div>'+
+      '<div class="foot"><span class="lb">자동 저장</span><button class="btn blk" data-a="seal" id="sealBtn"'+(d&&d.c?'':' disabled')+'>마치기</button></div>'+
+      (SY.repo?'':'<p class="note">SETTING에서 GitHub 동기화를 연결하면 기기끼리 기록이 맞춰지고, INSIGHT에 다이어리의 수면·운동 기록이 연결돼요.</p>');
+  }
+  return h;
+}
+function updProg(){
+  const ln=$('#lnNow');if(!ln)return;
+  const d=gd(S.date),c=d?d.c:0,t=target(),ll=M.cfg.ll;
+  ln.textContent=(c/ll).toFixed(1);
+  document.querySelectorAll('#segs i b').forEach((b,i)=>{b.style.transform='scaleX('+Math.max(0,Math.min(1,c/ll-i))+')'});
+  const el=$('#cnt');el.textContent=fmtN(c)+'자 / '+fmtN(t)+'자'+(c>=t?' · 목표 달성':'');el.classList.toggle('ok',c>=t);
+  const sb=$('#sealBtn');if(sb)sb.disabled=!c;
+}
+function fit(){const el=$('#pg');if(!el)return;el.style.height='auto';el.style.height=Math.max(el.scrollHeight,M.cfg.ln*LH)+'px'}
+function vMonth(){
+  const c=P(S.mon),y=c.getFullYear(),m=c.getMonth(),first=new Date(y,m,1),off=first.getDay(),weeks=Math.ceil((off+dim(y,m))/7),start=add(ymd(first),-off),t=target(),today=tdy();
+  let done=0,part=0;for(let i=1;i<=dim(y,m);i++){const d=gd(y+'-'+pad(m+1)+'-'+pad(i));if(d&&d.c>=t)done++;else if(d&&d.c>0)part++}
+  let h='<div class="ttl"><h1>'+MON[m]+'<small>'+y+'</small></h1><div class="pn"><button data-a="mprev">◂ PREV</button><i></i><button class="tdy" data-a="mtdy">TODAY</button><i></i><button data-a="mnext">NEXT ▸</button></div></div><hr class="rule">';
+  h+='<div class="stat"><div><b>'+streak()+'</b><span>STREAK · 연속</span></div><div><b>'+done+'</b><span>THIS MONTH · 이번 달</span></div></div>';
+  h+='<div class="mg">'+SHORT.map((x,i)=>'<div class="dw'+(i===0?' sun':i===6?' sat':'')+'">'+x+'</div>').join('');
+  for(let i=0;i<weeks*7;i++){
+    const k=add(start,i),dd=P(k),inM=dd.getMonth()===m,d=gd(k),mk=d&&d.c>=t?'f':(d&&d.c>0?'h':'');
+    h+='<button class="mc '+dcls(k)+(inM?'':' out')+(k===today?' tod':'')+(k===S.date?' sel':'')+'" data-a="goDay" data-d="'+k+'"'+(k>today?' disabled':'')+'><b>'+dd.getDate()+'</b><i class="mk '+mk+'"></i></button>';
+  }
+  h+='</div><div class="leg"><span><i class="mk f"></i>목표 달성</span><span><i class="mk h"></i>쓴 날</span></div>';
+  return h;
+}
+function kwDays(){
+  return Object.keys(M.days).sort().map(k=>({k:k,d:M.days[k]})).filter(x=>x.d.k&&x.d.k.length&&x.d.c>0).map(x=>{
+    const s=DD[x.k],p=DD[add(x.k,-1)];
+    return {k:x.k,kw:x.d.k,sl:s&&+s.slS>0?+s.slS:null,ex:p?(+p.ex||0):null,mv:p?(+p.mv||0):null};
+  });
+}
+function cmp(rows,key,label,unit){
+  const it=rows.filter(r=>r[key]!=null);
+  if(it.length<9)return {label:label,n:it.length,ok:false};
+  it.sort((a,b)=>a[key]-b[key]);
+  const th=Math.floor(it.length/3),lo=it.slice(0,th),hi=it.slice(-th);
+  const cn=g=>{const m={};g.forEach(r=>new Set(r.kw).forEach(w=>{m[w]=(m[w]||0)+1}));return m};
+  const a=cn(lo),b=cn(hi);
+  const side=(x,y)=>Object.keys(x).filter(w=>x[w]>=2&&x[w]>(y[w]||0)).sort((p,q)=>((x[q]-(y[q]||0))-(x[p]-(y[p]||0)))||(x[q]-x[p])).slice(0,6).map(w=>[w,x[w]]);
+  return {label:label,unit:unit,n:it.length,ok:true,lo:side(a,b),hi:side(b,a),loMax:lo[lo.length-1][key],hiMin:hi[0][key]};
+}
+function cmpHtml(c){
+  if(!c.ok)return '<div class="cmp"><span class="lb">'+c.label+'</span><p class="note">기록이 더 쌓이면 보여드릴게요. ('+c.n+'/9일)</p></div>';
+  const ch=a=>a.length?'<div class="chips">'+a.map(x=>'<span class="chip">'+esc(x[0])+'<small>'+x[1]+'일</small></span>').join('')+'</div>':'<p class="note">뚜렷한 차이가 없어요.</p>';
+  return '<div class="cmp"><span class="lb">'+c.label+' · '+c.n+'일</span><div class="two"><div><small>낮은 날 (≤ '+fmtN(c.loMax)+c.unit+')</small>'+ch(c.lo)+'</div><div><small>높은 날 (≥ '+fmtN(c.hiMin)+c.unit+')</small>'+ch(c.hi)+'</div></div></div>';
+}
+function vInsight(){
+  const rows=kwDays(),list=rows.slice().reverse().slice(0,30);
+  let h='<div class="ttl"><h1>Insight<small>KEYWORDS</small></h1></div><hr class="rule">';
+  if(!SY.repo)h+='<p class="note">GitHub 동기화를 연결하면 다이어리의 수면 점수와 운동 기록을 가져와요.</p>';
+  else if(!Object.keys(DD).length)h+='<p class="note">다이어리 기록을 아직 가져오지 못했어요. SETTING에서 지금 동기화를 눌러 보세요.</p>';
+  h+='<span class="lb">KEYWORDS × BODY</span>';
+  h+=cmpHtml(cmp(rows,'sl','수면 점수','점'))+cmpHtml(cmp(rows,'ex','전날 운동 시간','분'))+cmpHtml(cmp(rows,'mv','전날 활동량','kcal'));
+  h+='<p class="note">기록 수가 적을 때의 차이는 우연일 수 있어요. 참고용으로 봐 주세요.</p>';
+  h+='<div class="sec"><span class="lb">DAILY</span></div>';
+  if(!list.length)h+='<div class="emp">마치기를 누른 날이 생기면 키워드가 여기에 쌓여요.</div>';
+  else h+=list.map((r,i)=>{
+    const dd=P(r.k),m=[];
+    m.push(r.sl!=null?'수면 '+r.sl+'점':'수면 –');
+    if(r.ex!=null)m.push('전날 운동 '+r.ex+'분');
+    if(r.mv!=null)m.push('활동 '+fmtN(r.mv)+'kcal');
+    return '<div class="ir'+(i===0?' first':'')+'"><div class="d '+dcls(r.k)+'"><b>'+pad(dd.getMonth()+1)+'/'+pad(dd.getDate())+'</b><span>'+SHORT[dd.getDay()]+'</span></div>'+chipsHtml(r.kw)+'<div class="m">'+m.join('<br>')+'</div></div>';
+  }).join('');
+  return h;
+}
+function syncStatus(){if(S.msg)return S.msg;if(!SY.last)return '연결됨 · 아직 동기화 전이에요.';const d=new Date(SY.last);return '연결됨 · 마지막 동기화 '+(d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function vSetting(){
+  const c=M.cfg;
+  let h='<div class="ttl"><h1>Setting</h1></div><hr class="rule">';
+  h+='<div class="set"><span class="lb">목표 분량</span><p>손으로 쓰던 분량에 맞춰요. 한 줄 글자 수 × 줄 수가 목표 글자 수예요.</p><div class="nrow"><label><span class="lb">한 줄 글자</span><input class="nu" id="cfgLl" type="number" inputmode="numeric" min="5" max="80" value="'+c.ll+'"></label><label><span class="lb">줄 수</span><input class="nu" id="cfgLn" type="number" inputmode="numeric" min="3" max="40" value="'+c.ln+'"></label><div class="sub">목표 '+fmtN(target())+'자</div></div></div>';
+  h+='<div class="set"><span class="lb">기기 동기화 (GitHub)</span>';
+  if(SY.repo&&SY.token)h+='<p id="syncmsg">'+esc(syncStatus())+'</p><p>저장소 '+esc(SY.repo)+' · 모닝페이지는 morning 폴더에 저장되고, 다이어리 기록은 읽기만 해요.</p><div class="gr"><button class="btn sm" data-a="syncNow">지금 동기화</button><button class="btn sm" data-a="syncOff">연결 해제</button></div>';
+  else h+='<p>다이어리와 같은 비공개 저장소를 입력하면 돼요. 토큰은 이 기기의 이 페이지에만 저장돼요.</p><span class="lb">저장소 (아이디/저장소이름)</span><input class="fld" id="syRepo" data-f="repo" placeholder="내아이디/diary-data" autocapitalize="off" autocorrect="off" spellcheck="false"><span class="lb" style="margin-top:12px">접근 토큰</span><input class="fld" id="syTok" data-f="token" type="password" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="gr" style="margin-top:12px"><button class="btn sm blk" data-a="syncOn">연결하고 동기화</button></div><p id="syncmsg" class="err" style="margin-top:8px">'+esc(S.msg)+'</p>';
+  h+='</div>';
+  h+='<div class="set"><span class="lb">테마</span><div class="seg" style="margin-top:6px">'+[['auto','자동'],['light','라이트'],['dark','다크']].map(x=>'<button data-a="theme" data-v="'+x[0]+'" class="'+(M.loc.theme===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div></div>';
+  h+='<div class="set"><span class="lb">지난 글 열람</span><p>기본값은 잠금이에요. 허용하면 봉인된 글에서 “본문 보기”가 나타나요.</p><button class="btn sm" data-a="peek">'+(M.loc.peek?'다시 잠그기':'열람 허용')+'</button></div>';
+  return h;
+}
+function render(){
+  const v=$('#view');if(!v)return;
+  const sc=v.scrollTop,same=v.dataset.tab===S.tab;
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.tab));
+  v.innerHTML=({today:vToday,month:vMonth,insight:vInsight,setting:vSetting})[S.tab]();
+  v.dataset.tab=S.tab;
+  if(S.tab==='today'){
+    const el=$('#pg');
+    if(el){const d=gd(S.date);el.value=d?d.t:'';fit();if(S.date===tdy()&&!(d&&d.c)&&window.matchMedia('(hover:hover)').matches)el.focus()}
+    updProg();
+  }
+  v.scrollTop=same?sc:0;
+}
+/* ---------- sync ---------- */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const b64u=s=>{const b=new TextEncoder().encode(s);let bin='';for(let i=0;i<b.length;i+=0x8000)bin+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(bin)};
+async function gh(method,path,body,accept){return fetch('https://api.github.com'+path,{method:method,cache:'no-store',headers:Object.assign({Authorization:'Bearer '+SY.token,Accept:accept||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined})}
+function need(r){if(!r.ok){const e=new Error('http'+r.status);e.status=r.status;throw e}return r}
+function sm(t){S.msg=t;const e=$('#syncmsg');if(e)e.textContent=SY.repo&&SY.token?syncStatus():t}
+const shardOf=k=>k==='s'?'morning/misc.json':'morning/'+k.slice(2,9)+'.json';
+const localTs=k=>k==='s'?M.cfg.ts:((M.days[k.slice(2)]||{}).ts||0);
+function applyUnit(k,x){
+  if(k==='s'){const v=x.v||{};M.cfg.ll=+v.ll||25;M.cfg.ln=+v.ln||14;M.cfg.ts=x.t}
+  else M.days[k.slice(2)]=Object.assign({t:'',c:0,k:[],ks:'',sealed:false,hd:0,kh:''},x.v,{ts:x.t});
+}
+let syBusy=false,syT=null;
+async function doSync(retry){
+  persist();sm('동기화 중…');
+  const R='/repos/'+SY.repo;
+  let r=need(await gh('GET',R));const info=await r.json();
+  if(!info.private)throw new Error('PUBLIC');
+  const br=info.default_branch||'main',files={};
+  r=await gh('GET',R+'/git/trees/'+encodeURIComponent(br)+'?recursive=1');
+  if(r.status!==409&&r.status!==404){need(r);((await r.json()).tree||[]).forEach(x=>{if(x.type==='blob')files[x.path]=x.sha})}
+  let changed=false;
+  for(const p of Object.keys(files).filter(p=>/^morning\/(\d{4}-\d{2}|misc)\.json$/.test(p))){
+    if(files[p]===SY.shas[p])continue;
+    const rr=need(await gh('GET',R+'/contents/'+p+'?ref='+encodeURIComponent(br),null,'application/vnd.github.raw+json'));
+    const o=JSON.parse(await rr.text());
+    Object.keys(o.u||{}).forEach(k=>{const x=o.u[k],lt=localTs(k);if(!x||!x.v)return;if(!lt||x.t>lt){applyUnit(k,x);SY.pushed[k]=x.t;changed=true}else if(x.t===lt)SY.pushed[k]=lt});
+    SY.shas[p]=files[p];
+  }
+  const dirty={};
+  Object.keys(M.days).forEach(k=>{const d=M.days[k];if(d.ts&&SY.pushed['d:'+k]!==d.ts)dirty['morning/'+k.slice(0,7)+'.json']=1});
+  if(M.cfg.ts&&SY.pushed.s!==M.cfg.ts)dirty['morning/misc.json']=1;
+  for(const p of Object.keys(dirty)){
+    const o={v:1,u:{}},cap={};
+    if(p==='morning/misc.json'){if(M.cfg.ts){o.u.s={t:M.cfg.ts,v:{ll:M.cfg.ll,ln:M.cfg.ln}};cap.s=M.cfg.ts}}
+    else Object.keys(M.days).forEach(k=>{const d=M.days[k];if(d.ts&&'morning/'+k.slice(0,7)+'.json'===p){const v=Object.assign({},d);delete v.ts;o.u['d:'+k]={t:d.ts,v:v};cap['d:'+k]=d.ts}});
+    const body={message:'morning '+new Date().toISOString(),content:b64u(JSON.stringify(o))};if(files[p])body.sha=files[p];
+    const res=await gh('PUT',R+'/contents/'+p,body);
+    if((res.status===409||res.status===422)&&retry<2){saveSY();return doSync(retry+1)}
+    need(res);const j=await res.json();files[p]=j.content.sha;SY.shas[p]=j.content.sha;
+    Object.keys(cap).forEach(k=>{SY.pushed[k]=cap[k]});
+    saveSY();await sleep(300);
+  }
+  let ddch=false;
+  for(const p of Object.keys(files).filter(p=>/^days\/\d{4}-\d{2}\.json$/.test(p))){
+    if(files[p]===SY.dshas[p])continue;
+    const rr=need(await gh('GET',R+'/contents/'+p+'?ref='+encodeURIComponent(br),null,'application/vnd.github.raw+json'));
+    const o=JSON.parse(await rr.text());
+    Object.keys(o.u||{}).forEach(k=>{const x=o.u[k];if(k.slice(0,2)!=='d:'||!x||x.x||!x.v)return;const v=x.v;DD[k.slice(2)]={slS:v.slS,slH:v.slH,slM:v.slM,ex:v.ex,mv:v.mv,steps:v.steps};ddch=true});
+    SY.dshas[p]=files[p];
+  }
+  if(ddch)ls.s(DDK,JSON.stringify(DD));
+  SY.last=Date.now();saveSY();
+  if(changed)persist();
+  sm('');
+  if(changed||ddch){const a=document.activeElement;if(!(a&&a.id==='pg'))render()}
+}
+function syncErr(e){
+  if(e&&e.message==='PUBLIC')return '이 저장소는 공개 상태예요. 일기가 노출되지 않도록 비공개 저장소를 사용해 주세요.';
+  const s=e&&e.status;
+  if(s===401)return '토큰이 올바르지 않거나 만료됐어요.';
+  if(s===403)return '권한이 없거나 요청이 너무 많아요. 토큰의 Contents 읽기·쓰기 권한을 확인해 주세요.';
+  if(s===404)return '저장소를 찾을 수 없어요. 이름과, 토큰이 이 저장소에 접근할 수 있는지 확인해 주세요.';
+  if(e instanceof TypeError)return '연결할 수 없어요. 인터넷 상태를 확인해 주세요. 연결돼 있는데도 계속되면 이 페이지에서 GitHub 접근이 막힌 것일 수 있어요.';
+  return '동기화 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.';
+}
+async function syncRun(){if(!SY.repo||!SY.token||syBusy)return;syBusy=true;try{await doSync(0)}catch(e){sm(syncErr(e))}finally{syBusy=false}}
+function syncSoon(){if(!SY.repo||!SY.token)return;clearTimeout(syT);syT=setTimeout(syncRun,10000)}
+/* ---------- actions ---------- */
+const A={
+  tab(b){S.tab=b.dataset.t;render()},
+  prev(){S.date=add(S.date,-1);render()},
+  next(){if(S.date<tdy()){S.date=add(S.date,1);render()}},
+  tdy(){S.date=tdy();render()},
+  hol(){togHol(S.date)},
+  seal(){const d=gd(S.date);if(!d||!d.c)return;d.sealed=true;d.ts=Date.now();persist();render();extract(S.date,false)},
+  cont(){const d=gd(S.date);if(!d)return;d.sealed=false;d.ts=Date.now();S.show=null;save();render()},
+  show(){S.show=S.show===S.date?null:S.date;render()},
+  reai(){extract(S.date,true)},
+  mprev(){const c=P(S.mon);S.mon=ymd(new Date(c.getFullYear(),c.getMonth()-1,1));render()},
+  mnext(){const c=P(S.mon);S.mon=ymd(new Date(c.getFullYear(),c.getMonth()+1,1));render()},
+  mtdy(){S.mon=tdy().slice(0,8)+'01';render()},
+  goDay(b){S.date=b.dataset.d;S.tab='today';render()},
+  theme(b){M.loc.theme=b.dataset.v;persist();applyTheme();render()},
+  peek(){M.loc.peek=!M.loc.peek;if(!M.loc.peek)S.show=null;persist();render()},
+  syncOn(){
+    const repo=(S.syf.repo||'').trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,''),tok=(S.syf.token||'').trim();
+    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){sm('저장소는 “아이디/저장소이름” 형식으로 적어 주세요.');return}
+    if(!tok){sm('접근 토큰을 입력해 주세요.');return}
+    SY={repo:repo,token:tok,last:0,shas:{},pushed:{},dshas:{}};saveSY();S.syf={repo:'',token:''};S.msg='';render();syncRun();
+  },
+  syncNow(){syncRun()},
+  syncOff(){SY={repo:'',token:'',last:0,shas:{},pushed:{},dshas:{}};saveSY();S.msg='';render()}
+};
+function applyTheme(){const r=document.documentElement;if(M.loc.theme==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',M.loc.theme)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const f=A[b.dataset.a];if(f)f(b,e)});
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.id==='pg'){const d=wd(S.date);d.t=el.value;d.c=cnt(d.t);d.ts=Date.now();d.sealed=false;if(!d.c){d.k=[];d.ks='';d.kh=''}save();updProg();fit()}
+  else if(el.dataset&&el.dataset.f){S.syf[el.dataset.f]=el.value}
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.id==='cfgLl'||el.id==='cfgLn'){
+    const n=parseInt(el.value,10);
+    if(el.id==='cfgLl')M.cfg.ll=Math.max(5,Math.min(80,n||25));else M.cfg.ln=Math.max(3,Math.min(40,n||14));
+    M.cfg.ts=Date.now();save();render();
+  }
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){persist();return}
+  if(tdy()!==S.date&&S.tab==='today'&&!(gd(S.date)&&gd(S.date).c))S.date=tdy();
+  autoSeal();
+  if(SY.repo&&SY.token&&Date.now()-SY.last>60000)syncRun();
+});
+window.addEventListener('pagehide',persist);
+/* ---------- boot ---------- */
+applyTheme();autoSeal();render();
+getSample().then(s=>{S.hasAI=!!s;const a=document.activeElement;if(S.tab==='today'&&!(a&&a.id==='pg'))render()});
+if(SY.repo&&SY.token)setTimeout(syncRun,800);
+})();
+</script>
+
+</body></html>
