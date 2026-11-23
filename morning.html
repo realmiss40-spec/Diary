@@ -89,9 +89,10 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .seal .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .txt{white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--faint)}
 /* month */
-.stat{display:flex;gap:22px;padding:2px 0 12px}
+.stat{display:grid;grid-template-columns:repeat(7,1fr);padding:2px 0 12px}
+.stat>div{text-align:center;min-width:0}
 .stat b{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;line-height:1.1}
-.stat span{font-size:9px;letter-spacing:.1em;color:var(--mut)}
+.stat span{font-size:9px;letter-spacing:.1em;color:var(--mut);white-space:nowrap}
 .mg{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--ink)}
 .dw{font-size:8px;letter-spacing:.14em;color:var(--mut);text-align:center;padding:6px 0 4px;border-bottom:1px solid var(--faint)}
 .dw.sat{color:var(--blue)}.dw.sun{color:var(--red)}
@@ -120,6 +121,14 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .two small{display:block;font-size:10px;color:var(--mut)}
 .two > div{min-width:0}
 .sec{margin:20px 0 6px}
+.chip.yb{background:none}
+.chip.yb.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.mpk{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:2px 0 10px}
+.mb{border:1px solid var(--faint);border-radius:8px;padding:7px 0 6px;text-align:center;font-size:12px;line-height:1.25;min-width:0}
+.mb small{display:block;font-size:9px;color:var(--mut)}
+.mb.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.mb.on small{color:inherit;opacity:.75}
+.mb:disabled{opacity:.3}
 /* setting */
 .set{padding:12px 0;border-top:1px solid var(--faint)}
 .set p{margin:2px 0 8px;color:var(--mut);font-size:11.5px}
@@ -134,7 +143,11 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .cpin{display:block;border:1px solid var(--faint);padding:8px 10px;font-size:16px;line-height:1.5;margin-top:8px;resize:vertical}
 /* wide: calendar on the left, page on the right */
 @media(min-width:760px) and (orientation:landscape){#app{max-width:1120px}}
+/* 가로모드: 세로용 356px 제한은 풀되, 칸이 너무 커지지 않도록 520px에서 멈춘다. 숫자만 바꾸면 폭이 조절된다. */
+@media(orientation:landscape){.col{max-width:520px}}
 #app.wide #tabs [data-t="month"]{display:none}
+/* 가로모드: 탭 사이 틈의 중앙이 두 칸을 나누는 세로선(왼쪽 칸 오른쪽 끝 360px)과 정확히 만나도록 첫 탭 폭을 왼쪽 칸에 맞춘다. 14(바깥 여백)+344+1.5(틈 절반)=359.5 */
+#app.wide #tabs{display:grid;grid-template-columns:344px 1fr 1fr;align-items:start}
 #view.split{overflow:hidden;padding:0;display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
 #view.split .pl,#view.split .pr{overflow-y:auto;overflow-x:hidden;min-height:0;padding:4px 18px 28px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #view.split .pl{border-right:1px solid var(--faint)}
@@ -172,7 +185,8 @@ const MON=['January','February','March','April','May','June','July','August','Se
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const SHORT=['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const HF={'01-01':'신정','03-01':'삼일절','05-05':'어린이날','06-06':'현충일','08-15':'광복절','10-03':'개천절','10-09':'한글날','12-25':'성탄절'};
-const H26={'2026-02-16':1,'2026-02-17':1,'2026-02-18':1,'2026-03-02':1,'2026-05-24':1,'2026-05-25':1,'2026-06-03':1,'2026-08-17':1,'2026-09-24':1,'2026-09-25':1,'2026-09-26':1,'2026-10-05':1};
+const H26={'2026-02-16':1,'2026-02-17':1,'2026-02-18':1,'2026-03-02':1,'2026-05-24':1,'2026-05-25':1,'2026-06-03':1,'2026-08-17':1,'2026-09-24':1,'2026-09-25':1,'2026-09-26':1,'2026-10-05':1,
+'2027-02-06':1,'2027-02-07':1,'2027-02-08':1,'2027-02-09':1,'2027-05-01':1,'2027-05-03':1,'2027-05-13':1,'2027-07-17':1,'2027-07-19':1,'2027-08-16':1,'2027-09-14':1,'2027-09-15':1,'2027-09-16':1,'2027-10-04':1,'2027-10-11':1,'2027-12-27':1};
 const hol=k=>!!(H26[k]||HF[k.slice(5)]);
 const LH=32;
 /* ---------- storage ---------- */
@@ -186,7 +200,7 @@ M.loc=Object.assign({theme:'auto',peek:false},M.loc);
 if(!M.days||typeof M.days!=='object')M.days={};
 let SY=Object.assign({repo:'',token:'',last:0,shas:{},pushed:{},dshas:{}},jp(ls.g(SYK),{}));
 let DD=jp(ls.g(DDK),{});
-const S={tab:'today',date:tdy(),mon:tdy().slice(0,8)+'01',kx:null,show:null,hasAI:false,dead:false,msg:'',syf:{repo:'',token:''},wide:false,demo:false,gl:0,dn:7,cp:null,cpMsg:''};
+const S={tab:'today',date:tdy(),mon:tdy().slice(0,8)+'01',kx:null,show:null,hasAI:false,dead:false,msg:'',syf:{repo:'',token:''},wide:false,demo:false,gl:0,cp:null,cpMsg:'',ik:null};
 let pst=null;
 function persist(){clearTimeout(pst);ls.s(KEY,JSON.stringify(M))}
 function saveSoon(){clearTimeout(pst);pst=setTimeout(persist,250)}
@@ -269,9 +283,8 @@ function vToday(){
       (M.loc.peek?'<button class="btn sm" data-a="show">'+(S.show===k?'본문 닫기':'본문 보기')+'</button>':'')+'</div>'+
       (M.loc.peek&&S.show===k?'<div class="txt">'+esc(d.t)+'</div>':'')+'</div>';
   }else{
-    h+='<div class="sheet"><textarea id="pg" class="pg" rows="'+M.cfg.ln+'" spellcheck="false" aria-label="모닝페이지" placeholder="생각나는 대로 적어요" style="--gy:'+(M.cfg.ln*LH-1)+'px;min-height:'+(M.cfg.ln*LH)+'px"></textarea></div>'+
-      '<div class="foot"><span class="lb">자동 저장</span><button class="btn blk" data-a="seal" id="sealBtn"'+(d&&d.c?'':' disabled')+'>마치기</button></div>'+
-      (SY.repo?'':'<p class="note">SETTING에서 GitHub 동기화를 연결하면 기기끼리 기록이 맞춰지고, INSIGHT에 다이어리의 수면·운동 기록이 연결돼요.</p>');
+    h+='<div class="sheet"><textarea id="pg" class="pg" rows="1" spellcheck="false" aria-label="모닝페이지" placeholder="생각나는 대로 적어요" style="--gy:'+(M.cfg.ln*LH-1)+'px;min-height:'+(M.cfg.ln*LH)+'px"></textarea></div>'+
+      '<div class="foot"><span class="lb">자동 저장</span><button class="btn blk" data-a="seal" id="sealBtn"'+(d&&d.c?'':' disabled')+'>마치기</button></div>';
   }
   return h+'</div>';
 }
@@ -283,14 +296,14 @@ function updProg(){
   const el=$('#cnt');el.textContent=fmtN(c)+'자 / '+fmtN(t)+'자'+(c>=t?' · 목표 달성':'');el.classList.toggle('ok',c>=t);
   const sb=$('#sealBtn');if(sb)sb.disabled=!c;
 }
-function fit(){const el=$('#pg');if(!el)return;el.style.height='auto';el.style.height=Math.max(el.scrollHeight,(S.gl||M.cfg.ln)*LH)+'px'}
+function fit(){const el=$('#pg');if(!el)return;el.style.height='auto';el.style.height=Math.max(Math.ceil(el.scrollHeight/LH)*LH,(S.gl||M.cfg.ln)*LH)+'px'}
 /* 목표 글자 수가 끝나는 줄에 목표선을 둔다. 칸 폭에 따라 한 줄에 들어가는 글자 수가 달라지므로 폭을 재서 계산한다. */
 function layoutSheet(){const el=$('#pg');if(!el)return;const w=el.clientWidth-4,cpl=Math.max(8,Math.floor(w/14.1));S.gl=Math.max(3,Math.ceil(target()/cpl));el.style.setProperty('--gy',(S.gl*LH-1)+'px');el.style.minHeight=(S.gl*LH)+'px';fit()}
 function vMonth(){
   const c=P(S.mon),y=c.getFullYear(),m=c.getMonth(),first=new Date(y,m,1),off=first.getDay(),weeks=Math.ceil((off+dim(y,m))/7),start=add(ymd(first),-off),t=target(),today=tdy();
   let done=0,part=0;for(let i=1;i<=dim(y,m);i++){const d=gd(y+'-'+pad(m+1)+'-'+pad(i));if(d&&d.c>=t)done++;else if(d&&d.c>0)part++}
   let h='<div class="ttl"><h1>'+MON[m]+'<small>'+y+'</small></h1><div class="pn"><button data-a="mprev">◂ PREV</button><i></i><button class="tdy" data-a="mtdy">TODAY</button><i></i><button data-a="mnext">NEXT ▸</button></div></div><hr class="rule">';
-  h+='<div class="stat"><div><b>'+streak()+'</b><span>STREAK · 연속</span></div><div><b>'+done+'</b><span>THIS MONTH · 이번 달</span></div></div>';
+  h+='<div class="stat"><div><b>'+streak()+'</b><span>연속</span></div><div><b>'+done+'</b><span>이번 달</span></div></div>';
   h+='<div class="mg">'+SHORT.map((x,i)=>'<div class="dw'+(i===0?' sun':i===6?' sat':'')+'">'+x+'</div>').join('');
   for(let i=0;i<weeks*7;i++){
     const k=add(start,i),dd=P(k),inM=dd.getMonth()===m,d=gd(k),mk=d&&d.c>=t?'f':(d&&d.c>0?'h':'');
@@ -363,8 +376,13 @@ function demoRows(){
   }
   return out.reverse();
 }
+function insMonths(){
+  const rows=S.demo?demoRows():kwDays(),cnt={};
+  rows.forEach(r=>{const m=r.k.slice(0,7);cnt[m]=(cnt[m]||0)+1});
+  return {rows:rows,cnt:cnt,ms:Object.keys(cnt).sort()};
+}
 function vInsight(){
-  const rows=S.demo?demoRows():kwDays(),all=rows.slice().reverse(),list=all.slice(0,S.dn);
+  const mo=insMonths(),rows=mo.rows,ms=mo.ms;
   let h='<div class="ttl"><h1>Insight<small>KEYWORDS</small></h1></div><hr class="rule">';
   if(S.demo)h+='<div class="demo"><span>예시 데이터예요. 실제 기록이 아니고 저장되지도 않아요.</span><button class="btn sm" data-a="demo">예시 끄기</button></div>';
   else{
@@ -373,19 +391,23 @@ function vInsight(){
     else if(!Object.keys(DD).length)h+='<p class="note">다이어리 기록을 아직 가져오지 못했어요. SETTING에서 지금 동기화를 눌러 보세요.</p>';
   }
   if(!S.demo&&!(S.hasAI&&!S.dead))h+=cpBox();
-  h+='<span class="lb" style="margin-top:14px">KEYWORDS × BODY</span>';
+  h+='<span class="lb" style="margin-top:14px">키워드 분석</span>';
   h+=cmpHtml(cmp(rows,'sl','수면 점수','점'))+cmpHtml(cmp(rows,'ex','전날 운동 시간','분'))+cmpHtml(cmp(rows,'mv','전날 활동량','kcal'));
   h+='<p class="note">기록 수가 적을 때의 차이는 우연일 수 있어요. 참고용으로 봐 주세요.</p>';
-  h+='<div class="sec"><span class="lb">DAILY · 최근 '+list.length+'일 / 전체 '+all.length+'일</span></div>';
-  if(!list.length)h+='<div class="emp">마치기를 누른 날이 생기면 키워드가 여기에 쌓여요.</div>';
-  else h+=list.map((r,i)=>{
-    const dd=P(r.k),m=[];
-    m.push(r.sl!=null?'수면 '+r.sl+'점':'수면 –');
-    if(r.ex!=null)m.push('전날 운동 '+r.ex+'분');
-    if(r.mv!=null)m.push('활동 '+fmtN(r.mv)+'kcal');
-    return '<div class="ir'+(i===0?' first':'')+'"><div class="d '+dcls(r.k)+'"><b>'+pad(dd.getMonth()+1)+'/'+pad(dd.getDate())+'</b><span>'+SHORT[dd.getDay()]+'</span></div>'+chipsHtml(r.kw)+'<div class="m">'+m.join('<br>')+'</div></div>';
-  }).join('');
-  if(all.length>list.length||S.dn>7)h+='<div class="gr" style="margin-top:12px">'+(all.length>list.length?'<button class="btn sm" data-a="more">이전 기록 더 보기 ('+(all.length-list.length)+'일 남음)</button>':'')+(S.dn>7?'<button class="btn sm" data-a="less">접기</button>':'')+'</div>';
+  h+='<div class="sec"><span class="lb">일별 키워드</span></div>';
+  if(!ms.length)h+='<div class="emp">마치기를 누른 날이 생기면 키워드가 여기에 쌓여요.</div>';
+  else{
+    const ik=S.ik&&mo.cnt[S.ik]?S.ik:ms[ms.length-1],y=ik.slice(0,4),yrs=ms.map(m=>m.slice(0,4)).filter((v,i,a)=>a.indexOf(v)===i);
+    h+='<div class="gr">'+yrs.map(yy=>'<button class="chip yb'+(yy===y?' on':'')+'" data-a="iy" data-y="'+yy+'">'+yy+'</button>').join('')+'</div>';
+    h+='<div class="mpk">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>{const key=y+'-'+pad(n),c=mo.cnt[key]||0;return '<button class="mb'+(key===ik?' on':'')+'" data-a="im" data-m="'+key+'"'+(c?'':' disabled')+'>'+n+'월'+(c?'<small>'+c+'일</small>':'')+'</button>'}).join('')+'</div>';
+    h+=rows.filter(r=>r.k.slice(0,7)===ik).reverse().map((r,i)=>{
+      const dd=P(r.k),m=[];
+      m.push(r.sl!=null?'수면 '+r.sl+'점':'수면 –');
+      if(r.ex!=null)m.push('전날 운동 '+r.ex+'분');
+      if(r.mv!=null)m.push('활동 '+fmtN(r.mv)+'kcal');
+      return '<div class="ir'+(i===0?' first':'')+'"><div class="d '+dcls(r.k)+'"><b>'+pad(dd.getMonth()+1)+'/'+pad(dd.getDate())+'</b><span>'+SHORT[dd.getDay()]+'</span></div>'+chipsHtml(r.kw)+'<div class="m">'+m.join('<br>')+'</div></div>';
+    }).join('');
+  }
   return h;
 }
 function syncStatus(){if(S.msg)return S.msg;if(!SY.last)return '연결됨 · 아직 동기화 전이에요.';const d=new Date(SY.last);return '연결됨 · 마지막 동기화 '+(d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
@@ -493,9 +515,9 @@ const A={
   prev(){S.date=add(S.date,-1);S.mon=S.date.slice(0,8)+'01';render()},
   next(){if(S.date<tdy()){S.date=add(S.date,1);S.mon=S.date.slice(0,8)+'01';render()}},
   tdy(){S.date=tdy();S.mon=S.date.slice(0,8)+'01';render()},
-  demo(){S.demo=!S.demo;S.dn=7;render()},
-  more(){S.dn+=14;render()},
-  less(){S.dn=7;render()},
+  demo(){S.demo=!S.demo;S.ik=null;render()},
+  iy(b){const c=insMonths().ms.filter(m=>m.slice(0,4)===b.dataset.y);if(c.length){S.ik=c[c.length-1];render()}},
+  im(b){S.ik=b.dataset.m;render()},
   async cpcopy(){
     const p=pendingDays();if(!p.length)return;
     const use=p.slice(0,31),text=buildPrompt(use);
