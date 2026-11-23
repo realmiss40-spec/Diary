@@ -277,7 +277,7 @@ function vToday(){
     const canCont=k===today||M.loc.peek,ai=S.hasAI&&!S.dead&&d.ks==='local'&&!(S.kx&&S.kx.st==='run');
     h+='<div class="seal"><span class="lb">SEALED</span><h2>봉인된 모닝페이지</h2><div class="sub">'+fmtN(d.c)+'자 · '+(d.c/M.cfg.ll).toFixed(1)+'줄</div>'+
       (d.k.length?chipsHtml(d.k):(S.kx&&S.kx.st==='run'?'':'<p class="note">키워드가 아직 없어요.</p>'))+kxNote(k)+
-      (d.ks==='local'&&d.k.length&&!(S.kx&&S.kx.date===k)?'<p class="note">앱 안에서 단어 빈도로 뽑은 키워드예요.'+(S.hasAI&&!S.dead?'':' INSIGHT에서 Claude에게 받아 바꿀 수 있어요.')+'</p>':'')+
+      (d.ks==='local'&&d.k.length&&!(S.kx&&S.kx.date===k)?'<p class="note">앱 안에서 단어 빈도로 뽑은 키워드예요.'+(S.hasAI&&!S.dead?'':' SETTING에서 Claude에게 받아 바꿀 수 있어요.')+'</p>':'')+
       '<div class="acts">'+(canCont?'<button class="btn sm" data-a="cont">이어 쓰기</button>':'')+
       (!d.k.length?'<button class="btn sm" data-a="reai">키워드 뽑기</button>':'')+(ai?'<button class="btn sm" data-a="reai">Claude로 다시 뽑기</button>':'')+
       (M.loc.peek?'<button class="btn sm" data-a="show">'+(S.show===k?'본문 닫기':'본문 보기')+'</button>':'')+'</div>'+
@@ -353,7 +353,7 @@ function applyKw(raw){
 }
 function cpBox(){
   const p=pendingDays(),c=S.cp;
-  let h='<div class="cmp"><span class="lb">CLAUDE 키워드 · 복사해서 받기</span><p class="note">마치기를 누른 날의 글을 모아 복사해서 Claude 채팅에 보내고, 돌려받은 답변을 아래에 붙여넣으면 키워드가 바뀌어요. 언제든, 며칠치든 괜찮아요.</p>';
+  let h='<div class="set"><span class="lb">CLAUDE 키워드 · 복사해서 받기</span><p class="note">마치기를 누른 날의 글을 모아 복사해서 Claude 채팅에 보내고, 돌려받은 답변을 아래에 붙여넣으면 키워드가 바뀌어요. 언제든, 며칠치든 괜찮아요.</p>';
   h+='<div class="gr"><button class="btn sm" data-a="cpcopy"'+(p.length?'':' disabled')+'>요청문 복사 · 대기 '+p.length+'일</button></div>';
   if(c&&c.ok)h+='<p class="note">'+c.n+'일치를 복사했어요. Claude 채팅에 붙여넣어 보내 주세요.'+(c.rest?' 남은 '+c.rest+'일은 다음에 다시 복사하면 돼요.':'')+'</p>';
   if(c&&c.text)h+='<p class="note">자동 복사가 되지 않았어요. 아래 글을 눌러 선택한 뒤 직접 복사해 주세요.</p><textarea class="cpin cpout" rows="4" readonly>'+esc(c.text)+'</textarea>';
@@ -390,7 +390,7 @@ function vInsight(){
     if(!SY.repo)h+='<p class="note">GitHub 동기화를 연결하면 다이어리의 수면 점수와 운동 기록을 가져와요.</p>';
     else if(!Object.keys(DD).length)h+='<p class="note">다이어리 기록을 아직 가져오지 못했어요. SETTING에서 지금 동기화를 눌러 보세요.</p>';
   }
-  if(!S.demo&&!(S.hasAI&&!S.dead))h+=cpBox();
+  if(!S.demo&&!(S.hasAI&&!S.dead)&&pendingDays().length)h+='<p class="note">Claude에게 키워드를 받으려면 SETTING에서 요청문을 복사하세요. 대기 '+pendingDays().length+'일.</p>';
   h+='<span class="lb" style="margin-top:14px">키워드 분석</span>';
   h+=cmpHtml(cmp(rows,'sl','수면 점수','점'))+cmpHtml(cmp(rows,'ex','전날 운동 시간','분'))+cmpHtml(cmp(rows,'mv','전날 활동량','kcal'));
   h+='<p class="note">기록 수가 적을 때의 차이는 우연일 수 있어요. 참고용으로 봐 주세요.</p>';
@@ -419,6 +419,7 @@ function vSetting(){
   if(SY.repo&&SY.token)h+='<p id="syncmsg">'+esc(syncStatus())+'</p><p>저장소 '+esc(SY.repo)+' · 모닝페이지는 morning 폴더에 저장되고, 다이어리 기록은 읽기만 해요.</p><div class="gr"><button class="btn sm" data-a="syncNow">지금 동기화</button><button class="btn sm" data-a="syncOff">연결 해제</button></div>';
   else h+='<p>다이어리와 같은 비공개 저장소를 입력하면 돼요. 토큰은 이 기기의 이 페이지에만 저장돼요.</p><span class="lb">저장소 (아이디/저장소이름)</span><input class="fld" id="syRepo" data-f="repo" placeholder="내아이디/diary-data" autocapitalize="off" autocorrect="off" spellcheck="false"><span class="lb" style="margin-top:12px">접근 토큰</span><input class="fld" id="syTok" data-f="token" type="password" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="gr" style="margin-top:12px"><button class="btn sm blk" data-a="syncOn">연결하고 동기화</button></div><p id="syncmsg" class="err" style="margin-top:8px">'+esc(S.msg)+'</p>';
   h+='</div>';
+  if(!(S.hasAI&&!S.dead))h+=cpBox();
   h+='<div class="set"><span class="lb">테마</span><div class="seg" style="margin-top:6px">'+[['auto','자동'],['light','라이트'],['dark','다크']].map(x=>'<button data-a="theme" data-v="'+x[0]+'" class="'+(M.loc.theme===x[0]?'on':'')+'">'+x[1]+'</button>').join('')+'</div></div>';
   h+='<div class="set"><span class="lb">지난 글 열람</span><p>기본값은 잠금이에요. 허용하면 봉인된 글에서 “본문 보기”가 나타나요.</p><button class="btn sm" data-a="peek">'+(M.loc.peek?'다시 잠그기':'열람 허용')+'</button></div>';
   return h;

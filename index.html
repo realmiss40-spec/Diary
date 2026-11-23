@@ -830,14 +830,15 @@ function vReviewY(y){
  h+='<div class="lbr"><span class="lb" style="font-size:11px;letter-spacing:.08em">MONTHLY REVIEWS · 모아 보기</span></div>';
  const F=[['book','📚','BOOK','읽은 책'],['video','🎬','VIDEO','본 영상'],['event','⚡','EVENT','기억에 남는 일'],['place','📍','PLACE','가 본 곳'],['spend','💳','SPEND','지출']],data={};
  F.forEach(f=>{const L=[];for(let m=0;m<12;m++){const mk=y+'-'+pad(m+1),o=S.d.rv[mk],t=o&&o[f[0]];if(t&&t.trim())L.push('<button class="wrv" data-a="openRv" data-d="'+mk+'-01"><small>'+MS[m]+'</small><span>'+esc(t)+'</span></button>')}data[f[0]]=L});
- {const L=[];Object.keys(S.d.days).filter(k=>k.indexOf(y+'-')===0).sort().forEach(k=>{const m=S.d.days[k].memo||'';if(m.indexOf('Q. ')<0)return;
+ {const L=[],LY=[];Object.keys(S.d.days).filter(k=>k.indexOf(y+'-')===0).sort().forEach(k=>{const m=S.d.days[k].memo||'';if(m.indexOf('Q. ')<0)return;
    const ls=m.split('\n');for(let i=0;i<ls.length;i++){const ln=ls[i];if(ln.indexOf('Q. ')!==0)continue;const q=ln.slice(3);if(!Object.keys(RQD).some(c=>RQD[c].indexOf(q)>=0))continue;
     let a=[];for(let t=i+1;t<ls.length;t++){if(ls[t].trim()===''&&a.length)break;if(ls[t].trim()==='')continue;a.push(ls[t].indexOf('A. ')===0&&!a.length?ls[t].slice(3):ls[t])}
-    L.push('<button class="wrv" data-a="goDay" data-d="'+k+'"><small>'+k.slice(5).replace('-','.')+'</small><span><i style="font-style:normal;color:var(--mut);font-size:11.5px">'+esc(q)+'</i><br>'+(a.join(' ').trim()?esc(a.join('\n').trim()):'<i style="font-style:normal;color:var(--mut)">(아직 답이 없어요)</i>')+'</span></button>')}});
-  data.qa=L}
+    (RQD.ye.indexOf(q)>=0?LY:L).push('<button class="wrv" data-a="goDay" data-d="'+k+'"><small>'+k.slice(5).replace('-','.')+'</small><span><i style="font-style:normal;color:var(--mut);font-size:11.5px">'+esc(q)+'</i><br>'+(a.join(' ').trim()?esc(a.join('\n').trim()):'<i style="font-style:normal;color:var(--mut)">(아직 답이 없어요)</i>')+'</span></button>')}});
+  data.qa=L;data.qy=LY}
  const cur=S.rvc&&data[S.rvc]?S.rvc:'';
- h+='<div class="rvc">'+F.concat([['qa','💭','연말 질문','']]).map(f=>'<button class="'+(cur===f[0]?'on':'')+'" data-a="rvCat" data-c="'+f[0]+'">'+f[1]+' '+(f[2]==='연말 질문'?'질문 답':f[2])+' <small>'+data[f[0]].length+'</small></button>').join('')+'</div>';
- if(cur){const f=F.concat([['qa','💭','질문 답','']]).find(x=>x[0]===cur);h+='<div class="sec wsec"><span class="lb">'+f[1]+' '+f[2]+(f[3]?' · '+f[3]:'')+' · '+y+'</span>'+(data[cur].length?data[cur].join(''):'<div class="emp">아직 적은 게 없어요.</div>')+'</div>'}
+ const F2=F.concat([['qa','💭','질문',''],['qy','🎄','연말 질문','']]);
+ h+='<div class="rvc">'+F2.map(f=>'<button class="'+(cur===f[0]?'on':'')+'" data-a="rvCat" data-c="'+f[0]+'">'+f[1]+' '+f[2]+' <small>'+data[f[0]].length+'</small></button>').join('')+'</div>';
+ if(cur){const f=F2.find(x=>x[0]===cur);h+='<div class="sec wsec"><span class="lb">'+f[1]+' '+f[2]+(f[3]?' · '+f[3]:'')+' · '+y+'</span>'+(data[cur].length?data[cur].join(''):'<div class="emp">아직 적은 게 없어요.</div>')+'</div>'}
  else h+='<div class="emp">버튼을 누르면 올해 적은 내용을 모아서 보여 줘요.</div>';
  return h;
 }
