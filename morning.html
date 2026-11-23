@@ -1,8 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Morning Pages</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap">
-<style>
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Morning Pages"><meta name="theme-color" content="#fcfbf9"><title>Morning Pages</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap"><style>
 /* Layout: one paper card like Diary Book, folder tabs below, a calendar-sticker date block above a 14-line ruled sheet. */
 :root{
   --bg:#e6e4e0;--paper:#fcfbf9;--ink:#181818;--mut:#8f8c87;--faint:#dcd9d3;--soft:#f1efeb;
@@ -57,33 +54,35 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .seg button{padding:6px 16px;font-size:11.5px}
 .seg button.on{background:var(--ink);color:var(--paper)}
 /* today */
-.top{display:flex;gap:16px;align-items:flex-start;padding:10px 0 14px}
-.stkw{flex:none;width:108px}
+.top{display:flex;gap:16px;align-items:stretch;padding:10px 0 14px}
+.stkw{flex:none;width:116px}
 .stkw small{display:block;margin-top:9px;font-size:9px;color:var(--mut);line-height:1.35}
-.stk{display:block;width:108px;background:var(--stk);color:var(--stk-ink);box-shadow:0 1px 0 rgba(0,0,0,.05),0 6px 14px var(--shadow);text-align:center;font-family:var(--serif)}
+.stk{display:block;width:116px;background:var(--stk);color:var(--stk-ink);box-shadow:0 1px 0 rgba(0,0,0,.05),0 6px 14px var(--shadow);text-align:center;font-family:var(--serif);font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1}
 .stk span{display:block}
 .stk .tab{height:15px;background:var(--stk-tab);position:relative}
 .stk .tab::before,.stk .tab::after{content:"";position:absolute;top:5px;width:5px;height:5px;border-radius:50%;background:var(--stk-pin)}
 .stk .tab::before{left:15px}.stk .tab::after{right:15px}
-.stk .m{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding-top:11px}
-.stk .n{font-size:48px;line-height:1.05;font-weight:700}
-.stk .w{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 0 13px}
+.stk .bd{display:flex;flex-direction:column;align-items:center;gap:11px;padding:15px 2px 16px}
+.stk .m,.stk .w,.stk .n{line-height:.708;position:relative;top:-.0615em;font-weight:700;white-space:nowrap}
+.stk .m,.stk .w{font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.stk .n{font-size:68px;text-shadow:2px 3px 2px rgba(0,0,0,.2)}
 .stk.sat{color:var(--stk-blue)}
 .stk.red{color:var(--stk-red)}
-.side{flex:1;min-width:0}
+.side{flex:1;min-width:0;display:flex;flex-direction:column}
 .big{display:flex;align-items:baseline;gap:4px;margin-top:2px}
 .big b{font-size:34px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
 .big span{font-size:12px;color:var(--mut)}
-.segs{display:flex;gap:2px;margin:8px 0 6px}
-.segs i{flex:1;height:6px;background:var(--faint);position:relative;overflow:hidden;border-radius:1px}
-.segs i b{position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(0)}
+.segs{display:flex;gap:2px;margin:auto 0 1px;padding-top:10px}
+.segs i{flex:1;height:7px;background:var(--faint);position:relative;overflow:hidden;border-radius:1px}
+.segs i b{position:absolute;inset:0;background:var(--mut);transform-origin:left;transform:scaleX(0)}
 .sub{font-size:11px;color:var(--mut);font-variant-numeric:tabular-nums}
 .sub.ok{color:var(--ink);font-weight:600}
 .side .pn{margin-top:8px}
+.col{max-width:356px;margin:0 auto}
 .sheet{border-top:1.5px solid var(--ink);padding-top:4px}
 .pg{--lh:32px;display:block;width:100%;overflow:hidden;font-size:16px;line-height:var(--lh);padding:0 2px;min-height:calc(var(--lh)*14);
-  background-image:linear-gradient(var(--mut),var(--mut)),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--lh) - 1px),var(--faint) calc(var(--lh) - 1px),var(--faint) var(--lh));
-  background-size:100% 1px,100% var(--lh);background-position:0 var(--gy,447px),0 0;background-repeat:no-repeat,repeat;background-attachment:local,local}
+  background-image:linear-gradient(var(--ink),var(--ink)),repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--lh) - 1px),var(--faint) calc(var(--lh) - 1px),var(--faint) var(--lh));
+  background-size:100% 1.5px,100% var(--lh);background-position:0 var(--gy,447px),0 0;background-repeat:no-repeat,repeat;background-attachment:local,local}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
 .seal{border:1px solid var(--faint);background:var(--soft);padding:18px 16px;margin-top:4px}
 .seal h2{margin:2px 0 2px;font-size:17px;font-weight:600}
@@ -130,7 +129,19 @@ h1 small{font-size:12px;font-weight:500;color:var(--mut);margin-left:8px;letter-
 .nrow label{display:block}
 .nu{width:64px;text-align:center;font-size:24px;font-weight:600;border-bottom:1.5px solid var(--ink);padding:2px 0;font-variant-numeric:tabular-nums}
 .err{color:var(--red)}
-</style>
+.demo{border:1px dashed var(--mut);padding:10px 12px;margin:0 0 12px;font-size:11.5px;color:var(--mut);display:flex;gap:10px;align-items:center;justify-content:space-between}
+.demo span{min-width:0}
+.cpin{display:block;border:1px solid var(--faint);padding:8px 10px;font-size:16px;line-height:1.5;margin-top:8px;resize:vertical}
+/* wide: calendar on the left, page on the right */
+@media(min-width:760px) and (orientation:landscape){#app{max-width:1120px}}
+#app.wide #tabs [data-t="month"]{display:none}
+#view.split{overflow:hidden;padding:0;display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+#view.split .pl,#view.split .pr{overflow-y:auto;overflow-x:hidden;min-height:0;padding:4px 18px 28px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#view.split .pl{border-right:1px solid var(--faint)}
+</style></head><body>
+
+
+
 <div id="app">
   <header id="hd">
     <div class="t">Morning Pages</div>
@@ -175,7 +186,7 @@ M.loc=Object.assign({theme:'auto',peek:false},M.loc);
 if(!M.days||typeof M.days!=='object')M.days={};
 let SY=Object.assign({repo:'',token:'',last:0,shas:{},pushed:{},dshas:{}},jp(ls.g(SYK),{}));
 let DD=jp(ls.g(DDK),{});
-const S={tab:'today',date:tdy(),mon:tdy().slice(0,8)+'01',kx:null,show:null,hasAI:false,dead:false,msg:'',syf:{repo:'',token:''}};
+const S={tab:'today',date:tdy(),mon:tdy().slice(0,8)+'01',kx:null,show:null,hasAI:false,dead:false,msg:'',syf:{repo:'',token:''},wide:false,demo:false,gl:0,dn:7,cp:null,cpMsg:''};
 let pst=null;
 function persist(){clearTimeout(pst);ls.s(KEY,JSON.stringify(M))}
 function saveSoon(){clearTimeout(pst);pst=setTimeout(persist,250)}
@@ -195,8 +206,24 @@ function streak(){const dn=x=>{const d=gd(x);return !!d&&d.c>=target()};let k=td
 function autoSeal(){const t=tdy();let ch=false;Object.keys(M.days).forEach(k=>{const d=M.days[k];if(k<t&&d.c>0&&!d.sealed){d.sealed=true;if(!d.k.length){d.k=localKw(d.t);d.ks='local';d.kh=hashTxt(d.t)}d.ts=Date.now();ch=true}});if(ch){persist();syncSoon()}}
 /* ---------- keywords ---------- */
 const STOP=new Set('오늘 어제 내일 아침 진짜 정말 너무 그냥 일단 하지만 그리고 그래서 그런데 근데 이제 아직 다시 계속 조금 많이 같다 같은 있다 없다 있는 없는 하다 했다 한다 생각 느낌 뭔가 어떻게 그래도 그러면 이렇게 저렇게 그렇게 우리 나는 내가 저는 제가 때문 지금 해서 해야 하는 하면 되는 된다 됐다 이런 저런 그런 어떤 모든 하나 우선 바로 역시 아마 사실 결국 먼저 나중'.split(' '));
-const JOSA=/(으로|에서|에게|까지|부터|처럼|보다|하고|이랑|이다|입니다|했다|한다|하는|했는데|인데|이고|은|는|이|가|을|를|의|에|로|와|과|도|만|랑)$/;
-function localKw(text){const m=String(text||'').match(/[가-힣]{2,}|[A-Za-z]{3,}/g)||[],f={};m.forEach(w=>{if(/[가-힣]/.test(w)){const s=w.replace(JOSA,'');if(s.length>=2)w=s}if(STOP.has(w))return;f[w]=(f[w]||0)+1});return Object.keys(f).sort((a,b)=>(f[b]-f[a])||(b.length-a.length)).slice(0,5)}
+const JOSA=/(에서는|으로는|에게는|이라는|에서도|으로도|에서|으로|에게|한테|까지|부터|처럼|보다|이랑|이나|이라|에는|에도|라는|은|는|이|가|을|를|의|에|로|와|과|도|만|랑|나)$/;
+const VEND=/(했다|한다|하는|했는데|했던|했고|해서|해야|하고|하게|하면|하지|하며|되는|된다|됐다|있는|없는|싶은|싶다|같은|같다|이며|이다|입니다|인데|지만|니까|으면|면서|는데|다고|라고|네요|어요|아요|예요|이에요|겠다)$/;
+/* 조사가 붙어 있던 낱말은 명사일 가능성이 높고, 동사·형용사 어미로 끝나는 낱말은 버린다. 형태소 분석이 아니라 어림짐작이라 Claude보다 거칠다. */
+function localKw(text){
+  const m=String(text||'').match(/[가-힣]{2,}|[A-Za-z]{3,}/g)||[],f={},nn={};
+  m.forEach(w=>{
+    let stem=w,hit=0;
+    if(/[가-힣]/.test(w)){
+      const s=w.replace(JOSA,'');
+      if(s!==w&&s.length>=2){stem=s;hit=1}
+      else if(VEND.test(w)||(w.length>=3&&/[다요죠까네고며서니면지만데]$/.test(w)))return;
+    }
+    if(STOP.has(stem))return;
+    f[stem]=(f[stem]||0)+1;if(hit)nn[stem]=1;
+  });
+  const score=w=>(nn[w]?2:0)+f[w]+w.length*.2;
+  return Object.keys(f).filter(w=>nn[w]||f[w]>=2||w.length>=3).sort((a,b)=>score(b)-score(a)).slice(0,5);
+}
 function cleanKw(r){if(!Array.isArray(r))return[];const o=[];r.forEach(x=>{const s=String(x).replace(/["'\[\]{}.,!?]/g,'').trim();if(s&&s.length<=14&&o.indexOf(s)<0)o.push(s)});return o.slice(0,5)}
 let samplePromise=null;
 function getSample(){if(!samplePromise)samplePromise=(async()=>{try{if(window.claude&&window.claude.use){const s=await window.claude.use('sample');return s&&typeof s.json==='function'?s:null}}catch(e){}return null})();return samplePromise}
@@ -227,16 +254,16 @@ function kxNote(k){
 }
 /* ---------- views ---------- */
 const chipsHtml=a=>(a&&a.length?'<div class="chips">'+a.map(w=>'<span class="chip">'+esc(w)+'</span>').join('')+'</div>':'');
-function stkHtml(k){const d=P(k);return '<button class="stk '+dcls(k)+'" data-a="hol" aria-label="날짜 블록. 눌러서 공휴일 표시를 바꿔요"><span class="tab"></span><span class="m">'+MON[d.getMonth()]+'</span><span class="n">'+d.getDate()+'</span><span class="w">'+DAYS[d.getDay()]+'</span></button>'}
+function stkHtml(k){const d=P(k);return '<button class="stk '+dcls(k)+'" data-a="hol" aria-label="날짜 블록. 눌러서 공휴일 표시를 바꿔요"><span class="tab"></span><span class="bd"><span class="m">'+MON[d.getMonth()]+'</span><span class="n">'+d.getDate()+'</span><span class="w">'+DAYS[d.getDay()]+'</span></span></button>'}
 function vToday(){
   const k=S.date,d=gd(k),today=tdy(),sealed=!!(d&&d.sealed&&d.c>0);
   const pager='<div class="pn"><button data-a="prev">◂ PREV</button><i></i><button class="tdy" data-a="tdy">TODAY</button><i></i><button data-a="next"'+(k>=today?' disabled':'')+'>NEXT ▸</button></div>';
-  let h='<div class="top"><div class="stkw">'+stkHtml(k)+'<small>날짜를 누르면 공휴일 표시가 바뀌어요</small></div><div class="side"><span class="lb">PAGE</span><div class="big"><b id="lnNow">0.0</b><span>/ '+M.cfg.ln+'줄</span></div><div class="segs" id="segs">'+'<i><b></b></i>'.repeat(Math.min(M.cfg.ln,60))+'</div><div class="sub" id="cnt"></div>'+pager+'</div></div>';
+  let h='<div class="col"><div class="top"><div class="stkw">'+stkHtml(k)+'</div><div class="side"><span class="lb">PAGE</span><div class="big"><b id="lnNow">0.0</b><span>/ '+M.cfg.ln+'줄</span></div><div class="sub" id="cnt"></div>'+pager+'<div class="segs" id="segs">'+'<i><b></b></i>'.repeat(Math.min(M.cfg.ln,60))+'</div></div></div>';
   if(sealed){
     const canCont=k===today||M.loc.peek,ai=S.hasAI&&!S.dead&&d.ks==='local'&&!(S.kx&&S.kx.st==='run');
     h+='<div class="seal"><span class="lb">SEALED</span><h2>봉인된 모닝페이지</h2><div class="sub">'+fmtN(d.c)+'자 · '+(d.c/M.cfg.ll).toFixed(1)+'줄</div>'+
       (d.k.length?chipsHtml(d.k):(S.kx&&S.kx.st==='run'?'':'<p class="note">키워드가 아직 없어요.</p>'))+kxNote(k)+
-      (d.ks==='local'&&d.k.length&&!(S.kx&&S.kx.date===k)?'<p class="note">앱 안에서 단어 빈도로 뽑은 키워드예요.</p>':'')+
+      (d.ks==='local'&&d.k.length&&!(S.kx&&S.kx.date===k)?'<p class="note">앱 안에서 단어 빈도로 뽑은 키워드예요.'+(S.hasAI&&!S.dead?'':' INSIGHT에서 Claude에게 받아 바꿀 수 있어요.')+'</p>':'')+
       '<div class="acts">'+(canCont?'<button class="btn sm" data-a="cont">이어 쓰기</button>':'')+
       (!d.k.length?'<button class="btn sm" data-a="reai">키워드 뽑기</button>':'')+(ai?'<button class="btn sm" data-a="reai">Claude로 다시 뽑기</button>':'')+
       (M.loc.peek?'<button class="btn sm" data-a="show">'+(S.show===k?'본문 닫기':'본문 보기')+'</button>':'')+'</div>'+
@@ -246,7 +273,7 @@ function vToday(){
       '<div class="foot"><span class="lb">자동 저장</span><button class="btn blk" data-a="seal" id="sealBtn"'+(d&&d.c?'':' disabled')+'>마치기</button></div>'+
       (SY.repo?'':'<p class="note">SETTING에서 GitHub 동기화를 연결하면 기기끼리 기록이 맞춰지고, INSIGHT에 다이어리의 수면·운동 기록이 연결돼요.</p>');
   }
-  return h;
+  return h+'</div>';
 }
 function updProg(){
   const ln=$('#lnNow');if(!ln)return;
@@ -256,7 +283,9 @@ function updProg(){
   const el=$('#cnt');el.textContent=fmtN(c)+'자 / '+fmtN(t)+'자'+(c>=t?' · 목표 달성':'');el.classList.toggle('ok',c>=t);
   const sb=$('#sealBtn');if(sb)sb.disabled=!c;
 }
-function fit(){const el=$('#pg');if(!el)return;el.style.height='auto';el.style.height=Math.max(el.scrollHeight,M.cfg.ln*LH)+'px'}
+function fit(){const el=$('#pg');if(!el)return;el.style.height='auto';el.style.height=Math.max(el.scrollHeight,(S.gl||M.cfg.ln)*LH)+'px'}
+/* 목표 글자 수가 끝나는 줄에 목표선을 둔다. 칸 폭에 따라 한 줄에 들어가는 글자 수가 달라지므로 폭을 재서 계산한다. */
+function layoutSheet(){const el=$('#pg');if(!el)return;const w=el.clientWidth-4,cpl=Math.max(8,Math.floor(w/14.1));S.gl=Math.max(3,Math.ceil(target()/cpl));el.style.setProperty('--gy',(S.gl*LH-1)+'px');el.style.minHeight=(S.gl*LH)+'px';fit()}
 function vMonth(){
   const c=P(S.mon),y=c.getFullYear(),m=c.getMonth(),first=new Date(y,m,1),off=first.getDay(),weeks=Math.ceil((off+dim(y,m))/7),start=add(ymd(first),-off),t=target(),today=tdy();
   let done=0,part=0;for(let i=1;i<=dim(y,m);i++){const d=gd(y+'-'+pad(m+1)+'-'+pad(i));if(d&&d.c>=t)done++;else if(d&&d.c>0)part++}
@@ -291,15 +320,63 @@ function cmpHtml(c){
   const ch=a=>a.length?'<div class="chips">'+a.map(x=>'<span class="chip">'+esc(x[0])+'<small>'+x[1]+'일</small></span>').join('')+'</div>':'<p class="note">뚜렷한 차이가 없어요.</p>';
   return '<div class="cmp"><span class="lb">'+c.label+' · '+c.n+'일</span><div class="two"><div><small>낮은 날 (≤ '+fmtN(c.loMax)+c.unit+')</small>'+ch(c.lo)+'</div><div><small>높은 날 (≥ '+fmtN(c.hiMin)+c.unit+')</small>'+ch(c.hi)+'</div></div></div>';
 }
+/* Claude 키워드를 복사해서 받는 방식: 마치기를 누른 날 중 아직 Claude 키워드가 없는 날을 모아 요청문을 만든다. */
+function pendingDays(){return Object.keys(M.days).filter(k=>{const d=M.days[k];return d.c>0&&d.sealed&&d.ks!=='ai'}).sort()}
+function buildPrompt(days){
+  const ex='{"'+days[0]+'":["불안","마감","운동"]'+(days[1]?',"'+days[1]+'":["피곤","산책"]':'')+'}';
+  return '아래는 날짜별 모닝페이지 글입니다. 날짜마다 주제, 걱정, 감정, 바람을 가장 잘 드러내는 핵심 키워드를 5개 이내로 뽑아 주세요.\n'+
+    '규칙: 한국어 명사 또는 짧은 명사구(1~3어절), 사람 이름과 고유명사는 제외, 문장 금지, 글을 인용하거나 요약하지 말고 키워드만.\n'+
+    '출력은 JSON 객체 하나만, 키는 날짜입니다. 설명은 쓰지 마세요. 예: '+ex+'\n\n'+
+    days.map(k=>'['+k+']\n'+String(gd(k).t).trim()).join('\n\n');
+}
+function applyKw(raw){
+  let o=null;const a=raw.indexOf('{'),b=raw.lastIndexOf('}');
+  if(a>=0&&b>a){try{o=JSON.parse(raw.slice(a,b+1))}catch(e){}}
+  if(!o||typeof o!=='object'||Array.isArray(o))return {err:'답변에서 키워드 묶음을 찾지 못했어요. Claude의 답변을 그대로 붙여넣어 주세요.'};
+  let ok=0,skip=0;
+  Object.keys(o).forEach(k=>{const d=gd(k),ks=cleanKw(o[k]);if(d&&d.c>0&&ks.length){d.k=ks;d.ks='ai';d.kh=hashTxt(d.t);d.ts=Date.now();ok++}else skip++});
+  if(ok){persist();syncSoon()}
+  return {ok:ok,skip:skip};
+}
+function cpBox(){
+  const p=pendingDays(),c=S.cp;
+  let h='<div class="cmp"><span class="lb">CLAUDE 키워드 · 복사해서 받기</span><p class="note">마치기를 누른 날의 글을 모아 복사해서 Claude 채팅에 보내고, 돌려받은 답변을 아래에 붙여넣으면 키워드가 바뀌어요. 언제든, 며칠치든 괜찮아요.</p>';
+  h+='<div class="gr"><button class="btn sm" data-a="cpcopy"'+(p.length?'':' disabled')+'>요청문 복사 · 대기 '+p.length+'일</button></div>';
+  if(c&&c.ok)h+='<p class="note">'+c.n+'일치를 복사했어요. Claude 채팅에 붙여넣어 보내 주세요.'+(c.rest?' 남은 '+c.rest+'일은 다음에 다시 복사하면 돼요.':'')+'</p>';
+  if(c&&c.text)h+='<p class="note">자동 복사가 되지 않았어요. 아래 글을 눌러 선택한 뒤 직접 복사해 주세요.</p><textarea class="cpin cpout" rows="4" readonly>'+esc(c.text)+'</textarea>';
+  h+='<textarea class="cpin" id="cpIn" rows="3" placeholder="Claude의 답변을 여기에 붙여넣기" spellcheck="false"></textarea><div class="gr" style="margin-top:8px"><button class="btn sm blk" data-a="cpapply">키워드 적용</button></div>';
+  if(S.cpMsg)h+='<p class="note">'+esc(S.cpMsg)+'</p>';
+  return h+'</div>';
+}
+/* 예시 보기용 가짜 기록. 저장되지 않고 화면에서만 쓴다. */
+function demoRows(){
+  const out=[];let s=7;const r=()=>{s=(s*9301+49297)%233280;return s/233280};
+  const LOW=['피곤','걱정','마감','잡생각','졸림'],HIGH=['산책','감사','계획','기대','맑음'],MID=['커피','가족','책','점심','정리','날씨'],ACT=['개운','가벼움'];
+  const pick=(a,n)=>{const c=a.slice(),o=[];while(o.length<n&&c.length)o.push(c.splice(Math.floor(r()*c.length),1)[0]);return o};
+  for(let i=1;i<=24;i++){
+    const k=add(tdy(),-i),sl=Math.round(52+r()*44),ex=Math.round(r()<.35?0:10+r()*60),mv=Math.round(180+ex*6+r()*160);
+    let kw=[];
+    if(sl<70)kw=kw.concat(pick(LOW,2));else if(sl>=84)kw=kw.concat(pick(HIGH,2));
+    if(ex>=40)kw=kw.concat(pick(ACT,1));else if(ex===0&&r()<.6)kw.push('피곤');
+    kw=kw.concat(pick(MID,1+Math.floor(r()*2)));
+    out.push({k:k,kw:kw.filter((w,j)=>kw.indexOf(w)===j).slice(0,5),sl:sl,ex:ex,mv:mv});
+  }
+  return out.reverse();
+}
 function vInsight(){
-  const rows=kwDays(),list=rows.slice().reverse().slice(0,30);
+  const rows=S.demo?demoRows():kwDays(),all=rows.slice().reverse(),list=all.slice(0,S.dn);
   let h='<div class="ttl"><h1>Insight<small>KEYWORDS</small></h1></div><hr class="rule">';
-  if(!SY.repo)h+='<p class="note">GitHub 동기화를 연결하면 다이어리의 수면 점수와 운동 기록을 가져와요.</p>';
-  else if(!Object.keys(DD).length)h+='<p class="note">다이어리 기록을 아직 가져오지 못했어요. SETTING에서 지금 동기화를 눌러 보세요.</p>';
-  h+='<span class="lb">KEYWORDS × BODY</span>';
+  if(S.demo)h+='<div class="demo"><span>예시 데이터예요. 실제 기록이 아니고 저장되지도 않아요.</span><button class="btn sm" data-a="demo">예시 끄기</button></div>';
+  else{
+    h+='<div class="demo"><span>기록이 쌓이기 전에 화면 구성을 미리 볼 수 있어요.</span><button class="btn sm" data-a="demo">예시 보기</button></div>';
+    if(!SY.repo)h+='<p class="note">GitHub 동기화를 연결하면 다이어리의 수면 점수와 운동 기록을 가져와요.</p>';
+    else if(!Object.keys(DD).length)h+='<p class="note">다이어리 기록을 아직 가져오지 못했어요. SETTING에서 지금 동기화를 눌러 보세요.</p>';
+  }
+  if(!S.demo&&!(S.hasAI&&!S.dead))h+=cpBox();
+  h+='<span class="lb" style="margin-top:14px">KEYWORDS × BODY</span>';
   h+=cmpHtml(cmp(rows,'sl','수면 점수','점'))+cmpHtml(cmp(rows,'ex','전날 운동 시간','분'))+cmpHtml(cmp(rows,'mv','전날 활동량','kcal'));
   h+='<p class="note">기록 수가 적을 때의 차이는 우연일 수 있어요. 참고용으로 봐 주세요.</p>';
-  h+='<div class="sec"><span class="lb">DAILY</span></div>';
+  h+='<div class="sec"><span class="lb">DAILY · 최근 '+list.length+'일 / 전체 '+all.length+'일</span></div>';
   if(!list.length)h+='<div class="emp">마치기를 누른 날이 생기면 키워드가 여기에 쌓여요.</div>';
   else h+=list.map((r,i)=>{
     const dd=P(r.k),m=[];
@@ -308,6 +385,7 @@ function vInsight(){
     if(r.mv!=null)m.push('활동 '+fmtN(r.mv)+'kcal');
     return '<div class="ir'+(i===0?' first':'')+'"><div class="d '+dcls(r.k)+'"><b>'+pad(dd.getMonth()+1)+'/'+pad(dd.getDate())+'</b><span>'+SHORT[dd.getDay()]+'</span></div>'+chipsHtml(r.kw)+'<div class="m">'+m.join('<br>')+'</div></div>';
   }).join('');
+  if(all.length>list.length||S.dn>7)h+='<div class="gr" style="margin-top:12px">'+(all.length>list.length?'<button class="btn sm" data-a="more">이전 기록 더 보기 ('+(all.length-list.length)+'일 남음)</button>':'')+(S.dn>7?'<button class="btn sm" data-a="less">접기</button>':'')+'</div>';
   return h;
 }
 function syncStatus(){if(S.msg)return S.msg;if(!SY.last)return '연결됨 · 아직 동기화 전이에요.';const d=new Date(SY.last);return '연결됨 · 마지막 동기화 '+(d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
@@ -315,7 +393,7 @@ function vSetting(){
   const c=M.cfg;
   let h='<div class="ttl"><h1>Setting</h1></div><hr class="rule">';
   h+='<div class="set"><span class="lb">목표 분량</span><p>손으로 쓰던 분량에 맞춰요. 한 줄 글자 수 × 줄 수가 목표 글자 수예요.</p><div class="nrow"><label><span class="lb">한 줄 글자</span><input class="nu" id="cfgLl" type="number" inputmode="numeric" min="5" max="80" value="'+c.ll+'"></label><label><span class="lb">줄 수</span><input class="nu" id="cfgLn" type="number" inputmode="numeric" min="3" max="40" value="'+c.ln+'"></label><div class="sub">목표 '+fmtN(target())+'자</div></div></div>';
-  h+='<div class="set"><span class="lb">기기 동기화 (GitHub)</span>';
+  h+='<div class="set"><span class="lb">기기 동기화 (GitHub)</span>'+(inViewer()?'<p class="note">지금은 Claude 안에서 열린 페이지예요. 여기서는 Claude가 키워드를 뽑아 주지만 GitHub에는 연결되지 않아요. GitHub에 올린 주소로 열면 동기화가 되고, 키워드는 앱 안의 방식으로 뽑아요.</p>':'');
   if(SY.repo&&SY.token)h+='<p id="syncmsg">'+esc(syncStatus())+'</p><p>저장소 '+esc(SY.repo)+' · 모닝페이지는 morning 폴더에 저장되고, 다이어리 기록은 읽기만 해요.</p><div class="gr"><button class="btn sm" data-a="syncNow">지금 동기화</button><button class="btn sm" data-a="syncOff">연결 해제</button></div>';
   else h+='<p>다이어리와 같은 비공개 저장소를 입력하면 돼요. 토큰은 이 기기의 이 페이지에만 저장돼요.</p><span class="lb">저장소 (아이디/저장소이름)</span><input class="fld" id="syRepo" data-f="repo" placeholder="내아이디/diary-data" autocapitalize="off" autocorrect="off" spellcheck="false"><span class="lb" style="margin-top:12px">접근 토큰</span><input class="fld" id="syTok" data-f="token" type="password" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false"><div class="gr" style="margin-top:12px"><button class="btn sm blk" data-a="syncOn">연결하고 동기화</button></div><p id="syncmsg" class="err" style="margin-top:8px">'+esc(S.msg)+'</p>';
   h+='</div>';
@@ -325,19 +403,24 @@ function vSetting(){
 }
 function render(){
   const v=$('#view');if(!v)return;
-  const sc=v.scrollTop,same=v.dataset.tab===S.tab;
+  const split=S.wide&&S.tab==='today';
+  const pl=v.querySelector('.pl'),pr=v.querySelector('.pr');
+  const sc=v.scrollTop,sl=pl?pl.scrollTop:0,sr=pr?pr.scrollTop:0,same=v.dataset.tab===S.tab&&v.classList.contains('split')===split;
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.tab));
-  v.innerHTML=({today:vToday,month:vMonth,insight:vInsight,setting:vSetting})[S.tab]();
+  v.classList.toggle('split',split);
+  v.innerHTML=split?'<section class="pl">'+vMonth()+'</section><section class="pr">'+vToday()+'</section>':({today:vToday,month:vMonth,insight:vInsight,setting:vSetting})[S.tab]();
   v.dataset.tab=S.tab;
   if(S.tab==='today'){
     const el=$('#pg');
-    if(el){const d=gd(S.date);el.value=d?d.t:'';fit();if(S.date===tdy()&&!(d&&d.c)&&window.matchMedia('(hover:hover)').matches)el.focus()}
+    if(el){const d=gd(S.date);el.value=d?d.t:'';layoutSheet();if(S.date===tdy()&&!(d&&d.c)&&window.matchMedia('(hover:hover)').matches)el.focus()}
     updProg();
   }
-  v.scrollTop=same?sc:0;
+  if(split){const a=v.querySelector('.pl'),b=v.querySelector('.pr');if(a)a.scrollTop=same?sl:0;if(b)b.scrollTop=same?sr:0}
+  else v.scrollTop=same?sc:0;
 }
 /* ---------- sync ---------- */
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const inViewer=()=>!!(window.claude&&window.claude.use);
 const b64u=s=>{const b=new TextEncoder().encode(s);let bin='';for(let i=0;i<b.length;i+=0x8000)bin+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(bin)};
 async function gh(method,path,body,accept){return fetch('https://api.github.com'+path,{method:method,cache:'no-store',headers:Object.assign({Authorization:'Bearer '+SY.token,Accept:accept||'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined})}
 function need(r){if(!r.ok){const e=new Error('http'+r.status);e.status=r.status;throw e}return r}
@@ -399,7 +482,7 @@ function syncErr(e){
   if(s===401)return '토큰이 올바르지 않거나 만료됐어요.';
   if(s===403)return '권한이 없거나 요청이 너무 많아요. 토큰의 Contents 읽기·쓰기 권한을 확인해 주세요.';
   if(s===404)return '저장소를 찾을 수 없어요. 이름과, 토큰이 이 저장소에 접근할 수 있는지 확인해 주세요.';
-  if(e instanceof TypeError)return '연결할 수 없어요. 인터넷 상태를 확인해 주세요. 연결돼 있는데도 계속되면 이 페이지에서 GitHub 접근이 막힌 것일 수 있어요.';
+  if(e instanceof TypeError)return inViewer()?'Claude 안에서 연 이 페이지는 GitHub에 직접 연결할 수 없어요. GitHub에 올린 주소로 열면 동기화돼요.':'연결할 수 없어요. 인터넷 상태를 확인해 주세요.';
   return '동기화 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.';
 }
 async function syncRun(){if(!SY.repo||!SY.token||syBusy)return;syBusy=true;try{await doSync(0)}catch(e){sm(syncErr(e))}finally{syBusy=false}}
@@ -407,9 +490,27 @@ function syncSoon(){if(!SY.repo||!SY.token)return;clearTimeout(syT);syT=setTimeo
 /* ---------- actions ---------- */
 const A={
   tab(b){S.tab=b.dataset.t;render()},
-  prev(){S.date=add(S.date,-1);render()},
-  next(){if(S.date<tdy()){S.date=add(S.date,1);render()}},
-  tdy(){S.date=tdy();render()},
+  prev(){S.date=add(S.date,-1);S.mon=S.date.slice(0,8)+'01';render()},
+  next(){if(S.date<tdy()){S.date=add(S.date,1);S.mon=S.date.slice(0,8)+'01';render()}},
+  tdy(){S.date=tdy();S.mon=S.date.slice(0,8)+'01';render()},
+  demo(){S.demo=!S.demo;S.dn=7;render()},
+  more(){S.dn+=14;render()},
+  less(){S.dn=7;render()},
+  async cpcopy(){
+    const p=pendingDays();if(!p.length)return;
+    const use=p.slice(0,31),text=buildPrompt(use);
+    S.cp={n:use.length,rest:p.length-use.length,ok:false,text:null};S.cpMsg='';
+    try{await navigator.clipboard.writeText(text);S.cp.ok=true}catch(e){S.cp.text=text}
+    render();
+  },
+  cpapply(){
+    const el=$('#cpIn'),raw=el?el.value:'';
+    if(!raw.trim()){S.cpMsg='Claude의 답변을 붙여넣어 주세요.';render();return}
+    const r=applyKw(raw);
+    S.cpMsg=r.err?r.err:r.ok+'일의 키워드를 바꿨어요.'+(r.skip?' '+r.skip+'개 항목은 날짜가 없거나 형식이 달라 건너뛰었어요.':'');
+    if(!r.err&&r.ok)S.cp=null;
+    render();
+  },
   hol(){togHol(S.date)},
   seal(){const d=gd(S.date);if(!d||!d.c)return;d.sealed=true;d.ts=Date.now();persist();render();extract(S.date,false)},
   cont(){const d=gd(S.date);if(!d)return;d.sealed=false;d.ts=Date.now();S.show=null;save();render()},
@@ -452,11 +553,17 @@ document.addEventListener('visibilitychange',()=>{
   if(SY.repo&&SY.token&&Date.now()-SY.last>60000)syncRun();
 });
 window.addEventListener('pagehide',persist);
+document.addEventListener('focusin',e=>{const el=e.target;if(el&&el.classList&&el.classList.contains('cpout'))el.select()});
 /* ---------- boot ---------- */
+const mq=window.matchMedia('(min-width:760px) and (orientation:landscape)');
+function setWide(){S.wide=mq.matches;$('#app').classList.toggle('wide',S.wide);if(S.wide&&S.tab==='month')S.tab='today';const t=document.querySelector('#tabs [data-t="today"]');if(t)t.textContent=S.wide?'Page':'Today'}
+const onMq=()=>{setWide();render()};
+setWide();
+try{mq.addEventListener('change',onMq)}catch(e){try{mq.addListener(onMq)}catch(e2){}}
+let rzT=null;window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if($('#pg'))layoutSheet()},150)});
 applyTheme();autoSeal();render();
 getSample().then(s=>{S.hasAI=!!s;const a=document.activeElement;if(S.tab==='today'&&!(a&&a.id==='pg'))render()});
 if(SY.repo&&SY.token)setTimeout(syncRun,800);
 })();
 </script>
-
 </body></html>
