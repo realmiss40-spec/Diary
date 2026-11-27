@@ -301,6 +301,7 @@ a.btn{color:inherit;text-decoration:none}
 .nmc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(680px,calc(100% - 48px));max-height:calc(100% - 64px);overflow-y:auto;background:var(--paper);border-radius:20px;padding:6px 22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3);-webkit-overflow-scrolling:touch}
 html.wide.solo #view2{display:none}
 html.wide.solo #view{max-width:780px;margin:0 auto;width:100%}
+html.wide.solo.a100 #view{max-width:none}
 html.wide .nl.sel{background:var(--soft)}
 html.wide .mc.sel{background-color:var(--soft);box-shadow:inset 0 0 0 1px var(--ink)}
 html.wide .wr.sel{background:var(--soft)}
@@ -328,13 +329,39 @@ html.wide #view2{display:block;flex:1;min-width:0;overflow-y:auto;overflow-x:hid
 .rvc button small{font-size:10px;color:var(--mut);margin-left:2px}
 .rvc button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .rvc button.on small{color:var(--paper);opacity:.7}
+.a1s{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:end;margin:10px 0 6px}
+.a1s .a1big{font-size:38px;font-weight:700;line-height:1;letter-spacing:-.02em}.a1s .a1big small{font-size:14px;font-weight:500;color:var(--mut);margin-left:2px}
+.a1s .a1sub{font-size:12px;color:var(--mut);line-height:1.5;text-align:right}
+.a1p{height:6px;background:var(--faint);border-radius:3px;overflow:hidden;margin:8px 0 12px}.a1p i{display:block;height:100%;background:var(--ink);border-radius:3px}
+.a1b{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end;height:64px;margin:4px 0 2px}
+.a1b div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:9px;color:var(--mut);gap:3px}
+.a1b div i{display:block;width:100%;border-radius:2px 2px 0 0;min-height:2px}
+.a1m{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px}
+.a1m button{font-size:11px;border:1px solid var(--faint);border-radius:99px;padding:4px 9px;color:var(--ink);background:var(--paper);display:inline-flex;align-items:center;gap:5px}
+.a1m button i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.a1m button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.a1f{display:flex;gap:6px;margin:10px 0 4px}.a1f button{font-size:11.5px;border:1px solid var(--faint);border-radius:99px;padding:4px 11px;color:var(--mut)}.a1f button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.a1h{font-size:10px;letter-spacing:.14em;color:var(--mut);margin:16px 0 2px;border-bottom:1px solid var(--faint);padding-bottom:3px}
+.a1l{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}
+html.wide .a1l{grid-template-columns:repeat(4,minmax(0,1fr))}
+.a1l .a1h{grid-column:1/-1}
+.a1r{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--faint);padding:2px 0;min-width:0}
+.a1r .at{flex:1;min-width:0;display:flex;gap:6px;text-align:left;padding:7px 0;align-items:flex-start}
+.a1r .at b{flex:none;width:19px;text-align:right;font-size:11px;color:var(--mut);font-weight:600;padding-top:2px}
+.a1r.dn .at b{color:var(--red)}
+.a1r .at span{flex:1;min-width:0;font-size:13px;line-height:1.4;word-break:keep-all}
+.a1r .ad{flex:none;display:flex;flex-direction:row-reverse;padding-left:3px}
+.a1r .ad u{display:block;width:9px;height:9px;border-radius:50%;margin-left:-4px;box-shadow:0 0 0 1.5px var(--paper);text-decoration:none}
+.a1r .ap{flex:none;width:26px;height:26px;border:1px solid var(--faint);border-radius:50%;font-size:15px;line-height:1;color:var(--mut)}
+.a1g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 12px}
+.a1g div{display:flex;border:1px solid var(--faint);border-radius:10px;overflow:hidden}
+.a1g .mb{flex:1;padding:7px 6px;text-align:left;font-size:12px;display:flex;justify-content:space-between;align-items:center}.a1g .mb i{font-style:normal;font-weight:700}
+.a1g .mn{width:26px;color:var(--mut);border-left:1px solid var(--faint);font-size:15px}
 .rqk .b .sh small{font-size:10px;opacity:.7}
 .rqk .b .sh,.rqk .b .x{font-size:12px;color:var(--mut);padding:6px 6px}
 .rqk .b .x{margin-left:auto}
 .qbar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;margin:8px 0 6px}.qbar i{display:block;height:100%;background:var(--ink)}
 .qbar.w i{background:#c98a1b}.qbar.d i{background:var(--red)}
-/* 맥북·PC 앱 창: 위아래 여백을 같게. 터치 기기(아이폰·아이패드)는 해당 없음 */
-@media(min-width:500px) and (hover:hover) and (pointer:fine){html,body{overflow:hidden}body{padding:16px 0}#app,html.wide #app{margin:0 auto;height:min(calc(100dvh - 32px),880px)}html.wide #app{height:min(calc(100dvh - 32px),980px)}}
 @media print{#hd,#tabs,#strip{display:none}#app{height:auto}#view{overflow:visible}}
 </style>
 </head>
@@ -375,8 +402,7 @@ const MS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC
 const EN=['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const NOW=ymd(new Date());
 const HF={'01-01':'신정','03-01':'삼일절','05-05':'어린이날','06-06':'현충일','08-15':'광복절','10-03':'개천절','10-09':'한글날','12-25':'성탄절'};
-const H26={'2026-02-16':'설날 연휴','2026-02-17':'설날','2026-02-18':'설날 연휴','2026-03-02':'대체공휴일','2026-05-24':'부처님오신날','2026-05-25':'대체공휴일','2026-06-03':'지방선거','2026-08-17':'대체공휴일','2026-09-24':'추석 연휴','2026-09-25':'추석','2026-09-26':'추석 연휴','2026-10-05':'대체공휴일',
-'2027-02-06':'설날 연휴','2027-02-07':'설날','2027-02-08':'설날 연휴','2027-02-09':'대체공휴일','2027-05-01':'노동절','2027-05-03':'대체공휴일','2027-05-13':'부처님오신날','2027-07-17':'제헌절','2027-07-19':'대체공휴일','2027-08-16':'대체공휴일','2027-09-14':'추석 연휴','2027-09-15':'추석','2027-09-16':'추석 연휴','2027-10-04':'대체공휴일','2027-10-11':'대체공휴일','2027-12-27':'대체공휴일'};
+const H26={'2026-02-16':'설날 연휴','2026-02-17':'설날','2026-02-18':'설날 연휴','2026-03-02':'대체공휴일','2026-05-24':'부처님오신날','2026-05-25':'대체공휴일','2026-06-03':'지방선거','2026-08-17':'대체공휴일','2026-09-24':'추석 연휴','2026-09-25':'추석','2026-09-26':'추석 연휴','2026-10-05':'대체공휴일'};
 const hol=k=>H26[k]||HF[k.slice(5)]||'';
 /* ---------- icons ---------- */
 const ICONS={
@@ -409,7 +435,7 @@ all(){return new Promise(res=>{const o={};if(!idb.db)return res(o);try{const r=i
 const nd=()=>({wx:'',dl:'',slH:'',slM:'',slS:'',mA:0,mP:0,mv:'',ex:'',stand:'',steps:'',rd:0,pl:0,pp:[],memo:'',ph:[],habits:{}});
 const fix=d=>{const b=nd();Object.keys(b).forEach(k=>{if(d[k]==null)d[k]=b[k]});return d};
 const defHabits=()=>[{id:'h1',n:'Sleep',ic:'bed',auto:'sl'},{id:'h2',n:'Walk',ic:'walk',auto:'st'},{id:'h3',n:'Workout',ic:'dumbbell'},{id:'h4',n:'Drink water',ic:'drop'},{id:'h5',n:'Mood',ic:'heart',auto:'md'},{id:'h6',n:'Reading',ic:'book',auto:'rd'},{id:'h7',n:'Journal',ic:'doc',auto:'jn'},{id:'hdl',n:'Daylight',ic:'sun',auto:'dl'},{id:'h8',n:'Night',ic:'moon'}];
-const mkNew=()=>({title:'My Diary',habits:defHabits(),cats:['책','취미','관람','여행','장소','일상'],days:{},notes:[],goals:[],memo:{},wl:{},rv:{},rg:{mv:500,ex:30,st:12,slT:90,stT:6000,mdT:4,dlT:30,slH:75,stH:4000,dlH:15},gcal:[]});
+const mkNew=()=>({title:'My Diary',habits:defHabits(),cats:['책','취미','관람','여행','장소','일상'],days:{},notes:[],goals:[],memo:{},wl:{},rv:{},rg:{mv:500,ex:30,st:12,slT:90,stT:6000,mdT:4,dlT:30,slH:75,stH:4000,dlH:15},gcal:[],a100:{}});
 function norm(d){const b=mkNew();d=d||{};Object.keys(b).forEach(k=>{if(d[k]==null)d[k]=b[k]});
  d.rg=Object.assign({},b.rg,d.rg);
  d.cats=d.cats.map(c=>c==='감상'?'여행':c).filter((c,i,a)=>a.indexOf(c)===i);
@@ -459,7 +485,7 @@ function mkSample(){
 const S={mode:'sample',theme:'light',d:null,view:'month',cur:NOW,hist:[],nc:null,nid:null,logIc:'📝',hau:'',lay:'auto',ai:{range:'all',anon:true,memo:false,cy:false},mm:'text',rf:null,pk:null,cb:null,hid:null,hic:'star'};
 let PH={};
 S.nf={a:'',r:''};S.ny='';S.nq='';
-const TABS=['year','month','week','day','tri','review','notes','habit','goal','setting'],TABN={tri:'3 years'};
+const TABS=['year','a100','month','week','day','tri','review','notes','habit','goal','setting'],TABN={tri:'3 years',a100:'100'};
 const gd=k=>S.d.days[k]||null;
 const wd=k=>S.d.days[k]||(S.d.days[k]=nd());
 const written=d=>!!d&&!!(d.wx||d.dl||d.slH||d.slM||d.slS||d.mA||d.mP||d.mv||d.ex||d.stand||d.steps||d.rd||d.pl||(d.pp&&d.pp.length)||d.memo||(d.ph&&d.ph.length));
@@ -830,23 +856,55 @@ function vReviewY(y){
  h+='<div class="lbr"><span class="lb" style="font-size:11px;letter-spacing:.08em">MONTHLY REVIEWS · 모아 보기</span></div>';
  const F=[['book','📚','BOOK','읽은 책'],['video','🎬','VIDEO','본 영상'],['event','⚡','EVENT','기억에 남는 일'],['place','📍','PLACE','가 본 곳'],['spend','💳','SPEND','지출']],data={};
  F.forEach(f=>{const L=[];for(let m=0;m<12;m++){const mk=y+'-'+pad(m+1),o=S.d.rv[mk],t=o&&o[f[0]];if(t&&t.trim())L.push('<button class="wrv" data-a="openRv" data-d="'+mk+'-01"><small>'+MS[m]+'</small><span>'+esc(t)+'</span></button>')}data[f[0]]=L});
- {const L=[],LY=[];Object.keys(S.d.days).filter(k=>k.indexOf(y+'-')===0).sort().forEach(k=>{const m=S.d.days[k].memo||'';if(m.indexOf('Q. ')<0)return;
+ {const L=[];Object.keys(S.d.days).filter(k=>k.indexOf(y+'-')===0).sort().forEach(k=>{const m=S.d.days[k].memo||'';if(m.indexOf('Q. ')<0)return;
    const ls=m.split('\n');for(let i=0;i<ls.length;i++){const ln=ls[i];if(ln.indexOf('Q. ')!==0)continue;const q=ln.slice(3);if(!Object.keys(RQD).some(c=>RQD[c].indexOf(q)>=0))continue;
     let a=[];for(let t=i+1;t<ls.length;t++){if(ls[t].trim()===''&&a.length)break;if(ls[t].trim()==='')continue;a.push(ls[t].indexOf('A. ')===0&&!a.length?ls[t].slice(3):ls[t])}
-    (RQD.ye.indexOf(q)>=0?LY:L).push('<button class="wrv" data-a="goDay" data-d="'+k+'"><small>'+k.slice(5).replace('-','.')+'</small><span><i style="font-style:normal;color:var(--mut);font-size:11.5px">'+esc(q)+'</i><br>'+(a.join(' ').trim()?esc(a.join('\n').trim()):'<i style="font-style:normal;color:var(--mut)">(아직 답이 없어요)</i>')+'</span></button>')}});
-  data.qa=L;data.qy=LY}
+    L.push('<button class="wrv" data-a="goDay" data-d="'+k+'"><small>'+k.slice(5).replace('-','.')+'</small><span><i style="font-style:normal;color:var(--mut);font-size:11.5px">'+esc(q)+'</i><br>'+(a.join(' ').trim()?esc(a.join('\n').trim()):'<i style="font-style:normal;color:var(--mut)">(아직 답이 없어요)</i>')+'</span></button>')}});
+  data.qa=L}
  const cur=S.rvc&&data[S.rvc]?S.rvc:'';
- const F2=F.concat([['qa','💭','질문',''],['qy','🎄','연말 질문','']]);
- h+='<div class="rvc">'+F2.map(f=>'<button class="'+(cur===f[0]?'on':'')+'" data-a="rvCat" data-c="'+f[0]+'">'+f[1]+' '+f[2]+' <small>'+data[f[0]].length+'</small></button>').join('')+'</div>';
- if(cur){const f=F2.find(x=>x[0]===cur);h+='<div class="sec wsec"><span class="lb">'+f[1]+' '+f[2]+(f[3]?' · '+f[3]:'')+' · '+y+'</span>'+(data[cur].length?data[cur].join(''):'<div class="emp">아직 적은 게 없어요.</div>')+'</div>'}
+ h+='<div class="rvc">'+F.concat([['qa','💭','연말 질문','']]).map(f=>'<button class="'+(cur===f[0]?'on':'')+'" data-a="rvCat" data-c="'+f[0]+'">'+f[1]+' '+(f[2]==='연말 질문'?'질문 답':f[2])+' <small>'+data[f[0]].length+'</small></button>').join('')+'</div>';
+ if(cur){const f=F.concat([['qa','💭','질문 답','']]).find(x=>x[0]===cur);h+='<div class="sec wsec"><span class="lb">'+f[1]+' '+f[2]+(f[3]?' · '+f[3]:'')+' · '+y+'</span>'+(data[cur].length?data[cur].join(''):'<div class="emp">아직 적은 게 없어요.</div>')+'</div>'}
  else h+='<div class="emp">버튼을 누르면 올해 적은 내용을 모아서 보여 줘요.</div>';
  return h;
 }
-const VIEWS={year:vYear,month:vMonth,week:vWeek,day:vDay,tri:vTri,review:vReview,notes:vNotes,habit:vHabit,goal:vGoal,setting:vSetting};
+
+/* ---------- 100 ACTIONS ---------- */
+const A1C=['#6c8ebf','#9b8ec7','#e29aa8','#a8c66c','#5fae7a','#3fb0a8','#4aa3d8','#f0a03c','#d9703c','#b5503c','#8c6b4f','#5a5a6e'];
+function a1y(){if(S.ay)return S.ay;const ys=Object.keys(S.d.a100||{}).map(Number).sort(),cy=P(NOW).getFullYear();return S.ay=ys.length?(ys.indexOf(cy)>=0?cy:ys[ys.length-1]):(P(NOW).getMonth()>=10?cy+1:cy)}
+function a1m(){if(S.amk)return S.amk;const y=a1y(),t=P(NOW);return y===t.getFullYear()?t.getMonth()+1:y>t.getFullYear()?1:12}
+function aList(create){const y=a1y();if(!S.d.a100)S.d.a100={};if(!S.d.a100[y]&&create)S.d.a100[y]={items:[]};return S.d.a100[y]||{items:[]}}
+function a1dots(it){return it.m.slice().sort((a,b)=>a-b).map(m=>'<u style="background:'+A1C[m-1]+'"></u>').join('')}
+function vA100(){
+ const y=a1y(),L=aList(false),its=L.items,am=a1m();its.forEach(x=>{x.m=x.m.filter((v,k,a)=>a.indexOf(v)===k)});const tot=its.length,done=its.filter(x=>x.m.length).length,marks=its.reduce((a,x)=>a+x.m.length,0),pct=tot?Math.round(done/tot*100):0;
+ const cnt=Array(12).fill(0);its.forEach(x=>x.m.forEach(m=>cnt[m-1]++));const mx=Math.max.apply(null,cnt.concat([1]));
+ const f=S.af||'all';
+ let h='<div class="ttl"><h1>100<small>ACTIONS · '+y+'</small></h1><div class="pn"><button data-a="ayStep" data-n="-1">◂ '+(y-1)+'</button><i></i><button data-a="ayStep" data-n="1">'+(y+1)+' ▸</button></div></div><hr class="rule">';
+ h+='<div class="a1s"><div class="a1big">'+pct+'<small>%</small></div><div class="a1sub">'+done+' / '+tot+'개 달성<br>총 '+marks+'번 했어요'+(tot&&tot<100?' · 목록 '+tot+'/100':'')+'</div></div><div class="a1p"><i style="width:'+pct+'%"></i></div>';
+ h+='<div class="a1b">'+cnt.map((c,i)=>'<div><i style="height:'+Math.round(c/mx*100)*0.46+'px;background:'+A1C[i]+'"></i>'+(i+1)+'</div>').join('')+'</div>';
+ h+='<span class="lb" style="margin-top:10px">표시할 달 · 항목 오른쪽 버튼을 누르면 이 달 달성, 한 번 더 누르면 취소돼요</span><div class="a1m">'+A1C.map((c,i)=>'<button class="'+(am===i+1?'on':'')+'" data-a="amSel" data-m="'+(i+1)+'"><i style="background:'+c+'"></i>'+(i+1)+'월</button>').join('')+'</div>';
+ h+='<div class="a1f">'+[['all','전체'],['todo','못 한 것'],['mon',am+'월에 한 것']].map(a=>'<button class="'+(f===a[0]?'on':'')+'" data-a="afSet" data-f="'+a[0]+'">'+a[1]+'</button>').join('')+'</div>';
+ const rows=[];its.forEach((it,i)=>{if(f==='todo'&&it.m.length)return;if(f==='mon'&&it.m.indexOf(am)<0)return;rows.push([it,i])});
+ if(!its.length)h+='<div class="emp" style="margin:18px 0">'+y+'년에 하고 싶은 일을 적어 보세요. 이미 적어 둔 목록이 있다면 아래 ‘붙여넣기’로 한꺼번에 넣을 수 있어요.</div>';
+ else if(!rows.length)h+='<div class="emp" style="margin:18px 0">해당하는 항목이 없어요.</div>';
+ let lastG=-1;h+='<div class="a1l">';
+ rows.forEach(x=>{const it=x[0],i=x[1],g=Math.floor(i/25),on=it.m.indexOf(am)>=0;if(f==='all'&&g!==lastG){lastG=g;h+='<div class="a1h">'+(g*25+1)+' – '+(g*25+25)+'</div>'}
+  h+='<div class="a1r'+(it.m.length?' dn':'')+'"><button class="at" data-a="aEdit" data-id="'+it.id+'"><b>'+(i+1)+'</b><span>'+esc(it.t)+'</span></button><div class="ad">'+a1dots(it)+'</div><button class="ap" data-a="aPlus" data-id="'+it.id+'" aria-label="'+am+'월 '+(on?'취소':'달성')+'" style="'+(on?'background:'+A1C[am-1]+';border-color:'+A1C[am-1]+';color:#fff':'color:'+A1C[am-1]+';border-color:'+A1C[am-1])+'">'+(on?'✓':'＋')+'</button></div>'});
+ h+='</div>';
+ h+='<form class="addf" data-form="a100" style="margin-top:12px"><input placeholder="+ 항목 추가" enterkeyhint="done"><button class="go">↵</button></form>';
+ h+='<div class="gr" style="margin-top:10px"><button class="btn sm" data-a="aBulk">📋 붙여넣기로 한꺼번에 추가</button></div>';
+ return h;
+}
+function a1sheet(id){
+ const it=aList(false).items.find(x=>x.id===id);if(!it)return;
+ const c=Array(12).fill(0);it.m.forEach(m=>c[m-1]=1);
+ sheet('<h3>'+(aList(false).items.indexOf(it)+1)+'번 항목</h3><textarea class="fld" id="an" rows="2" style="width:100%;resize:none">'+esc(it.t)+'</textarea><span class="lb" style="margin-top:12px">달성한 달 · 눌러서 표시, 한 번 더 누르면 취소</span><div class="a1g">'+c.map((n,i)=>'<div><button class="mb" data-a="aM" data-id="'+id+'" data-m="'+(i+1)+'" style="'+(n?'background:'+A1C[i]+'33;':'')+'"><span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:'+A1C[i]+';display:inline-block"></span>'+(i+1)+'월</span><i>'+(n?'✓':'')+'</i></button></div>').join('')+'</div><div class="gr"><button class="btn blk" data-a="aSave" data-id="'+id+'">저장</button><button class="btn" data-a="aDel" data-id="'+id+'" style="color:var(--red);border-color:var(--red)">삭제</button><button class="btn" data-a="closeSh">닫기</button></div>');
+}
+function aParse(t){return t.split(/\r?\n/).map(l=>l.replace(/^\s*(?:\d{1,3}\s*[.)\]:]|[-•·*])\s*/,'').trim()).filter(Boolean)}
+const VIEWS={a100:vA100,year:vYear,month:vMonth,week:vWeek,day:vDay,tri:vTri,review:vReview,notes:vNotes,habit:vHabit,goal:vGoal,setting:vSetting};
 /* ---------- render ---------- */
 function autosize(el){el.style.height='auto';el.style.height=Math.max(26,el.scrollHeight)+'px'}
 let LAYW=false,R2K='',LW0=0;
-const SOLO=['goal','setting'];
+const SOLO=['goal','setting','a100'];
 const paneL=()=>!LAYW?VIEWS[S.view]():S.view==='notes'?vNotes(true):(S.view==='day'||S.view==='tri')?vTri():VIEWS[S.view]();
 function paneR(){
  if(S.view==='review'){const y=P(S.cur).getFullYear();return '<div class="ttl"><h1>Year<small>'+y+'</small></h1><div class="pn"><button data-a="yPrev">◂ '+(y-1)+'</button><i></i><button data-a="yNext">'+(y+1)+' ▸</button></div></div><hr class="rule">'+vReviewY(y)}
@@ -869,7 +927,7 @@ function refreshRight(){if(!LAYW||S.view!=='review')return;clearTimeout(refreshR
  const v2=$('#view2'),t=v2.scrollTop;v2.innerHTML=paneR();v2.scrollTop=t;v2.querySelectorAll('textarea').forEach(autosize)},60)}
 function render(keep){
  const v=$('#view'),v2=$('#view2'),top=keep?v.scrollTop:0,k2=S.cur+'|'+S.view,top2=keep&&R2K===k2?v2.scrollTop:0;
- const solo=LAYW&&SOLO.indexOf(S.view)>=0;document.documentElement.classList.toggle('solo',solo);document.documentElement.classList.toggle('wide',LAYW);document.documentElement.classList.toggle('one',S.lay==='one');
+ const solo=LAYW&&SOLO.indexOf(S.view)>=0;document.documentElement.classList.toggle('solo',solo);document.documentElement.classList.toggle('wide',LAYW);document.documentElement.classList.toggle('a100',S.view==='a100');document.documentElement.classList.toggle('one',S.lay==='one');
  v.innerHTML=paneL();
  if(LAYW&&!solo){v2.innerHTML=paneR();R2K=k2}else{v2.innerHTML='';R2K=''}
  v.querySelectorAll('textarea').forEach(autosize);v2.querySelectorAll('textarea').forEach(autosize);
@@ -1210,6 +1268,16 @@ const A={
  goWk(el){closeSh();S.cur=el.dataset.d;go('week')},
  openRv(el){closeSh();S.cur=el.dataset.d;S.nid=null;S.rvm='m';go('review')},
  rvCat(el){S.rvc=S.rvc===el.dataset.c?'':el.dataset.c;render(true)},
+ ayStep(el){S.ay=a1y()+ +el.dataset.n;S.amk=null;S.af='all';render(false)},
+ amSel(el){S.amk=+el.dataset.m;render(true)},
+ afSet(el){S.af=el.dataset.f;render(true)},
+ aPlus(el){const it=aList(false).items.find(x=>x.id===el.dataset.id);if(!it)return;const m=a1m(),i=it.m.indexOf(m);if(i>=0)it.m.splice(i,1);else it.m.push(m);save();render(true)},
+ aEdit(el){a1sheet(el.dataset.id)},
+ aM(el){const it=aList(false).items.find(x=>x.id===el.dataset.id);if(!it)return;const t=($('#an').value||'').trim();if(t)it.t=t;const m=+el.dataset.m;const k=it.m.indexOf(m);if(k>=0)it.m.splice(k,1);else it.m.push(m);save();a1sheet(it.id);render(true)},
+ aSave(el){const it=aList(false).items.find(x=>x.id===el.dataset.id);if(it){const t=($('#an').value||'').trim();if(t)it.t=t}save();closeSh();render(true)},
+ aDel(el){const id=el.dataset.id;ask('이 항목을 삭제할까요?','삭제',()=>{const L=aList(false);L.items=L.items.filter(x=>x.id!==id);save();closeSh();render(true)})},
+ aBulk(){sheet('<h3>한꺼번에 추가</h3><p class="emp" style="margin:0 0 8px">한 줄에 하나씩 붙여 넣으세요. 줄 앞의 번호(1. 2) 등)는 자동으로 떼요.</p><textarea class="fld" id="ab" rows="10" style="width:100%" placeholder="아침에 10분 스트레칭하기&#10;주 1회 산책하기&#10;…"></textarea><div class="gr" style="margin-top:10px"><button class="btn blk" data-a="aBulkGo">추가</button><button class="btn" data-a="closeSh">취소</button></div>')},
+ aBulkGo(){const ls=aParse($('#ab').value||'');if(!ls.length)return;const L=aList(true);ls.forEach(t=>L.items.push({id:uid(),t:t,m:[]}));save();closeSh();render(true)},
  yPrev(){S.cur=shiftM(S.cur,-12);render(true)},
  yNext(){S.cur=shiftM(S.cur,12);render(true)},
  rvMode(el){S.rvm=el.dataset.m==='y'?'y':'m';render(true)},
@@ -1330,6 +1398,7 @@ document.addEventListener('submit',e=>{
  if(k==='pp'){const d=wd(S.cur);if(d.pp.indexOf(v)<0)d.pp.push(v);S.rf='form[data-form=pp] input'}
  else if(k==='goal'){S.d.goals.push({id:uid(),scope:f.dataset.scope,key:f.dataset.key,t:v,d:false});S.rf='form[data-form=goal][data-scope='+f.dataset.scope+'] input'}
  else if(k==='cat'){if(S.d.cats.indexOf(v)<0)S.d.cats.push(v);S.rf='form[data-form=cat] input'}
+ else if(k==='a100'){aList(true).items.push({id:uid(),t:v,m:[]});S.rf='form[data-form=a100] input'}
  save();render(true);
 });
 document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});
@@ -1355,7 +1424,7 @@ function syncUi(){
 }
 const shardOf=k=>k.indexOf('d:')===0?'days/'+k.slice(2,9)+'.json':k.indexOf('n:')===0?'notes.json':k==='c'?'gcal.json':'misc.json';
 const isShard=p=>p==='notes.json'||p==='misc.json'||p==='gcal.json'||/^days\/\d{4}-\d{2}\.json$/.test(p);
-function units(){const d=S.d,u={};Object.keys(d.days).forEach(k=>{u['d:'+k]=d.days[k]});d.notes.forEach(n=>{u['n:'+n.id]=n});d.goals.forEach(g=>{u['g:'+g.id]=g});Object.keys(d.memo).forEach(k=>{u['m:'+k]=d.memo[k]});Object.keys(d.wl).forEach(k=>{u['w:'+k]=d.wl[k]});Object.keys(d.rv).forEach(k=>{u['r:'+k]=d.rv[k]});u.s={title:d.title,habits:d.habits,cats:d.cats,rg:d.rg};u.c=d.gcal||[];return u}
+function units(){const d=S.d,u={};Object.keys(d.days).forEach(k=>{u['d:'+k]=d.days[k]});d.notes.forEach(n=>{u['n:'+n.id]=n});d.goals.forEach(g=>{u['g:'+g.id]=g});Object.keys(d.memo).forEach(k=>{u['m:'+k]=d.memo[k]});Object.keys(d.wl).forEach(k=>{u['w:'+k]=d.wl[k]});Object.keys(d.rv).forEach(k=>{u['r:'+k]=d.rv[k]});Object.keys(d.a100||{}).forEach(k=>{u['a:'+k]=d.a100[k]});u.s={title:d.title,habits:d.habits,cats:d.cats,rg:d.rg};u.c=d.gcal||[];return u}
 function track(){
  const u=units();let now=parseInt(ls.g('diary.v2.edit'),10)||Date.now();
  Object.keys(u).forEach(k=>{const h=hs(u[k]);if(SY.h[k]!==h){SY.h[k]=h;SY.ts[k]=SY.fresh&&SY.ts[k]===undefined?0:now;delete SY.tomb[k]}});
@@ -1368,6 +1437,7 @@ function applyUnit(key,val,del){
  else if(t==='d:'){if(del)delete d.days[id];else d.days[id]=fix(val)}
  else if(t==='n:'){d.notes=d.notes.filter(x=>x.id!==id);if(!del)d.notes.push(val)}
  else if(t==='g:'){d.goals=d.goals.filter(x=>x.id!==id);if(!del)d.goals.push(val)}
+ else if(t==='a:'){if(!d.a100)d.a100={};if(del)delete d.a100[id];else d.a100[id]=val}
  else{const m=t==='m:'?d.memo:t==='w:'?d.wl:d.rv;if(del)delete m[id];else m[id]=val}
 }
 async function gh(method,path,body,accept){
